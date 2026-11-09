@@ -780,7 +780,7 @@ pub fn table_to_doc(df: &DataFrame, shape: Shape, format: Format, table_name: &s
 /// sanitising is needed beyond dropping whitespace and any extension the sheet title
 /// carries (a sheet is usually named after its file).
 fn toml_table_name(name: &str) -> String {
-    let stem = name.rsplit('/').next().unwrap_or(name);
+    let stem = name.rsplit(std::path::is_separator).next().unwrap_or(name);
     let stem = stem.split('.').next().unwrap_or(stem);
     let cleaned: String = stem
         .trim()
@@ -1219,5 +1219,16 @@ mod tests {
     fn key_value_shape_needs_two_columns() {
         let (df, _) = state(r#"[{"a":1,"b":2,"c":3}]"#, Format::Json);
         assert!(table_to_doc(&df, Shape::KeyValue, Format::Json, "x").is_err());
+    }
+
+    #[test]
+    fn a_toml_table_is_named_after_the_file_stem() {
+        assert_eq!(toml_table_name("data/orders.json"), "orders");
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn a_toml_table_is_named_after_the_file_stem_of_a_windows_path() {
+        assert_eq!(toml_table_name(r"C:\data\orders.json"), "orders");
     }
 }

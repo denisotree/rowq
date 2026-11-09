@@ -727,17 +727,7 @@ impl App {
     pub(super) fn saving_autocomplete(&mut self) {
         let input = self.save.input.as_str().to_owned();
 
-        let path = std::path::Path::new(&input);
-        let (dir, prefix) = if input.ends_with('/') {
-            (path, "")
-        } else {
-            let dir = path.parent().unwrap_or(std::path::Path::new("."));
-            let prefix = path
-                .file_name()
-                .map(|f| f.to_str().unwrap_or(""))
-                .unwrap_or("");
-            (dir, prefix)
-        };
+        let (dir, prefix) = crate::app::split_path_input(&input);
 
         let dir_str = if dir == std::path::Path::new("") {
             std::path::Path::new(".")

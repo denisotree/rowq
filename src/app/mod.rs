@@ -2700,7 +2700,7 @@ impl App {
         // Resolve editor command
         let editor = std::env::var("EDITOR")
             .or_else(|_| std::env::var("VISUAL"))
-            .unwrap_or_else(|_| "vi".to_string());
+            .unwrap_or_else(|_| if cfg!(windows) { "notepad" } else { "vi" }.to_string());
 
         let status = std::process::Command::new(&editor).arg(&tmp_path).status();
 
@@ -3016,14 +3016,7 @@ impl App {
 
     fn join_path_autocomplete(&mut self) {
         let input = self.join.path_input.as_str().to_owned();
-        let path = std::path::Path::new(&input);
-        let (dir, prefix) = if input.ends_with('/') {
-            (path, "")
-        } else {
-            let dir = path.parent().unwrap_or(std::path::Path::new("."));
-            let prefix = path.file_name().and_then(|f| f.to_str()).unwrap_or("");
-            (dir, prefix)
-        };
+        let (dir, prefix) = split_path_input(&input);
         let dir_str = if dir == std::path::Path::new("") {
             std::path::Path::new(".")
         } else {
@@ -3099,18 +3092,29 @@ pub const OPEN_AS_FORMATS: [crate::data::doc::Format; 4] = [
     crate::data::doc::Format::Toml,
 ];
 
-/// Expand a leading `~` to the user's home directory.
+/// Expand a leading `~` to the user's home directory: `~`, `~/x`, and on Windows `~\x`.
 pub fn expand_tilde(input: &str) -> std::path::PathBuf {
-    if let Some(rest) = input.strip_prefix("~/") {
-        if let Ok(home) = std::env::var("HOME") {
-            return std::path::PathBuf::from(home).join(rest);
-        }
-    } else if input == "~" {
-        if let Ok(home) = std::env::var("HOME") {
-            return std::path::PathBuf::from(home);
+    if let Some(rest) = input.strip_prefix('~') {
+        if rest.is_empty() || rest.starts_with(std::path::is_separator) {
+            if let Some(home) = std::env::home_dir() {
+                return home.join(rest.trim_start_matches(std::path::is_separator));
+            }
         }
     }
     std::path::PathBuf::from(input)
+}
+
+/// Split typed path input into the directory to list and the name prefix to complete.
+/// Input ending in a separator — `/`, or `\` too on Windows — completes inside that
+/// directory; a bare name gives an empty directory, which callers read as `.`.
+pub fn split_path_input(input: &str) -> (&std::path::Path, &str) {
+    let path = std::path::Path::new(input);
+    if input.ends_with(std::path::is_separator) {
+        return (path, "");
+    }
+    let dir = path.parent().unwrap_or(std::path::Path::new("."));
+    let prefix = path.file_name().and_then(|f| f.to_str()).unwrap_or("");
+    (dir, prefix)
 }
 
 fn longest_common_prefix(strs: &[String]) -> String {
