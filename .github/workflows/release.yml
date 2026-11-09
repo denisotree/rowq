@@ -4,12 +4,14 @@ on:
   push:
     tags:
       - 'v[0-9]*'
+  # Builds every target and uploads the archives to the run, nothing more: no GitHub
+  # Release and no APT publish. For checking a build (the Windows zip) without a tag.
+  workflow_dispatch: {}
 
 env:
   CARGO_TERM_COLOR: always
   BIN_NAME: rowq
   CARGO_INCREMENTAL: "0"
-  RUSTFLAGS: "-C debuginfo=0"
 
 jobs:
   build:
@@ -41,6 +43,13 @@ jobs:
             target: aarch64-apple-darwin
             archive: tar.gz
             cargo_build_jobs: "2"
+          # The static CRT links the MSVC runtime in, so the .exe runs on a Windows
+          # without the VC++ Redistributable. Per entry and not in `env`: a global
+          # RUSTFLAGS would apply it to every target.
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            archive: zip
+            rustflags: "-C debuginfo=0 -C target-feature=+crt-static"
     steps:
       - uses: actions/checkout@v7
 
@@ -64,6 +73,7 @@ jobs:
       - name: Build
         env:
           CARGO_BUILD_JOBS: ${{ matrix.cargo_build_jobs || '2' }}
+          RUSTFLAGS: ${{ matrix.rustflags || '-C debuginfo=0' }}
         run: cargo build --release --locked --target ${{ matrix.target }}
 
       - name: Package (Unix)
@@ -74,9 +84,40 @@ jobs:
           STAGING="${BIN_NAME}-${TAG}-${{ matrix.target }}"
           mkdir "$STAGING"
           cp "target/${{ matrix.target }}/release/${BIN_NAME}" "$STAGING/"
+          # cargo-binstall expects every binary the crate declares in the archive.
+          cp "target/${{ matrix.target }}/release/${BIN_NAME}-mcp" "$STAGING/"
           cp README.md LICENSE "$STAGING/"
           tar -czf "${STAGING}.tar.gz" "$STAGING"
           echo "ASSET=${STAGING}.tar.gz" >> "$GITHUB_ENV"
+
+      - name: Package (Windows)
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        run: |
+          $tag = "$env:GITHUB_REF_NAME"
+          $staging = "$env:BIN_NAME-$tag-${{ matrix.target }}"
+          New-Item -ItemType Directory -Path $staging | Out-Null
+          # rowq-mcp.exe: the MCP server alone, built for the GUI subsystem, so clients
+          # without a console start it without a console window appearing.
+          Copy-Item "target/${{ matrix.target }}/release/$env:BIN_NAME.exe" $staging
+          Copy-Item "target/${{ matrix.target }}/release/$env:BIN_NAME-mcp.exe" $staging
+          Copy-Item README.md, LICENSE $staging
+          # -Path of the directory itself, so the zip holds it as the tarballs do.
+          Compress-Archive -Path $staging -DestinationPath "$staging.zip"
+          "ASSET=$staging.zip" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      # Import names are plain ASCII in a PE file: finding the VC++ runtime's DLL name
+      # means the static CRT did not take, and the .exe would not start without it.
+      - name: Static CRT check
+        if: matrix.archive == 'zip'
+        shell: pwsh
+        run: |
+          $exes = "target/${{ matrix.target }}/release/$env:BIN_NAME.exe",
+                  "target/${{ matrix.target }}/release/$env:BIN_NAME-mcp.exe"
+          if (Select-String -Path $exes -Pattern 'VCRUNTIME140' -SimpleMatch -Quiet) {
+            Write-Error "an .exe imports VCRUNTIME140.dll: the static CRT is not in effect"
+            exit 1
+          }
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
@@ -108,6 +149,7 @@ jobs:
   release:
     name: Create GitHub Release
     needs: build
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -149,6 +191,7 @@ jobs:
   apt:
     name: APT repository
     needs: release
+    if: github.event_name == 'push'
     permissions:
       contents: write
     uses: ./.github/workflows/apt.yml
