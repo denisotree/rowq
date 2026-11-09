@@ -42,8 +42,9 @@ jobs:
       - name: Build
         run: cargo build --all-targets --locked
 
+      # --no-fail-fast: one failing test binary must not hide the failures in the rest.
       - name: Run tests
-        run: cargo test --locked
+        run: cargo test --locked --no-fail-fast
 
   clippy:
     name: Clippy
