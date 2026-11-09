@@ -33,7 +33,7 @@ fn the_notes_do_not_untap_the_old_tap() {
     }
 }
 
-/// tuitab stays available at 0.11.1 as its own product, so the notes describe rowq as
+/// tuitab stays available at 0.11.2 as its own product, so the notes describe rowq as
 /// something installed next to it, not over it.
 #[test]
 fn the_notes_install_rowq_beside_tuitab() {
@@ -86,4 +86,31 @@ fn rowq_packages_do_not_replace_tuitab() {
     assert!(!std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("packaging/homebrew/formula_renames.json")
         .exists());
+}
+
+/// tuitab is frozen at its last release; the notes that send people to it name that
+/// version, not an earlier one.
+#[test]
+fn the_notes_name_the_frozen_tuitab_release() {
+    const FROZEN: &str = "0.11.2";
+    for path in [
+        "README.md",
+        "docs/en/README.md",
+        "docs/ru/README.md",
+        "packaging/aur/README.md",
+        "packaging/homebrew/README.md",
+        "packaging/debian/control",
+    ] {
+        let text = read(path);
+        assert!(
+            text.contains(FROZEN),
+            "{path} does not name tuitab {FROZEN}"
+        );
+        assert!(!text.contains("0.11.1"), "{path} still names tuitab 0.11.1");
+    }
+    let manifest = read("Cargo.toml");
+    assert!(
+        manifest.contains(&format!("stays at {FROZEN}")),
+        "Cargo.toml .deb description"
+    );
 }

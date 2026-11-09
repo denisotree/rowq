@@ -2,7 +2,7 @@
 
 The tap is the repository **`denisotree/homebrew-rowq`**; it holds `Formula/rowq.rb`, a copy
 of `rowq.rb` from this directory. tuitab, which rowq continues, keeps its own tap
-(`denisotree/homebrew-tuitab`) at 0.11.1, so the two install side by side.
+(`denisotree/homebrew-tuitab`) at 0.11.2, so the two install side by side.
 
 ## User installation
 

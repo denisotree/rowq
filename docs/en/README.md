@@ -6,7 +6,7 @@ SQLite · DuckDB**.
 
 > 🇷🇺 Эта документация также доступна на [русском языке](../ru/README.md).
 
-> rowq continues tuitab, which stays at 0.11.1 — see
+> rowq continues tuitab, which stays at 0.11.2 — see
 > [Coming from tuitab](../../README.md#coming-from-tuitab) to move an existing install.
 
 ## Contents

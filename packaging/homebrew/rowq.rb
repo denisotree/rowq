@@ -2,7 +2,7 @@
 #
 # Lives at Formula/rowq.rb in the tap repository
 #   https://github.com/denisotree/homebrew-rowq
-# (tuitab keeps its own tap, denisotree/homebrew-tuitab, at 0.11.1).
+# (tuitab keeps its own tap, denisotree/homebrew-tuitab, at 0.11.2).
 #
 # Users install via:
 #   brew tap denisotree/rowq

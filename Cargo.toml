@@ -83,7 +83,7 @@ CSV, TSV, JSON, JSONL, YAML, TOML, Markdown, Parquet, Arrow, Excel, SQLite and
 DuckDB. Filtering, sorting, pivot tables, joins, computed columns, statistics
 and charts. JSON, YAML and TOML open as a table over the parsed document, so
 nested data can be browsed, edited and converted between formats. rowq
-continues tuitab, which stays at 0.11.1 and installs side by side with it."""
+continues tuitab, which stays at 0.11.2 and installs side by side with it."""
 # Every entry is a table on purpose: dependabot's TOML library cannot re-emit an
 # array that mixes arrays with tables, and dies on Cargo.toml before it can open
 # an update PR.  Table form is what cargo-deb documents for symlinks anyway.

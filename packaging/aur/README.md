@@ -12,7 +12,7 @@ go in as plain `PKGBUILD` and `.SRCINFO`.
 
 ## Next to tuitab
 
-tuitab, which rowq continues, stays on the AUR at 0.11.1 (`tuitab`, `tuitab-bin`). The
+tuitab, which rowq continues, stays on the AUR at 0.11.2 (`tuitab`, `tuitab-bin`). The
 binaries differ (`tuitab`, `ttab`, `ttb` against `rowq`), so the packages do not
 conflict and install side by side.
 

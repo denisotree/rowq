@@ -17,7 +17,7 @@ leaving the terminal.
 
 </div>
 
-> **rowq continues [tuitab](https://github.com/denisotree/tuitab)**, which stays at 0.11.1.
+> **rowq continues [tuitab](https://github.com/denisotree/tuitab)**, which stays at 0.11.2.
 > Coming from it? See [Coming from tuitab](#coming-from-tuitab).
 
 ```sh
@@ -385,7 +385,7 @@ for every command (column ops, clipboard, dedup, and more).
 ## Coming from tuitab
 
 rowq 1.0.0 continues tuitab: the same engine, developed further under a new name. tuitab
-stays available at 0.11.1 on every channel and keeps working; it gets no further releases.
+stays available at 0.11.2 on every channel and keeps working; it gets no further releases.
 The two install side by side — the commands differ (`tuitab`, `ttab`, `ttb` against `rowq`), and so do the MCP tools (`tuitab_*` against `rowq_*`). To move over, install rowq,
 then remove tuitab when you no longer need it.
 
