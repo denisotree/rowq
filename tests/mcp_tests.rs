@@ -1647,6 +1647,7 @@ fn a_delete_removes_only_the_matched_rows() {
         .query_row("SELECT k FROM other", [], |r| r.get(0))
         .unwrap();
     assert_eq!(other, "untouched", "the neighbouring table is not touched");
+    drop(conn); // Windows will not delete a file that is still open
     std::fs::remove_file(&db).unwrap();
 }
 
@@ -1690,6 +1691,7 @@ fn an_insert_leaves_a_defaulted_column_to_the_schema_and_writes_null_otherwise()
         })
         .unwrap();
     assert_eq!(tier.as_deref(), Some("basic"));
+    drop(conn); // Windows will not delete a file that is still open
     std::fs::remove_file(&db).unwrap();
 }
 
@@ -1722,6 +1724,8 @@ fn alter_adds_drops_and_renames_columns() {
         cols.iter().find(|(n, _)| n == "level").unwrap().1,
         "INTEGER"
     );
+    drop(stmt);
+    drop(conn); // Windows will not delete a file that is still open
     std::fs::remove_file(&db).unwrap();
 }
 
@@ -2212,6 +2216,8 @@ fn a_table_name_with_spaces_around_it_is_trimmed() {
         .map(|r| r.unwrap())
         .collect();
     assert_eq!(names, ["spaced"]);
+    drop(stmt);
+    drop(conn); // Windows will not delete a file that is still open
     std::fs::remove_file(&out).unwrap();
 }
 
