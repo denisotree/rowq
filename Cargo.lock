@@ -4363,6 +4363,7 @@ dependencies = [
  "serde_json",
  "serde_yaml_ng",
  "statrs",
+ "sysinfo",
  "tempfile",
  "toml_edit",
  "unicode-width",

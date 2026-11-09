@@ -104,20 +104,14 @@ pub fn stream_from(budget: u64) -> u64 {
 
 /// Half the machine's physical memory: what may be held in memory by default.
 pub fn memory_budget() -> u64 {
-    #[cfg(unix)]
-    {
-        // SAFETY: sysconf reads a system constant and has no preconditions.
-        let (pages, size) = unsafe {
-            (
-                libc::sysconf(libc::_SC_PHYS_PAGES),
-                libc::sysconf(libc::_SC_PAGESIZE),
-            )
-        };
-        if pages > 0 && size > 0 {
-            return (pages as u64).saturating_mul(size as u64) / 2;
-        }
+    use sysinfo::{MemoryRefreshKind, RefreshKind, System};
+    let sys = System::new_with_specifics(
+        RefreshKind::nothing().with_memory(MemoryRefreshKind::nothing().with_ram()),
+    );
+    match sys.total_memory() {
+        0 => 8 * 1024 * 1024 * 1024,
+        total => total / 2,
     }
-    8 * 1024 * 1024 * 1024
 }
 
 impl Default for Opened {
