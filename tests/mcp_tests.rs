@@ -2,7 +2,7 @@
 //!
 //! Most of these drive `handle_message` directly — it is the whole request path
 //! minus the pipe, so a test gets the same answer a client would without paying
-//! for a process.  One test at the end does spawn the binary, to check the
+//! for a process.  Two tests in "the wire" section do spawn the binaries, to check the
 //! framing and that nothing leaks onto stdout.
 
 use rowq::mcp::{handle_message, Server};
@@ -1154,15 +1154,14 @@ fn jq_on_a_csv_points_at_the_right_tool() {
 
 // ── the wire ────────────────────────────────────────────────────────────────
 
-/// The one test that pays for a process: it checks the newline framing and that
+/// The tests that pay for a process: they check the newline framing and that
 /// nothing but protocol messages reaches stdout.
-#[test]
-fn the_binary_speaks_the_protocol_over_stdio() {
+fn speaks_the_protocol(exe: &str, args: &[&str]) {
     use std::io::Write;
     use std::process::{Command, Stdio};
 
-    let mut child = Command::new(env!("CARGO_BIN_EXE_rowq"))
-        .arg("--mcp")
+    let mut child = Command::new(exe)
+        .args(args)
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -1213,6 +1212,18 @@ fn the_binary_speaks_the_protocol_over_stdio() {
         })
         .collect();
     assert_eq!(ids, vec![1, 2, 3]);
+}
+
+#[test]
+fn the_binary_speaks_the_protocol_over_stdio() {
+    speaks_the_protocol(env!("CARGO_BIN_EXE_rowq"), &["--mcp"]);
+}
+
+/// `rowq-mcp` is the same server on its own — what Windows clients run, because it
+/// opens no console window there.
+#[test]
+fn rowq_mcp_speaks_the_protocol_over_stdio() {
+    speaks_the_protocol(env!("CARGO_BIN_EXE_rowq-mcp"), &[]);
 }
 
 /// An unseeded random operation must report the seed it drew, or its result is

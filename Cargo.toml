@@ -27,6 +27,11 @@ bundled-duckdb = ["duckdb/bundled"]
 name = "rowq"
 path = "src/main.rs"
 
+# The MCP server alone. On Windows it opens no console window: see the file.
+[[bin]]
+name = "rowq-mcp"
+path = "src/bin/rowq-mcp.rs"
+
 [dependencies]
 ratatui = "0.30"
 crossterm = "0.29"

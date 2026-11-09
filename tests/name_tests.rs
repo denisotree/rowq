@@ -36,7 +36,10 @@ fn rowq_packages_declare_nothing_about_qrow() {
     }
 }
 
-/// One command, `rowq`: there is no short alias in any package.
+/// One command, `rowq`: there is no short alias in any package.  The crate also
+/// builds `rowq-mcp` — the MCP server alone, for Windows clients without a console —
+/// and it ships in the release archives (cargo-binstall needs every declared binary
+/// there), but the system packages install `rowq` only.
 #[test]
 fn only_the_rowq_command_ships() {
     let manifest: toml_edit::DocumentMut = read("Cargo.toml").parse().unwrap();
@@ -46,7 +49,19 @@ fn only_the_rowq_command_ships() {
         .iter()
         .map(|b| b["name"].as_str().unwrap())
         .collect();
-    assert_eq!(bins, ["rowq"]);
+    assert_eq!(bins, ["rowq", "rowq-mcp"]);
+    for path in [
+        "packaging/aur/PKGBUILD",
+        "packaging/aur/PKGBUILD-bin",
+        "packaging/homebrew/rowq.rb",
+    ] {
+        assert!(!read(path).contains("rowq-mcp"), "{path} installs rowq-mcp");
+    }
+    let deb_assets = manifest["package"]["metadata"]["deb"]["assets"].to_string();
+    assert!(
+        !deb_assets.contains("rowq-mcp"),
+        "the .deb installs rowq-mcp"
+    );
     assert!(manifest["features"].get("aliases").is_none());
 
     for path in [
