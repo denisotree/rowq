@@ -11,7 +11,7 @@ pub(crate) fn quote_ident(name: &str) -> String {
 }
 
 /// Read one value the way the loader does: `None` for NULL, and the exact string the
-/// rest of qrow will hold.
+/// rest of rowq will hold.
 ///
 /// The drift check has to go through this same function.  `CAST(x AS TEXT)` inside
 /// SQLite is *not* equivalent: SQLite renders a REAL `1.0` as `"1.0"` while Rust's

@@ -1,13 +1,13 @@
 [package]
-name = "qrow"
-version = "1.1.1"
+name = "rowq"
+version = "1.0.0"
 edition = "2021"
 authors = ["denisotree"]
 description = "Query rows in tables, documents and databases from the terminal — CSV, JSON, YAML, TOML, Parquet, Excel, SQLite, DuckDB — with an MCP server that lets AI assistants compute over the same files"
 license = "Apache-2.0"
-repository = "https://github.com/denisotree/qrow"
-homepage = "https://qrow.dev"
-documentation = "https://docs.rs/qrow"
+repository = "https://github.com/denisotree/rowq"
+homepage = "https://rowq.dev"
+documentation = "https://docs.rs/rowq"
 readme = "README.md"
 keywords = ["tui", "data", "mcp", "csv", "sqlite"]
 categories = ["command-line-utilities", "visualization"]
@@ -20,21 +20,12 @@ exclude = [
 ]
 
 [features]
-default = ["bundled-duckdb", "aliases"]
+default = ["bundled-duckdb"]
 bundled-duckdb = ["duckdb/bundled"]
-# Builds `qrw`, a short name for `qrow`.  On by default, so `cargo install` is unchanged;
-# it exists so cargo-binstall, which wants every non-optional binary inside the release
-# archive, accepts an archive that carries `qrow` alone.
-aliases = []
 
 [[bin]]
-name = "qrow"
+name = "rowq"
 path = "src/main.rs"
-
-[[bin]]
-name = "qrw"
-path = "src/bin/qrw.rs"
-required-features = ["aliases"]
 
 [dependencies]
 ratatui = "0.30"
@@ -77,8 +68,7 @@ libm = "0.2"
 rust_decimal = { version = "1.43", default-features = false, features = ["std", "maths"] }
 
 # `.deb` built by cargo-deb in the release workflow and served from the APT
-# repository on qrow.dev.  Only the `qrow` binary ships; `qrw` is a symlink, as in
-# the Homebrew and AUR packages.
+# repository on rowq.dev.
 [package.metadata.deb]
 maintainer = "denisotree <denisotree@users.noreply.github.com>"
 copyright = "2026, denisotree"
@@ -92,26 +82,23 @@ with an MCP server that lets AI assistants compute over the same files. Reads
 CSV, TSV, JSON, JSONL, YAML, TOML, Markdown, Parquet, Arrow, Excel, SQLite and
 DuckDB. Filtering, sorting, pivot tables, joins, computed columns, statistics
 and charts. JSON, YAML and TOML open as a table over the parsed document, so
-nested data can be browsed, edited and converted between formats. Installs
-`qrow` and the short alias `qrw`. qrow continues tuitab, which stays at
-0.11.1 and installs side by side with it."""
+nested data can be browsed, edited and converted between formats. rowq
+continues tuitab, which stays at 0.11.1 and installs side by side with it."""
 # Every entry is a table on purpose: dependabot's TOML library cannot re-emit an
 # array that mixes arrays with tables, and dies on Cargo.toml before it can open
 # an update PR.  Table form is what cargo-deb documents for symlinks anyway.
 assets = [
-    { source = "target/release/qrow", dest = "usr/bin/", mode = "755" },
-    { dest = "usr/bin/qrw", link_name = "qrow" },
-    { source = "README.md", dest = "usr/share/doc/qrow/", mode = "644" },
+    { source = "target/release/rowq", dest = "usr/bin/", mode = "755" },
+    { source = "README.md", dest = "usr/share/doc/rowq/", mode = "644" },
 ]
 
 [package.metadata.docs.rs]
 # Build only for Linux x86_64. Without default features: compiling the bundled DuckDB
-# from C++ needs more than docs.rs's 6 GB build limit (the 1.0.0 and tuitab 0.11.1 builds
-# were killed for memory), and documenting the crate links nothing, so the system
+# from C++ needs more than docs.rs's 6 GB build limit (earlier builds, tuitab 0.11.1
+# among them, were killed for memory), and documenting the crate links nothing, so the system
 # library is never needed. SQLite stays bundled through rusqlite either way.
 targets = ["x86_64-unknown-linux-gnu"]
 no-default-features = true
-features = ["aliases"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 [profile.dev]

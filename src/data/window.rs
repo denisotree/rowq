@@ -374,7 +374,7 @@ pub fn add_window_column(df: &DataFrame, spec: &Spec) -> Result<DataFrame, Strin
         // marker rides along through both sorts and carries every row back to
         // where the table has it, so the answer arrives ordered by date while
         // the table stays as the user left it.
-        let mut marker = "__qrow_window_pos".to_string();
+        let mut marker = "__rowq_window_pos".to_string();
         while visible.column(&marker).is_ok() {
             marker.push('_');
         }

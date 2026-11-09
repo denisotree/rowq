@@ -2,7 +2,7 @@
 
 > 🇷🇺 [Эта страница на русском](../ru/keybindings.md) · [← Documentation index](README.md)
 
-The complete command reference. Press `?` in qrow for a built-in summary. A prefix
+The complete command reference. Press `?` in rowq for a built-in summary. A prefix
 key — `g`, `z`, `y`, `Shift+S` — lists the keys it takes while it waits for the second one.
 All keys below are for **Normal mode** unless noted. Many commands act on the
 **cursor column** or the **selected rows**.

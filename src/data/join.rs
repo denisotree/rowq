@@ -202,15 +202,15 @@ pub fn join_dataframes(
 }
 
 /// What polars appends to a clashing right column, renamed away by [`join_dataframes`].
-const JOIN_SUFFIX: &str = "__qrow_join_right";
+const JOIN_SUFFIX: &str = "__rowq_join_right";
 
 /// The status column of a DIFF result.
 pub const DIFF_COL: &str = "_diff";
 /// Suffix of the column holding the right table's value of a compared column.
 pub const RIGHT_SUFFIX: &str = "_right";
 
-const LEFT_ROW: &str = "__qrow_diff_left_row";
-const RIGHT_ROW: &str = "__qrow_diff_right_row";
+const LEFT_ROW: &str = "__rowq_diff_left_row";
+const RIGHT_ROW: &str = "__rowq_diff_right_row";
 
 /// Row counts per DIFF status, in the order `=`, `~`, `-`, `+`.
 pub fn diff_counts(df: &DataFrame) -> [usize; 4] {
@@ -275,7 +275,7 @@ pub fn diff_dataframes(
     }
     // Polars puts the right table's value of a shared column in `<col>_right`.  A
     // table that already has that name collides, and the way out Polars suggests —
-    // its `suffix` parameter — is not one qrow offers.
+    // its `suffix` parameter — is not one rowq offers.
     for r in &right.columns {
         let shared = !right_keys.contains(&r.name) && left.columns.iter().any(|l| l.name == r.name);
         let suffixed = format!("{}{RIGHT_SUFFIX}", r.name);

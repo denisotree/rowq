@@ -117,18 +117,18 @@ fn column_index(df: &DataFrame, name: &str) -> Result<usize, CallError> {
 pub fn plan(server: &mut Server, args: &Value) -> Result<Value, CallError> {
     // Taken first, and unconditionally: a second call means the model has moved on, and
     // leaving the old plan applicable through a *failed* second call is how
-    // `qrow_write_apply` ends up running something nobody is looking at any more.
+    // `rowq_write_apply` ends up running something nobody is looking at any more.
     let displaced = server.pending.take().map(|p| p.id);
     let src_arg = super::tools::source_arg(args)?;
     if !db_write::is_db_path(&src_arg.path) {
         return Err(CallError::Failed(
-            "qrow_write changes a table in a database. Give a .sqlite or .duckdb source."
+            "rowq_write changes a table in a database. Give a .sqlite or .duckdb source."
                 .to_string(),
         ));
     }
     let Some(container) = src_arg.container.clone() else {
         return Err(CallError::Failed(
-            "Give the table to change as 'container'. qrow_inspect lists them.".to_string(),
+            "Give the table to change as 'container'. rowq_inspect lists them.".to_string(),
         ));
     };
 
@@ -176,7 +176,7 @@ pub fn plan(server: &mut Server, args: &Value) -> Result<Value, CallError> {
     let wanted_schema = matches!(change, Change::Alter(_));
     apply_change(&mut df, &source, change, &matched)?;
 
-    // Verbatim, here and in `apply`: these are qrow's own refusals, written to be
+    // Verbatim, here and in `apply`: these are rowq's own refusals, written to be
     // read by a person, and wrapping them would bury the sentence that matters.
     let plan = db_write::build_plan(&source, &df).map_err(|e| CallError::Failed(e.to_string()))?;
     if !wanted_schema && plan.schema > 0 {
@@ -230,7 +230,7 @@ pub fn plan(server: &mut Server, args: &Value) -> Result<Value, CallError> {
         "note": note_with_displaced(
             &format!(
                 "Nothing has been written. Read these statements back to the user, then \
-                 call qrow_write_apply with plan_id '{}' to run exactly them.",
+                 call rowq_write_apply with plan_id '{}' to run exactly them.",
                 id
             ),
             displaced.as_deref(),
@@ -249,7 +249,7 @@ pub fn plan(server: &mut Server, args: &Value) -> Result<Value, CallError> {
 /// `output.overwrite` destroys more than any `set` ever does — the previous table
 /// entire, and with it the indexes, triggers and views that hung off it — so it goes
 /// through the same handshake: the statements exist, the caller reads them back, and
-/// `qrow_write_apply` runs precisely them.  There is no human at the keyboard to
+/// `rowq_write_apply` runs precisely them.  There is no human at the keyboard to
 /// catch a model that answered a refusal by re-sending it with the flag set; a second
 /// deliberate call is the only thing that does not depend on the model behaving.
 pub fn plan_replacement(
@@ -296,7 +296,7 @@ pub fn plan_replacement(
         "note": note_with_displaced(
             &format!(
                 "Nothing has been written. Replacing '{}' drops the table that is there \
-                 now. Tell the user what it holds, then call qrow_write_apply with \
+                 now. Tell the user what it holds, then call rowq_write_apply with \
                  plan_id '{}' to run exactly these statements.",
                 table, id
             ),
@@ -348,7 +348,7 @@ pub fn plan_file_overwrite(
             &format!(
                 "Nothing has been written. {} exists and would be replaced entirely. \
                  Tell the user what is about to be overwritten, then call \
-                 qrow_write_apply with plan_id '{}' to write it.",
+                 rowq_write_apply with plan_id '{}' to write it.",
                 path.display(),
                 id
             ),
@@ -369,7 +369,7 @@ pub fn plan_file_overwrite(
 /// Say that an earlier plan is gone, when there was one.
 ///
 /// A model that planned twice has to know the first plan is no longer applicable, or it
-/// will read a refusal from `qrow_write_apply` as a bug rather than as the answer.
+/// will read a refusal from `rowq_write_apply` as a bug rather than as the answer.
 fn note_with_displaced(note: &str, displaced: Option<&str>) -> String {
     match displaced {
         Some(id) => format!(
@@ -595,7 +595,7 @@ pub fn apply(server: &mut Server, args: &Value) -> Result<Value, CallError> {
     let wanted = args
         .get("plan_id")
         .and_then(Value::as_str)
-        .ok_or_else(|| CallError::Failed("qrow_write_apply needs a 'plan_id'".to_string()))?;
+        .ok_or_else(|| CallError::Failed("rowq_write_apply needs a 'plan_id'".to_string()))?;
 
     // Taken before the write: a plan that failed is invalid by definition — after a
     // drift error the data it was made against is gone — so it must not be retryable.
@@ -612,7 +612,7 @@ pub fn apply(server: &mut Server, args: &Value) -> Result<Value, CallError> {
         None => {
             // A plan this server once handed out is a different situation from one it
             // never made: it was superseded by a later plan or spent by a write, and
-            // "call qrow_write to make one" reads as if it had never existed.  The id
+            // "call rowq_write to make one" reads as if it had never existed.  The id
             // is a counter, so no bookkeeping is needed to tell the two apart.
             let issued = wanted
                 .strip_prefix("write-")
@@ -621,13 +621,13 @@ pub fn apply(server: &mut Server, args: &Value) -> Result<Value, CallError> {
             return Err(CallError::Failed(if issued {
                 format!(
                     "Plan '{}' is no longer valid: a later plan or a write that has \
-                     already run replaced it. Call qrow_write again for a plan against \
+                     already run replaced it. Call rowq_write again for a plan against \
                      the table as it stands now.",
                     wanted
                 )
             } else {
                 format!(
-                    "No plan '{}' is waiting. Call qrow_write to make one.",
+                    "No plan '{}' is waiting. Call rowq_write to make one.",
                     wanted
                 )
             }));

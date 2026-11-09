@@ -404,7 +404,7 @@ mod tests {
     // does not parse — is plain logic and is covered here.
 
     fn doc_app(src: &str, name: &str) -> crate::app::App {
-        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tmp/qrow-editor-tests");
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tmp/rowq-editor-tests");
         std::fs::create_dir_all(&dir).unwrap();
         let path = dir.join(name);
         std::fs::write(&path, src).unwrap();
@@ -418,7 +418,7 @@ mod tests {
         let mut app = doc_app(r#"{"db":{"host":"h"}}"#, "node-ok.json");
         let path = vec![Seg::Key("db".into())];
         let tmp =
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tmp/qrow-editor-tests/buf.json");
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tmp/rowq-editor-tests/buf.json");
         std::fs::write(&tmp, "{}").unwrap();
 
         app.apply_node_from_editor(&path, r#"{"host":"h2","port":5432}"#, &tmp);
@@ -456,7 +456,7 @@ mod tests {
         let mut app = doc_app(r#"{"db":{"host":"h"}}"#, "node-bad.json");
         let path = vec![Seg::Key("db".into())];
         let tmp =
-            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tmp/qrow-editor-tests/bad.json");
+            std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tmp/rowq-editor-tests/bad.json");
         let typed = "{\"host\": oops";
         std::fs::write(&tmp, typed).unwrap();
 

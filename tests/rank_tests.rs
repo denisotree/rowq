@@ -1,7 +1,7 @@
-//! Mann–Whitney U and two-sample Kolmogorov–Smirnov in `qrow_calc`, held to
+//! Mann–Whitney U and two-sample Kolmogorov–Smirnov in `rowq_calc`, held to
 //! scipy 1.18.1 — and samples that come from a query rather than typed in.
 
-use qrow::mcp::{handle_message, Server};
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -18,7 +18,7 @@ fn one_vs_60() -> (String, String) {
 
 fn calc(server: &mut Server, args: Value) -> Value {
     let message = json!({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-                         "params": {"name": "qrow_calc", "arguments": args}});
+                         "params": {"name": "rowq_calc", "arguments": args}});
     handle_message(server, &message.to_string()).unwrap()["result"].clone()
 }
 

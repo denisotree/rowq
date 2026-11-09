@@ -5,17 +5,17 @@
 **[VisiData](https://www.visidata.org)** by [Saul Pwanson](https://github.com/saulpw)
 ([saul@visidata.org](mailto:saul@visidata.org)) — MIT License
 
-qrow was directly inspired by VisiData, a terminal-based spreadsheet multitool
+rowq was directly inspired by VisiData, a terminal-based spreadsheet multitool
 that reimagines how tabular data can be explored interactively from the command line.
 VisiData's approach to keyboard-driven navigation, sheet stacking, and column
-aggregators shaped the core design of qrow.
+aggregators shaped the core design of rowq.
 
-If you enjoy qrow, please consider trying VisiData — it has a much broader
+If you enjoy rowq, please consider trying VisiData — it has a much broader
 feature set, supports more formats, and has a thriving community.
 
 ## Built with
 
-qrow is built on top of several excellent open source libraries:
+rowq is built on top of several excellent open source libraries:
 
 - **[ratatui](https://github.com/ratatui/ratatui)** — TUI framework for Rust
 - **[Polars](https://github.com/pola-rs/polars)** — fast DataFrame library for Rust

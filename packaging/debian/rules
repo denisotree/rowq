@@ -1,5 +1,5 @@
 #!/usr/bin/make -f
-# debhelper rules for qrow
+# debhelper rules for rowq
 
 %:
 	dh $@
@@ -8,11 +8,8 @@ override_dh_auto_build:
 	cargo build --release --locked
 
 override_dh_auto_install:
-	install -Dm755 target/release/qrow \
-		$(CURDIR)/debian/qrow/usr/bin/qrow
-	# Short alias
-	ln -s /usr/bin/qrow \
-		$(CURDIR)/debian/qrow/usr/bin/qrw
+	install -Dm755 target/release/rowq \
+		$(CURDIR)/debian/rowq/usr/bin/rowq
 
 override_dh_auto_test:
 	cargo test --locked

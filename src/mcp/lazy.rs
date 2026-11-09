@@ -17,7 +17,7 @@ use std::collections::HashMap;
 use std::path::Path;
 use std::sync::{Mutex, OnceLock};
 
-/// A source as a plan, and an empty table of its columns carrying what qrow knows
+/// A source as a plan, and an empty table of its columns carrying what rowq knows
 /// about each — types, epoch units.
 #[derive(Clone)]
 pub struct Scanned {

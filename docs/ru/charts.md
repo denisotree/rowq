@@ -5,7 +5,7 @@
 Нажмите `V` на любом столбце, чтобы построить график. Что именно вы получите,
 зависит от типа столбца и от того, **закрепили** ли вы опорный столбец через `!`.
 
-![Графики — гистограмма и сгруппированный столбчатый](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/charts.gif)
+![Графики — гистограмма и сгруппированный столбчатый](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/charts.gif)
 
 ## Типы графиков
 
@@ -50,7 +50,7 @@
 ## Примеры
 
 ```sh
-qrow sales.csv     # столбцы: date, region, category, units, revenue
+rowq sales.csv     # столбцы: date, region, category, units, revenue
 ```
 
 - **Распределение выручки** — встаньте на `revenue`, нажмите `V`. Появится

@@ -24,7 +24,7 @@ What actually happened. Include any error messages or unexpected output.
 
 ## Environment
 
-- **qrow version**: (run `qrow --version`)
+- **rowq version**: (run `rowq --version`)
 - **OS**: (e.g. macOS 14.4, Ubuntu 22.04)
 - **Terminal**: (e.g. iTerm2, Alacritty, GNOME Terminal)
 - **Terminal size**: (columns × rows, run `echo "${COLUMNS}x${LINES}"`)

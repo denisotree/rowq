@@ -1,5 +1,5 @@
-use qrow::data::dataframe::DataFrame;
-use qrow::data::loader::load_csv;
+use rowq::data::dataframe::DataFrame;
+use rowq::data::loader::load_csv;
 use std::path::Path;
 
 fn load_sample() -> DataFrame {
@@ -148,9 +148,9 @@ fn chaining_sorts_agrees_on_the_primary_key_but_promises_nothing_more() {
 /// calls for: one function, driven from the surface, compared cell by cell.
 #[test]
 fn the_z_bracket_keys_build_the_same_compound_sort() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
+    let mut app = rowq::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
 
     // Cursor onto `department` (column 4), sort ascending — replacing any sort.
     app.stack.active_mut().cursor_col = 4;
@@ -187,9 +187,9 @@ fn the_z_bracket_keys_build_the_same_compound_sort() {
 /// without bound while meaning nothing new.
 #[test]
 fn appending_a_column_already_sorted_replaces_its_direction() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
+    let mut app = rowq::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
     app.stack.active_mut().cursor_col = 4;
     app.handle_action(Action::SortAscending);
 

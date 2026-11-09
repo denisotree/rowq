@@ -5,8 +5,8 @@ mod keys;
 
 use crossterm::event::KeyCode;
 use keys::{columns as cols, drill, key};
-use qrow::app::App;
-use qrow::types::Action;
+use rowq::app::App;
+use rowq::types::Action;
 use std::path::PathBuf;
 
 const USERS: &str = "CREATE TABLE users (id INTEGER, name TEXT);
@@ -109,7 +109,7 @@ fn reloading_a_top_level_scalar_view_refuses() {
     for target in ["servers", "port"] {
         app.handle_action(Action::StartPathGoto);
         app.stack.active_mut().path_input =
-            qrow::ui::text_input::TextInput::with_value(target.into());
+            rowq::ui::text_input::TextInput::with_value(target.into());
         app.handle_action(Action::ApplyPathGoto);
     }
     assert_eq!(app.stack.depth(), 3, "{}", app.status_message);
@@ -133,7 +133,7 @@ fn select(app: &mut App, name: &str) {
     let df = &app.stack.active().dataframe;
     let row = (0..df.visible_row_count())
         .find(|&r| {
-            qrow::data::dataframe::DataFrame::anyvalue_to_string_fmt(&df.get_val(r, 0)) == name
+            rowq::data::dataframe::DataFrame::anyvalue_to_string_fmt(&df.get_val(r, 0)) == name
         })
         .unwrap_or_else(|| panic!("no row {} in {:?}", name, cols(app)));
     app.stack.active_mut().table_state.select(Some(row));
@@ -293,7 +293,7 @@ fn reloading_a_file_opened_as_from_the_browser_keeps_the_type() {
     let base = fresh_dir("browse-as");
     std::fs::write(base.join("data.txt"), r#"[{"a":1},{"a":2}]"#).unwrap();
     let mut app = App::new_as(&base, None, None).unwrap();
-    app.open_directory_row_as(Some(qrow::data::doc::Format::Json));
+    app.open_directory_row_as(Some(rowq::data::doc::Format::Json));
     assert_eq!(cols(&app), ["a"]);
     reload(&mut app);
     assert_reloaded(&app);

@@ -1,7 +1,7 @@
 name: APT repository
 
 # Publishes a release's .deb files into the signed APT repository served from
-# the gh-pages branch, served at https://qrow.dev/apt.  Called by
+# the gh-pages branch, served at https://rowq.dev/apt.  Called by
 # release.yml once the GitHub Release exists; run it by hand to republish a tag.
 on:
   workflow_call:

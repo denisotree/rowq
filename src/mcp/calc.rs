@@ -1,4 +1,4 @@
-//! `qrow_calc`: the arithmetic a model would otherwise do in its head.
+//! `rowq_calc`: the arithmetic a model would otherwise do in its head.
 //!
 //! Not every question is about a table, and a model multiplying three numbers from
 //! the conversation is exactly as unreliable as one summing a column by eye.  This
@@ -1409,7 +1409,7 @@ fn is_identifier(name: &str) -> bool {
         && chars.all(|c| c.is_alphanumeric() || c == '_')
 }
 
-/// Run a `qrow_calc` call: `{"steps": [{"name", "expr"}, …]}`, or `{"expr": …}` for one.
+/// Run a `rowq_calc` call: `{"steps": [{"name", "expr"}, …]}`, or `{"expr": …}` for one.
 pub fn run(args: &Value) -> Result<Value, String> {
     run_with(args, Vec::new())
 }

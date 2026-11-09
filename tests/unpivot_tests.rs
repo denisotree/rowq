@@ -1,6 +1,6 @@
 //! Wide to long: a column per country becomes a row per country.
 
-use qrow::mcp::{handle_message, Server};
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -30,7 +30,7 @@ fn write_wide() -> PathBuf {
 
 fn call(ops: Value) -> Value {
     let message = json!({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-        "params": {"name": "qrow_query",
+        "params": {"name": "rowq_query",
                    "arguments": {"source": wide().to_string_lossy(), "ops": ops,
                                  "output": {"limit": 1000}}}});
     handle_message(&mut Server::new(), &message.to_string()).unwrap()["result"].clone()
@@ -118,8 +118,8 @@ fn unpivot_refuses_an_unknown_column_and_a_name_that_is_taken() {
 
 #[test]
 fn gw_unpivots_the_unpinned_columns() {
-    use qrow::types::Action;
-    let mut app = qrow::app::App::new_as(&wide(), None, None).unwrap();
+    use rowq::types::Action;
+    let mut app = rowq::app::App::new_as(&wide(), None, None).unwrap();
     let time = app.stack.active().dataframe.column_index("Time").unwrap();
     app.stack.active_mut().dataframe.columns[time].pinned = true;
     let sheets = app.stack.depth();
@@ -133,8 +133,8 @@ fn gw_unpivots_the_unpinned_columns() {
 
 #[test]
 fn gw_without_a_pinned_column_says_what_to_do() {
-    use qrow::types::Action;
-    let mut app = qrow::app::App::new_as(&wide(), None, None).unwrap();
+    use rowq::types::Action;
+    let mut app = rowq::app::App::new_as(&wide(), None, None).unwrap();
     let sheets = app.stack.depth();
     app.handle_action(Action::Unpivot);
     assert_eq!(app.stack.depth(), sheets);
@@ -193,11 +193,11 @@ fn unpivot_datetimes_of_different_units() {
 /// back as the objects and strings they were.
 #[test]
 fn json_columns_stay_json_through_unpivot_and_join() {
-    use qrow::data::io::jsonl_table;
+    use rowq::data::io::jsonl_table;
     let wide = jsonl_table("{\"id\":1,\"a\":{\"x\":1},\"b\":\"s\"}\n").unwrap();
-    let long = qrow::data::unpivot::unpivot(
+    let long = rowq::data::unpivot::unpivot(
         &wide,
-        &qrow::data::unpivot::Spec {
+        &rowq::data::unpivot::Spec {
             index: vec!["id".into()],
             columns: None,
             name: "key".into(),
@@ -212,12 +212,12 @@ fn json_columns_stay_json_through_unpivot_and_join() {
     assert_eq!(cells, ["{\"x\":1}", "\"s\""]);
 
     let right = jsonl_table("{\"id\":1,\"n\":5}\n").unwrap();
-    let joined = qrow::data::join::join_dataframes(
+    let joined = rowq::data::join::join_dataframes(
         &wide,
         &right,
         &["id".to_string()],
         &["id".to_string()],
-        qrow::data::join::JoinType::Left,
+        rowq::data::join::JoinType::Left,
     )
     .unwrap();
     assert!(joined.columns[joined.column_index("a").unwrap()].json);

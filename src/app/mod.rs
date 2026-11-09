@@ -155,11 +155,11 @@ impl App {
     /// Open a file that is not there yet: one empty column, and the path remembered as
     /// where `Ctrl+S` will write.
     ///
-    /// This is how a database gets made from nothing — `qrow inventory.sqlite` on a
+    /// This is how a database gets made from nothing — `rowq inventory.sqlite` on a
     /// missing file, then columns, rows, and a save.  It refuses two cases, which is
     /// where a mistyped path shows up: a directory that does not exist (nothing could
-    /// be saved there anyway), and an extension qrow cannot write, *including no
-    /// extension at all* — `qrow notes` is far more likely to be a typo than an
+    /// be saved there anyway), and an extension rowq cannot write, *including no
+    /// extension at all* — `rowq notes` is far more likely to be a typo than an
     /// intention.
     fn blank_at(path: &Path) -> Result<Self> {
         use crate::data::column::ColumnMeta;
@@ -194,7 +194,7 @@ impl App {
             );
         if !writable {
             return Err(eyre!(
-                "'{}': no such file, and qrow cannot create a .{} — try .csv, .json, \
+                "'{}': no such file, and rowq cannot create a .{} — try .csv, .json, \
                  .parquet, .xlsx, .sqlite or .duckdb",
                 path.display(),
                 if ext.is_empty() { "…" } else { &ext }
@@ -243,7 +243,7 @@ impl App {
     ///
     /// The same reading the MCP server gives it, through the same code: a table has to
     /// agree on its columns and the file that does not is named, while markdown pages
-    /// are records and are unioned.  Only `qrow 'data/*.csv'` arrives here — unquoted,
+    /// are records and are unioned.  Only `rowq 'data/*.csv'` arrives here — unquoted,
     /// the shell expands first and `from_file_list` shows the listing instead.
     fn from_pattern(pattern: &Path, delimiter: Option<char>, forced: Option<&str>) -> Result<Self> {
         let text = pattern.to_string_lossy().into_owned();
@@ -3085,7 +3085,7 @@ fn keep_failed_edit(tmp_path: &Path) -> Option<std::path::PathBuf> {
         .extension()
         .and_then(|e| e.to_str())
         .unwrap_or("txt");
-    let kept = std::env::temp_dir().join(format!("qrow-failed-edit.{}", ext));
+    let kept = std::env::temp_dir().join(format!("rowq-failed-edit.{}", ext));
     std::fs::copy(tmp_path, &kept).ok()?;
     Some(kept)
 }

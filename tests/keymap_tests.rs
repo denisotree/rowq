@@ -2,13 +2,13 @@
 //!
 //! `zJ` went into `handle_key_event` and the docs but not into the `z` hint or `?`,
 //! so a person pressing `z` never learned it existed. The `?` popup and the prefix
-//! hints are built from one table, `qrow::ui::popup::SECTIONS`; this checks that
+//! hints are built from one table, `rowq::ui::popup::SECTIONS`; this checks that
 //! table against the key layer in both directions, and the docs against both.
 
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyEventState, KeyModifiers};
-use qrow::event::handle_key_event;
-use qrow::types::{Action, AppMode};
-use qrow::ui::popup::SECTIONS;
+use rowq::event::handle_key_event;
+use rowq::types::{Action, AppMode};
+use rowq::ui::popup::SECTIONS;
 
 const PREFIXES: [(char, AppMode); 4] = [
     ('g', AppMode::GPrefix),

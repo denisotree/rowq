@@ -76,7 +76,7 @@ impl DataFrame {
         let height = visible.height();
 
         // A name no real column can shadow.
-        let mut marker = "__qrow_pos".to_string();
+        let mut marker = "__rowq_pos".to_string();
         while visible.column(&marker).is_ok() {
             marker.push('_');
         }

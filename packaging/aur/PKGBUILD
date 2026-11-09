@@ -1,18 +1,18 @@
 # Maintainer: denisotree <denisotree@users.noreply.github.com>
-# AUR package: qrow  (builds from source)
-# AUR page: https://aur.archlinux.org/packages/qrow
+# AUR package: rowq  (builds from source)
+# AUR page: https://aur.archlinux.org/packages/rowq
 
-pkgname=qrow
-pkgver=1.1.1
+pkgname=rowq
+pkgver=1.0.0
 pkgrel=1
 pkgdesc="Query rows in tables, documents and databases from the terminal"
 arch=('x86_64' 'aarch64')
-url="https://github.com/denisotree/qrow"
+url="https://github.com/denisotree/rowq"
 license=('Apache-2.0')
 depends=()
 makedepends=('rust' 'cargo')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('c4e472d9cd7a1a78f11d9a83b4f56b6177789b318732a5642fba762d8d47342c')
+sha256sums=('SKIP')
 
 prepare() {
     cd "$pkgname-$pkgver"
@@ -37,10 +37,8 @@ package() {
     cd "$pkgname-$pkgver"
 
     # Main binary
-    install -Dm755 "target/release/qrow" "$pkgdir/usr/bin/qrow"
+    install -Dm755 "target/release/rowq" "$pkgdir/usr/bin/rowq"
 
-    # Short alias
-    ln -s /usr/bin/qrow "$pkgdir/usr/bin/qrw"
 
     # License
     install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"

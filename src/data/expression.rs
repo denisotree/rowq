@@ -432,7 +432,7 @@ fn group_of(args: &[Expr], re: &regex::Regex) -> Result<usize, String> {
     Ok(group)
 }
 
-/// `round()`'s places: a whole-number literal, as in `qrow_calc`.
+/// `round()`'s places: a whole-number literal, as in `rowq_calc`.
 fn round_places(args: &[Expr]) -> Result<i32, String> {
     match args.get(1) {
         None => Ok(0),
@@ -445,7 +445,7 @@ fn round_places(args: &[Expr]) -> Result<i32, String> {
     }
 }
 
-/// Half away from zero, as a person rounds and as `qrow_calc` does.
+/// Half away from zero, as a person rounds and as `rowq_calc` does.
 fn round_half_away(x: f64, places: i32) -> f64 {
     let scale = 10f64.powi(places);
     (x * scale).round() / scale
@@ -2706,7 +2706,7 @@ mod tests {
         let cases: &[(&str, &[f64], &[f64])] = &[
             ("abs(v)", &[-2.5, 3.0], &[2.5, 3.0]),
             ("round(v, 2)", &[2.345, -2.345], &[2.35, -2.35]),
-            // Half away from zero, as qrow_calc rounds.
+            // Half away from zero, as rowq_calc rounds.
             ("round(v)", &[2.5, -2.5, 1.4], &[3.0, -3.0, 1.0]),
             ("round(v, -2)", &[1234.5678, -150.0], &[1200.0, -200.0]),
             ("floor(v)", &[-1.5, 1.5], &[-2.0, 1.0]),

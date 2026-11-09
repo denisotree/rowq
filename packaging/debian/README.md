@@ -20,7 +20,7 @@ The `.deb` file is created one directory above the repo root.
 ## Install
 
 ```sh
-sudo dpkg -i ../qrow_<version>-1_amd64.deb
+sudo dpkg -i ../rowq_<version>-1_amd64.deb
 ```
 
 ## Clean up
@@ -36,4 +36,4 @@ dh_clean
   `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`
   or via the `rustup` package from the official repository.
 - For CI/CD, consider building with `cross` for cross-compilation to `aarch64`.
-- The package installs two command names: `/usr/bin/qrow` and the alias `/usr/bin/qrw`.
+- The package installs one command: `/usr/bin/rowq`.

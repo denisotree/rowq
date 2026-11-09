@@ -3,11 +3,11 @@
 > 🇬🇧 [This page in English](../en/join.md) · [← Оглавление документации](README.md)
 
 Нажмите `J`, чтобы соединить текущую таблицу с другой через пошаговый мастер.
-Вторая таблица может быть **любым файлом, который открывает qrow** (CSV, TSV,
+Вторая таблица может быть **любым файлом, который открывает rowq** (CSV, TSV,
 JSON, JSONL, YAML, TOML, Parquet, Arrow, Excel, Markdown, SQLite, DuckDB) либо
 другим уже открытым листом.
 
-![Мастер JOIN](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/join.gif)
+![Мастер JOIN](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/join.gif)
 
 ## Четыре шага
 
@@ -72,7 +72,7 @@ right`, `left SEMI JOIN right`, `left DIFF right`). Нажмите `Esc` / `q`,
 ```sh
 # orders.csv:    order_id, customer_id, amount
 # customers.csv: customer_id, name, country
-qrow orders.csv
+rowq orders.csv
 ```
 
 1. Нажмите `J`.
@@ -90,7 +90,7 @@ DIFF сравнивает две таблицы так же, как `git diff` �
 сравниваются.
 
 ```sh
-qrow march.csv
+rowq march.csv
 ```
 
 1. Нажмите `J`, выберите **`[Browse file…]`**, введите `april.csv`, нажмите `Enter`.

@@ -1,6 +1,6 @@
 //! Boolean columns typed as boolean, and frequency tables that count every row.
 
-use qrow::mcp::{handle_message, Server};
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -39,14 +39,14 @@ fn type_of(out: &Value, name: &str) -> String {
 #[test]
 fn a_boolean_column_is_reported_as_boolean() {
     let csv = file("flags.csv", "id,mobile\n1,true\n2,false\n3,true\n");
-    let out = call("qrow_inspect", json!({"source": csv}));
+    let out = call("rowq_inspect", json!({"source": csv}));
     assert_eq!(type_of(&out, "mobile"), "boolean", "{}", out);
 
     let jsonl = file(
         "flags.jsonl",
         "{\"id\":1,\"ok\":true}\n{\"id\":2,\"ok\":false}\n",
     );
-    let out = call("qrow_inspect", json!({"source": jsonl}));
+    let out = call("rowq_inspect", json!({"source": jsonl}));
     assert_eq!(type_of(&out, "ok"), "boolean", "{}", out);
 }
 
@@ -54,7 +54,7 @@ fn a_boolean_column_is_reported_as_boolean() {
 fn a_boolean_column_filters_and_sums() {
     let csv = file("flags2.csv", "id,mobile\n1,true\n2,false\n3,true\n");
     let out = call(
-        "qrow_query",
+        "rowq_query",
         json!({"source": csv, "ops": [
             {"filter": {"col": "mobile", "op": "eq", "value": true}},
             {"aggregate": [{"col": "*", "fn": "count"}, {"col": "mobile", "fn": "sum"}]}
@@ -70,7 +70,7 @@ fn a_boolean_column_filters_and_sums() {
 fn multi_column_frequency_counts_rows_with_a_null_first_key() {
     let csv = file("keys.csv", "a,b\n,x\n,x\n1,y\n");
     let out = call(
-        "qrow_query",
+        "rowq_query",
         json!({"source": csv, "ops": [{"frequency": {"by": ["a", "b"]}}]}),
     );
     let rows = out["rows"].as_array().unwrap();

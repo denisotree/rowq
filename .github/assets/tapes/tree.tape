@@ -17,7 +17,7 @@ Type "clear"
 Enter
 Show
 
-Type "qrow config.toml"
+Type "rowq config.toml"
 Enter
 Sleep 2200ms
 

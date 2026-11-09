@@ -1,8 +1,8 @@
 //! Window functions: rank, running totals, neighbours and partition shares.
 
-use qrow::data::dataframe::DataFrame;
-use qrow::data::io::load_file;
-use qrow::data::window::{add_window_column, Spec, WindowFn};
+use rowq::data::dataframe::DataFrame;
+use rowq::data::io::load_file;
+use rowq::data::window::{add_window_column, Spec, WindowFn};
 use std::path::Path;
 use std::sync::Arc;
 
@@ -224,9 +224,9 @@ fn an_unknown_column_or_partition_is_refused() {
 /// the same function, so the column they produce must match.
 #[test]
 fn the_zf_key_produces_the_shared_window() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
+    let mut app = rowq::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
     let salary = app.stack.active().dataframe.column_index("salary").unwrap();
     app.stack.active_mut().cursor_col = salary;
     app.handle_action(Action::CreatePctColumn);
@@ -263,9 +263,9 @@ fn the_zf_key_produces_the_shared_window() {
 /// surfaces drift, which is the thing this whole layer exists to prevent.
 #[test]
 fn the_zw_picker_offers_every_window_function() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
+    let mut app = rowq::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
     let salary = app.stack.active().dataframe.column_index("salary").unwrap();
     app.stack.active_mut().cursor_col = salary;
 
@@ -300,9 +300,9 @@ fn the_zw_picker_offers_every_window_function() {
 /// `zF`, which would silently apply the wrong window.
 #[test]
 fn a_cancelled_picker_does_not_arm_the_next_partitioned_share() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
+    let mut app = rowq::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
     let salary = app.stack.active().dataframe.column_index("salary").unwrap();
     app.stack.active_mut().cursor_col = salary;
 
@@ -328,7 +328,7 @@ fn a_cancelled_picker_does_not_arm_the_next_partitioned_share() {
 /// typing it otherwise renders an average salary of 80428.79 as "8042878.57%".
 #[test]
 fn an_average_is_not_a_percentage() {
-    use qrow::types::ColumnType;
+    use rowq::types::ColumnType;
 
     let df = sample();
     let out =

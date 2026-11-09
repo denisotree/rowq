@@ -1,4 +1,4 @@
-# Документация qrow
+# Документация rowq
 
 Быстрый обозреватель табличных данных в терминале с управлением с клавиатуры —
 **CSV · JSON · JSONL · YAML · TOML · Parquet · Arrow · Excel · Markdown ·
@@ -6,7 +6,7 @@ SQLite · DuckDB**.
 
 > 🇬🇧 This documentation is also available in [English](../en/README.md).
 
-> qrow продолжает tuitab, который остаётся на версии 0.11.1, — как перейти со старой
+> rowq продолжает tuitab, который остаётся на версии 0.11.1, — как перейти со старой
 > установки, описано в [Coming from tuitab](../../README.md#coming-from-tuitab).
 
 ## Содержание
@@ -20,18 +20,18 @@ SQLite · DuckDB**.
 | [JOIN](join.md) | Пошаговый мастер JOIN, типы соединений и DIFF двух таблиц |
 | [Базы данных](database.md) | Правка таблицы SQLite/DuckDB и запись обратно, сборка базы с нуля |
 | [Сводные таблицы](pivot.md) | Синтаксис сводных таблиц, агрегации и примеры |
-| [MCP-сервер](mcp.md) | Как дать ИИ-ассистенту считать движком qrow: инструменты, операции, подключение |
+| [MCP-сервер](mcp.md) | Как дать ИИ-ассистенту считать движком rowq: инструменты, операции, подключение |
 | [Рецепты](recipes.md) | Практические приёмы: дедупликация, доля от итога, буфер обмена, экспорт и другое |
 
 ## Кратко
 
 ```sh
-qrow data.csv                   # открыть файл
-qrow config.toml                # JSON / YAML / TOML открываются деревом
-qrow orders.csv customers.csv   # просмотреть несколько файлов списком
-qrow ./reports/                 # просмотреть каталог
-qrow inventory.sqlite           # файла ещё нет — откроется пустой лист
-cat data.csv | qrow -t csv      # прочитать из конвейера
+rowq data.csv                   # открыть файл
+rowq config.toml                # JSON / YAML / TOML открываются деревом
+rowq orders.csv customers.csv   # просмотреть несколько файлов списком
+rowq ./reports/                 # просмотреть каталог
+rowq inventory.sqlite           # файла ещё нет — откроется пустой лист
+cat data.csv | rowq -t csv      # прочитать из конвейера
 ```
 
 Когда таблица открыта: перемещение — `hjkl`, сортировка — `[` / `]` (`z[` / `z]`
@@ -41,6 +41,6 @@ cat data.csv | qrow -t csv      # прочитать из конвейера
 
 ## Смотрите также
 
-- [Основной README проекта](https://github.com/denisotree/qrow/blob/master/README.md)
-- [Руководство для контрибьюторов](https://github.com/denisotree/qrow/blob/master/CONTRIBUTING.md)
-- [История изменений](https://github.com/denisotree/qrow/blob/master/CHANGELOG.md)
+- [Основной README проекта](https://github.com/denisotree/rowq/blob/master/README.md)
+- [Руководство для контрибьюторов](https://github.com/denisotree/rowq/blob/master/CONTRIBUTING.md)
+- [История изменений](https://github.com/denisotree/rowq/blob/master/CHANGELOG.md)

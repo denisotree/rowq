@@ -1,7 +1,7 @@
 //! Pipelines over files larger than memory: scanned and streamed rather than loaded.
 //! Every answer must be the one the in-memory path gives.
 
-use qrow::mcp::{handle_message, Server};
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -87,10 +87,10 @@ fn pipelines() -> Vec<Value> {
 fn lazy_and_eager_paths_agree_on_a_csv() {
     let path = write("events.csv", CSV);
     for ops in pipelines() {
-        agree("qrow_query", json!({"source": path, "ops": ops}));
+        agree("rowq_query", json!({"source": path, "ops": ops}));
     }
-    agree("qrow_inspect", json!({"source": path}));
-    agree("qrow_describe", json!({"source": path, "columns": ["ms"]}));
+    agree("rowq_inspect", json!({"source": path}));
+    agree("rowq_describe", json!({"source": path, "columns": ["ms"]}));
 }
 
 #[test]
@@ -100,14 +100,14 @@ fn lazy_and_eager_paths_agree_on_parquet() {
     let _ = std::fs::remove_file(&parquet);
     let wrote = call(
         &mut server(true),
-        "qrow_query",
+        "rowq_query",
         json!({"source": csv, "ops": [], "output": {"path": parquet}}),
     );
     assert_eq!(wrote["isError"], json!(false), "{}", wrote);
     for ops in pipelines() {
-        agree("qrow_query", json!({"source": parquet, "ops": ops}));
+        agree("rowq_query", json!({"source": parquet, "ops": ops}));
     }
-    agree("qrow_inspect", json!({"source": parquet}));
+    agree("rowq_inspect", json!({"source": parquet}));
 }
 
 #[test]
@@ -123,9 +123,9 @@ fn lazy_and_eager_paths_agree_on_jsonl() {
         json!([{"group_by": {"by": ["class"], "agg": [{"col": "ms", "fn": "sum"}]}}]),
         json!([{"select": ["geo", "tags"]}]),
     ] {
-        agree("qrow_query", json!({"source": path, "ops": ops}));
+        agree("rowq_query", json!({"source": path, "ops": ops}));
     }
-    agree("qrow_inspect", json!({"source": path}));
+    agree("rowq_inspect", json!({"source": path}));
 }
 
 #[test]
@@ -137,7 +137,7 @@ fn a_glob_of_parquet_is_scanned() {
         let _ = std::fs::remove_file(&out);
         call(
             &mut server(true),
-            "qrow_query",
+            "rowq_query",
             json!({"source": src, "ops": [], "output": {"path": out}}),
         );
     }
@@ -146,7 +146,7 @@ fn a_glob_of_parquet_is_scanned() {
         .to_string_lossy()
         .into_owned();
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": pattern, "ops": [
             {"group_by": {"by": ["k"], "agg": [{"col": "v", "fn": "sum"}]}}
         ]}),
@@ -166,7 +166,7 @@ fn the_guard_refuses_a_result_too_big_to_collect() {
     };
     let out = call(
         &mut tight,
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"dedup": {"by": ["class"], "keep": "first"}}]}),
     );
     assert_eq!(out["isError"], json!(true), "{}", out);
@@ -176,7 +176,7 @@ fn the_guard_refuses_a_result_too_big_to_collect() {
     // What streams to a small answer is not held to the budget.
     let out = call(
         &mut tight,
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"frequency": {"by": ["class"]}}]}),
     );
     assert_eq!(out["isError"], json!(false), "{}", out);
@@ -198,11 +198,11 @@ fn json_get_streams_with_the_type_the_loaded_path_gives() {
             {"compute": {"name": "x", "expr": format!("json_get(client, \"$.{}\")", field)}},
             {"frequency": {"by": ["x"]}}
         ]);
-        agree("qrow_query", json!({"source": path, "ops": ops}));
+        agree("rowq_query", json!({"source": path, "ops": ops}));
         let ops = json!([
             {"compute": {"name": "x", "expr": format!("json_get(client, \"$.{}\")", field)}}
         ]);
-        agree("qrow_query", json!({"source": path, "ops": ops}));
+        agree("rowq_query", json!({"source": path, "ops": ops}));
     }
 }
 
@@ -220,7 +220,7 @@ fn json_get_then_frequency_is_not_held_to_the_budget() {
     };
     let out = call(
         &mut tight,
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [
             {"compute": {"name": "cc", "expr": "json_get(client, \"$.cc\")"}},
             {"frequency": {"by": ["cc"]}}
@@ -241,16 +241,16 @@ fn fine_epochs_keep_every_digit_streamed() {
         "fine-epochs.csv",
         "sent_at,recv_at,v\n1787569800123456789,1787569800123457,1\n1787569801987654321,1787569801987655,2\n",
     );
-    agree("qrow_query", json!({"source": path, "ops": []}));
+    agree("rowq_query", json!({"source": path, "ops": []}));
     agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"compute": {"name": "x", "expr": "from_epoch(v * 1000000000 + 1787569800000000000, \"ns\")"}}]}),
     );
     let out = dir().join("fine-epochs-out.csv");
     let _ = std::fs::remove_file(&out);
     let wrote = call(
         &mut server(false),
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [], "output": {"path": out}}),
     );
     assert_eq!(wrote["isError"], json!(false), "{}", wrote);
@@ -267,7 +267,7 @@ fn fine_epochs_keep_every_digit_streamed() {
 fn from_epoch_over_an_integer_column_keeps_nanoseconds() {
     let path = write("raw-ns.csv", "raw\n1787569800123456789\n");
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"compute": {"name": "x", "expr": "from_epoch(raw, \"ns\")"}}]}),
     );
     assert_eq!(
@@ -299,15 +299,15 @@ fn jsonl_a_scan_cannot_take_is_read_in_memory() {
         ),
     ] {
         let path = write(name, text);
-        let out = agree("qrow_query", json!({"source": path, "ops": []}));
+        let out = agree("rowq_query", json!({"source": path, "ops": []}));
         let loaded = call(
             &mut server(true),
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": []}),
         );
         assert_eq!(out, loaded, "{}", name);
         agree(
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [{"aggregate": [{"col": "*", "fn": "count"}]}]}),
         );
     }
@@ -323,7 +323,7 @@ fn a_jsonl_the_scan_takes_is_still_streamed() {
     };
     let out = call(
         &mut tight,
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"dedup": {"by": ["class"], "keep": "first"}}]}),
     );
     assert_eq!(out["isError"], json!(true), "{}", out);
@@ -349,7 +349,7 @@ fn a_json_file_holding_json_lines_is_streamed() {
         };
         let out = call(
             &mut tight,
-            "qrow_query",
+            "rowq_query",
             json!({"source": source, "ops": [{"dedup": {"by": ["class"], "keep": "first"}}]}),
         );
         assert!(
@@ -363,7 +363,7 @@ fn a_json_file_holding_json_lines_is_streamed() {
     }
     let out = call(
         &mut server(true),
-        "qrow_jq",
+        "rowq_jq",
         json!({"source": path, "program": "length"}),
     );
     assert_ne!(out["isError"], json!(true), "{}", out);
@@ -382,7 +382,7 @@ fn a_nested_jsonl_field_is_json_on_both_paths() {
                 {\"id\":2,\"client\":{\"country\":\"DE\",\"n\":3},\"tags\":[]}\n";
     let path = write("nested-fields.jsonl", text);
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"select": ["client", "tags"]}]}),
     );
     assert_eq!(
@@ -390,14 +390,14 @@ fn a_nested_jsonl_field_is_json_on_both_paths() {
         json!(["{\"country\":\"RU\",\"n\":2}", "[\"a\"]"])
     );
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [
             {"compute": {"name": "c", "expr": "json_get(client, \"$.country\")"}},
             {"select": ["c"]}]}),
     );
     assert_eq!(out["structuredContent"]["rows"], json!([["RU"], ["DE"]]));
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [
             {"expand_json": {"col": "client", "prefix": "client_"}},
             {"select": ["client_country"]}]}),
@@ -408,7 +408,7 @@ fn a_nested_jsonl_field_is_json_on_both_paths() {
         let _ = std::fs::remove_file(&target);
         let out = call(
             &mut server(eager),
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [], "output": {"path": target}}),
         );
         assert_ne!(out["isError"], json!(true), "{}", out);
@@ -459,9 +459,9 @@ fn a_parquet_list_and_struct_read_alike_on_both_paths() {
     ParquetWriter::new(std::fs::File::create(&path).unwrap())
         .finish(&mut df)
         .unwrap();
-    agree("qrow_query", json!({"source": path, "ops": []}));
+    agree("rowq_query", json!({"source": path, "ops": []}));
     agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"frequency": {"by": ["tags"]}}]}),
     );
 }
@@ -473,12 +473,12 @@ fn a_pattern_is_profiled_over_all_its_files() {
     write("prof-a.csv", "ts,v\n1700000000000,1.5\n1700000001000,2\n");
     write("prof-b.csv", "ts,v\n5,3.5\n6,4.5\n");
     let pattern = dir().join("prof-*.csv").to_string_lossy().into_owned();
-    let out = agree("qrow_query", json!({"source": pattern, "ops": []}));
+    let out = agree("rowq_query", json!({"source": pattern, "ops": []}));
     assert_eq!(out["structuredContent"]["row_count"], json!(4), "{}", out);
     write("unit-a.csv", "created_at\n1787569800000\n");
     write("unit-b.csv", "created_at\n1787569800\n");
     let pattern = dir().join("unit-*.csv").to_string_lossy().into_owned();
-    agree("qrow_query", json!({"source": pattern, "ops": []}));
+    agree("rowq_query", json!({"source": pattern, "ops": []}));
 }
 
 /// A moment past 2262 or before 1677 — `9999-12-31`, an SCD's open end — compares,
@@ -493,7 +493,7 @@ fn a_moment_outside_the_nanosecond_range_compares() {
         ("lt", "9999-12-31", 5),
     ] {
         let out = agree(
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [{"filter": {"col": "Time", "op": op, "value": value}}]}),
         );
         assert_eq!(
@@ -520,7 +520,7 @@ fn a_moment_outside_the_nanosecond_range_compares() {
         .unwrap();
     for (op, value, rows) in [("lt", "2300-01-01 00:00", 2), ("gt", "1600-01-01T00:00", 2)] {
         let out = agree(
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [{"filter": {"col": "ts", "op": op, "value": value}}]}),
         );
         assert_eq!(
@@ -540,7 +540,7 @@ fn a_csv_pattern_reads_each_file_by_its_own_separator() {
     write("sep-a.csv", "k,v\nx,1\n");
     write("sep-b.csv", "k;v\ny;2\n");
     let pattern = dir().join("sep-*.csv").to_string_lossy().into_owned();
-    let out = agree("qrow_query", json!({"source": pattern, "ops": []}));
+    let out = agree("rowq_query", json!({"source": pattern, "ops": []}));
     assert_eq!(
         out["structuredContent"]["rows"],
         json!([["x", 1], ["y", 2]]),
@@ -558,7 +558,7 @@ fn a_file_named_like_a_pattern_is_read_as_itself() {
     let jsonl: String = (0..200).map(|i| format!("{{\"a\":{}}}\n", i)).collect();
     for (name, text) in [("report[1].csv", csv), ("events[1].jsonl", jsonl)] {
         let path = write(name, &text);
-        let out = agree("qrow_query", json!({"source": path, "ops": []}));
+        let out = agree("rowq_query", json!({"source": path, "ops": []}));
         assert_eq!(out["structuredContent"]["row_count"], json!(200), "{}", out);
         // Scanned, not loaded: only the scan refuses a dedup past the budget.
         let out = call(
@@ -566,7 +566,7 @@ fn a_file_named_like_a_pattern_is_read_as_itself() {
                 memory_budget: Some(64),
                 ..Server::new()
             },
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [{"dedup": {"by": ["a"], "keep": "first"}}]}),
         );
         assert!(
@@ -586,7 +586,7 @@ fn a_file_named_like_a_pattern_is_read_as_itself() {
 fn a_limit_past_the_row_index_reads_every_row() {
     let path = write("limit-far.csv", CSV);
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"limit": 4294967297u64}], "output": {"limit": 4294967296u64}}),
     );
     assert_eq!(out["structuredContent"]["row_count"], json!(5), "{}", out);
@@ -597,7 +597,7 @@ fn a_limit_past_the_row_index_reads_every_row() {
 fn a_comparison_with_a_nested_column_reads_it_alike() {
     let path = write("nested-cmp.jsonl", JSONL);
     agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"filter": {"col": "msg", "op": "ne", "value": {"col": "geo"}}}]}),
     );
 }
@@ -617,7 +617,7 @@ fn a_compute_beside_a_nested_column_streams() {
     };
     let out = call(
         &mut tight,
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [
             {"compute": {"name": "slow", "expr": "ms > 1000"}},
             {"frequency": {"by": ["slow"]}}]}),
@@ -637,7 +637,7 @@ fn a_large_output_limit_is_held_to_the_budget() {
             memory_budget: Some(4096),
             ..Server::new()
         },
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [], "output": {"limit": 100000}}),
     );
     assert_eq!(out["isError"], json!(true), "{}", out);
@@ -661,7 +661,7 @@ fn a_file_too_large_to_load_that_cannot_be_scanned_is_refused() {
             memory_budget: Some(1024),
             ..Server::new()
         },
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": []}),
     );
     assert_eq!(out["isError"], json!(true), "{}", out);
@@ -675,7 +675,7 @@ fn a_file_too_large_to_load_that_cannot_be_scanned_is_refused() {
 fn nan_in_a_csv_is_missing_on_both_paths() {
     let path = write("nan.csv", "v,w\n1.5,1\nNaN,NaN\n3.5,3\n");
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"aggregate": [
             {"col": "v", "fn": "avg"}, {"col": "v", "fn": "count"}, {"col": "w", "fn": "sum"}]}]}),
     );
@@ -693,7 +693,7 @@ fn nan_in_a_csv_is_missing_on_both_paths() {
 fn a_bad_date_format_is_refused_alike() {
     let path = write("dates-format.csv", CSV);
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"compute": {"name": "f", "expr": "date_format(ts, \"%Q\")"}}]}),
     );
     assert_eq!(out["isError"], json!(true), "{}", out);
@@ -719,7 +719,7 @@ fn a_parquet_decimal_column_reads_as_numbers() {
         .finish(&mut df)
         .unwrap();
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"aggregate": [{"col": "amount", "fn": "sum"}]}]}),
     );
     assert_eq!(
@@ -743,7 +743,7 @@ fn a_decimal_past_the_head_still_streams() {
             memory_budget: Some(4096),
             ..Server::new()
         },
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"dedup": {"by": ["ms"], "keep": "first"}}]}),
     );
     let message = out["content"][0]["text"].as_str().unwrap();
@@ -761,7 +761,7 @@ fn in_over_a_datetime_column_matches_moments() {
     let path = write("events-in.csv", CSV);
     for (op, rows) in [("in", 2), ("not_in", 3)] {
         let out = agree(
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [{"filter": {"col": "Time", "op": op,
                 "value": ["2026-08-24 11:10:00", "2026-08-24 12:10"]}}]}),
         );
@@ -800,7 +800,7 @@ fn a_step_that_cannot_run_fails_alike() {
         "from_epoch(class, \"s\")",
     ] {
         let out = agree(
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [{"compute": {"name": "x", "expr": expr}}]}),
         );
         let text = out["content"][0]["text"].as_str().unwrap();
@@ -818,7 +818,7 @@ fn a_step_that_cannot_run_fails_alike() {
         json!({"col": "class", "op": "contains", "value": "["}),
     ] {
         let out = agree(
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [{"filter": filter}]}),
         );
         let text = out["content"][0]["text"].as_str().unwrap();
@@ -833,7 +833,7 @@ abc,[
 ",
     );
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"compute": {"name": "x", "expr": "contains(k, p)"}}]}),
     );
     let text = out["content"][0]["text"].as_str().unwrap();
@@ -845,7 +845,7 @@ abc,[
 fn numeric_aggregates_over_booleans_are_numbers() {
     let path = write("events-bool.csv", CSV);
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"group_by": {"by": ["class"], "agg": [
             {"col": "flag", "fn": "sum"}, {"col": "flag", "fn": "avg"}]}}]}),
     );
@@ -853,7 +853,7 @@ fn numeric_aggregates_over_booleans_are_numbers() {
     assert_eq!(cols[1]["type"], json!("integer"), "{}", out);
     assert_eq!(cols[2]["type"], json!("float"), "{}", out);
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"aggregate": [{"col": "flag", "fn": "sum"}]}]}),
     );
     assert_eq!(
@@ -865,7 +865,7 @@ fn numeric_aggregates_over_booleans_are_numbers() {
     // A window over the same column reads it the same way.
     for (function, kind) in [("sum", "integer"), ("avg", "float"), ("median", "float")] {
         let out = agree(
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [
                 {"window": {"fn": function, "col": "flag", "over": ["class"], "as": "w"}},
                 {"select": ["w"]}]}),
@@ -890,7 +890,7 @@ fn a_written_file_is_not_said_to_be_formatted() {
     let _ = std::fs::remove_file(&out);
     let wrote = call(
         &mut server(true),
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [], "output": {"path": out}}),
     );
     assert_eq!(wrote["isError"], json!(false), "{}", wrote);
@@ -902,7 +902,7 @@ fn a_written_file_is_not_said_to_be_formatted() {
 fn contains_over_a_datetime_reads_what_is_shown() {
     let path = write("events-contains-dt.csv", CSV);
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"filter": {"col": "Time", "op": "contains", "value": "10:00$"}}]}),
     );
     // 11:10:00 and 12:10:00 — no `.000` after them.
@@ -915,7 +915,7 @@ fn a_bucket_too_wide_is_refused() {
     let path = write("events-bucket.csv", CSV);
     for col in ["ts", "Time"] {
         let out = agree(
-            "qrow_query",
+            "rowq_query",
             json!({"source": path, "ops": [{"compute": {"name": "b",
                 "expr": format!("time_bucket({}, \"4000000000d\")", col)}}]}),
         );
@@ -930,11 +930,11 @@ fn a_bucket_too_wide_is_refused() {
 fn a_file_read_as_two_formats_is_profiled_for_each() {
     let path = write("two-formats.txt", "a\tb,c\n1\t2,3\n");
     let as_csv = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path, "format": "csv"}, "ops": []}),
     );
     let as_tsv = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path, "format": "tsv"}, "ops": []}),
     );
     let names = |out: &Value| -> Vec<String> {
@@ -959,7 +959,7 @@ fn a_csv_pattern_with_types_that_differ_names_the_file() {
         .join("mixed-types-*.csv")
         .to_string_lossy()
         .into_owned();
-    let out = agree("qrow_query", json!({"source": pattern, "ops": []}));
+    let out = agree("rowq_query", json!({"source": pattern, "ops": []}));
     assert_eq!(out["isError"], json!(true), "{}", out);
     assert!(
         out["content"][0]["text"]
@@ -981,18 +981,18 @@ fn the_guard_names_the_tool_that_wanted_the_rows() {
     };
     let out = call(
         &mut tight,
-        "qrow_describe",
+        "rowq_describe",
         json!({"source": path, "columns": ["ms"]}),
     );
     let text = out["content"][0]["text"].as_str().unwrap().to_string();
     assert!(
-        text.contains("qrow_describe") && !text.contains("writing"),
+        text.contains("rowq_describe") && !text.contains("writing"),
         "{}",
         text
     );
     let out = call(
         &mut tight,
-        "qrow_calc",
+        "rowq_calc",
         json!({"lists": {"m": {"source": path, "col": "ms"}}, "expr": "mean(m)"}),
     );
     let text = out["content"][0]["text"].as_str().unwrap().to_string();
@@ -1012,7 +1012,7 @@ fn a_jsonl_pattern_streams_like_its_files_loaded() {
     write("lines-b.jsonl", "{\"k\":\"x\",\"v\":3}\n");
     let pattern = dir().join("lines-*.jsonl").to_string_lossy().into_owned();
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": pattern, "ops": [{"group_by": {"by": ["k"], "agg": [{"col": "v", "fn": "sum"}]}}]}),
     );
     assert_eq!(out["structuredContent"]["row_count"], json!(2), "{}", out);
@@ -1026,7 +1026,7 @@ fn a_csv_pattern_types_its_files_with_the_null_values_given() {
     write("nulls-b.csv", "k,v\nz,3\nw,-\n");
     let pattern = dir().join("nulls-*.csv").to_string_lossy().into_owned();
     let out = agree(
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": pattern, "null_values": ["-"]},
                "ops": [{"aggregate": [{"col": "v", "fn": "sum"}]}]}),
     );
@@ -1043,10 +1043,10 @@ fn a_pattern_is_profiled_again_when_one_of_its_files_changes() {
     let pattern = dir().join("versions-*.csv").to_string_lossy().into_owned();
     let mut s = server(false);
     let args = json!({"source": pattern, "ops": [{"aggregate": [{"col": "v", "fn": "sum"}]}]});
-    let out = call(&mut s, "qrow_query", args.clone());
+    let out = call(&mut s, "rowq_query", args.clone());
     assert_eq!(out["structuredContent"]["rows"][0][0], json!(3), "{}", out);
     write("versions-b.csv", "k,v\ny,20\nz,30\n");
-    let out = call(&mut s, "qrow_query", args);
+    let out = call(&mut s, "rowq_query", args);
     assert_eq!(out["structuredContent"]["rows"][0][0], json!(51), "{}", out);
 }
 
@@ -1057,7 +1057,7 @@ fn a_small_file_is_loaded_and_kept_rather_than_streamed() {
     let path = write("kept.csv", CSV);
     let mut s = Server::new();
     let args = json!({"source": path, "ops": [{"frequency": {"by": ["class"]}}]});
-    let out = call(&mut s, "qrow_query", args);
+    let out = call(&mut s, "rowq_query", args);
     assert_eq!(out["isError"], json!(false), "{}", out);
     assert_eq!(s.cache.len(), 1, "the frame is kept");
     // Past a sixteenth of the budget it streams, and nothing is kept.
@@ -1067,7 +1067,7 @@ fn a_small_file_is_loaded_and_kept_rather_than_streamed() {
     };
     let out = call(
         &mut tight,
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"limit": 1}]}),
     );
     assert_eq!(out["isError"], json!(false), "{}", out);

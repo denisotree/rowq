@@ -1,16 +1,16 @@
-pkgbase = qrow-bin
+pkgbase = rowq-bin
 	pkgdesc = Query rows in tables, documents and databases from the terminal (pre-built binary)
-	pkgver = 1.1.1
+	pkgver = 1.0.0
 	pkgrel = 1
-	url = https://github.com/denisotree/qrow
+	url = https://github.com/denisotree/rowq
 	arch = x86_64
 	arch = aarch64
 	license = Apache-2.0
-	provides = qrow
-	conflicts = qrow
-	source_x86_64 = qrow-bin-1.1.1-x86_64.tar.gz::https://github.com/denisotree/qrow/releases/download/v1.1.1/qrow-v1.1.1-x86_64-unknown-linux-gnu.tar.gz
-	sha256sums_x86_64 = 7d4d1d15ee9abf63ffba79e87649cd604fcef1b7add11ac8185eb17cae436058
-	source_aarch64 = qrow-bin-1.1.1-aarch64.tar.gz::https://github.com/denisotree/qrow/releases/download/v1.1.1/qrow-v1.1.1-aarch64-unknown-linux-gnu.tar.gz
-	sha256sums_aarch64 = 72e2b5bcc360a34a7582a9ec4e3fa361adbc0c081bb3335d7d96f3418fec3f10
+	provides = rowq
+	conflicts = rowq
+	source_x86_64 = rowq-bin-1.0.0-x86_64.tar.gz::https://github.com/denisotree/rowq/releases/download/v1.0.0/rowq-v1.0.0-x86_64-unknown-linux-gnu.tar.gz
+	sha256sums_x86_64 = SKIP
+	source_aarch64 = rowq-bin-1.0.0-aarch64.tar.gz::https://github.com/denisotree/rowq/releases/download/v1.0.0/rowq-v1.0.0-aarch64-unknown-linux-gnu.tar.gz
+	sha256sums_aarch64 = SKIP
 
-pkgname = qrow-bin
+pkgname = rowq-bin

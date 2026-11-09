@@ -14,8 +14,8 @@ use keys::{key, open, press};
 
 #[test]
 fn a_copied_cell_can_be_pasted_into_another_cell() {
-    let saved = qrow::clipboard::paste_from_clipboard().ok();
-    if qrow::clipboard::copy_text("qrow clipboard probe").is_err() {
+    let saved = rowq::clipboard::paste_from_clipboard().ok();
+    if rowq::clipboard::copy_text("rowq clipboard probe").is_err() {
         eprintln!("no system clipboard here — skipping");
         return;
     }
@@ -26,7 +26,7 @@ fn a_copied_cell_can_be_pasted_into_another_cell() {
     app.stack.active_mut().table_state.select(Some(0));
     press(&mut app, "yc");
     assert_eq!(
-        qrow::clipboard::paste_from_clipboard().unwrap(),
+        rowq::clipboard::paste_from_clipboard().unwrap(),
         "75000",
         "the clipboard must still hold the copied value after the copy returns"
     );
@@ -43,6 +43,6 @@ fn a_copied_cell_can_be_pasted_into_another_cell() {
     );
 
     if let Some(s) = saved {
-        let _ = qrow::clipboard::copy_text(&s);
+        let _ = rowq::clipboard::copy_text(&s);
     }
 }

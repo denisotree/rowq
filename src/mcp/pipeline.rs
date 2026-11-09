@@ -1,7 +1,7 @@
-//! The pipeline of operations a model sends to `qrow_query`.
+//! The pipeline of operations a model sends to `rowq_query`.
 //!
 //! Each operation maps onto a function that already exists in [`crate::data`],
-//! so the arithmetic here is qrow's, not a second implementation of it.  The
+//! so the arithmetic here is rowq's, not a second implementation of it.  The
 //! only genuinely new compute is `filter`.
 //!
 //! # How operations compose
@@ -718,7 +718,7 @@ fn apply(mut df: DataFrame, op: &Op, drawn_seed: Option<u64>) -> Result<DataFram
 }
 
 /// A Polars error without the parts meant for Polars users: the dump of the query
-/// plan, and advice about Polars' own API (`suffix`) that qrow does not expose.
+/// plan, and advice about Polars' own API (`suffix`) that rowq does not expose.
 pub(crate) fn without_polars_hints(message: &str) -> &str {
     ["\n\nResolved plan until failure", "\n\nYou may want to try"]
         .iter()

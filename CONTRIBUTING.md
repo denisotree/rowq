@@ -1,12 +1,12 @@
-# Contributing to qrow
+# Contributing to rowq
 
 Thank you for your interest in contributing!
 
 ## Quick start
 
 ```sh
-git clone https://github.com/denisotree/qrow
-cd qrow
+git clone https://github.com/denisotree/rowq
+cd rowq
 cargo build        # debug build
 cargo test         # run all tests
 cargo run -- path/to/file.csv   # run with a file
@@ -19,7 +19,7 @@ Requirements: Rust stable (see `rust-version` in `Cargo.toml` for minimum).
 ### Reporting bugs
 
 Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md).
-Include your OS, terminal emulator, qrow version (`qrow --version`), and the exact steps to reproduce.
+Include your OS, terminal emulator, rowq version (`rowq --version`), and the exact steps to reproduce.
 
 ### Requesting features
 
@@ -86,4 +86,4 @@ The app uses Polars LazyFrame for filtering and aggregation. When adding new dat
 
 ## Questions
 
-Open a [Discussion](https://github.com/denisotree/qrow/discussions) for anything that doesn't fit as a bug or feature request.
+Open a [Discussion](https://github.com/denisotree/rowq/discussions) for anything that doesn't fit as a bug or feature request.

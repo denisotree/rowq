@@ -73,7 +73,7 @@ list.
   hold is marked red and `Enter` refuses until it is fixed. A blank field is
   NULL, and the first `Enter` says how many are blank and waits for a second.
 
-![The new-row form](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/rowform.gif)
+![The new-row form](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/rowform.gif)
 
 ## Set column types
 

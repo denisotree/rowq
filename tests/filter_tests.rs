@@ -1,12 +1,12 @@
 //! Row selection shared by the TUI's typed expressions and the MCP server's
 //! structured predicates.
 
-use qrow::data::dataframe::DataFrame;
-use qrow::data::expression::{Expr, Value};
-use qrow::data::filter::{
+use rowq::data::dataframe::DataFrame;
+use rowq::data::expression::{Expr, Value};
+use rowq::data::filter::{
     matching_rows, select_rows, Clause, Fallback, Operand, PredOp, Predicate,
 };
-use qrow::data::io::load_file;
+use rowq::data::io::load_file;
 use std::path::{Path, PathBuf};
 
 fn sample() -> DataFrame {
@@ -294,7 +294,7 @@ fn present(col: &str) -> Predicate {
 
 /// `is_empty` compared the column against a null literal, and in three-valued
 /// logic `x == null` is null — never true. It matched nothing at all, on any
-/// file, because polars reads an empty CSV field as null and qrow does not
+/// file, because polars reads an empty CSV field as null and rowq does not
 /// override that.
 #[test]
 fn is_empty_finds_the_blank_cells() {
@@ -400,7 +400,7 @@ fn a_date_column_can_be_filtered_by_an_iso_string() {
     let mut df = hires();
     let col = df.column_index("hire_date").unwrap();
     // What `t` does in the terminal.
-    df.set_column_type(col, qrow::types::ColumnType::Date)
+    df.set_column_type(col, rowq::types::ColumnType::Date)
         .unwrap();
 
     let after = matching_rows(

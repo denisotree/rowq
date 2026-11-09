@@ -5,7 +5,7 @@
 //! pattern, `content/**/index.md` is the whole site in one call, which is what makes
 //! reconciling a site against a database possible without an export script in between.
 //!
-//! The frontmatter is parsed by qrow's own document reader, so YAML (`---`) and TOML
+//! The frontmatter is parsed by rowq's own document reader, so YAML (`---`) and TOML
 //! (`+++`) behave exactly as they do in a `.yaml` or `.toml` file, nesting included.
 
 use crate::data::dataframe::DataFrame;

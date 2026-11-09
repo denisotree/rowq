@@ -1,13 +1,13 @@
-//! MCP server exposing qrow's engine to language models.
+//! MCP server exposing rowq's engine to language models.
 //!
 //! A model that is handed a data file either computes over it in its head — and
-//! invents numbers — or writes a throwaway script.  qrow already has a tested
+//! invents numbers — or writes a throwaway script.  rowq already has a tested
 //! engine for exactly this work: it loads a dozen formats, infers types, and can
 //! group, pivot, join and export.  This module is the way to call that engine
 //! without a terminal.
 //!
 //! The model expresses a request as a **structured pipeline of operations**, not
-//! as SQL.  Two reasons: every operation maps onto an existing qrow function
+//! as SQL.  Two reasons: every operation maps onto an existing rowq function
 //! (so the arithmetic is Polars', not a reimplementation), and a JSON-schema'd
 //! operation is validated where a SQL string is not — a typo in a schema is an
 //! error, a typo in SQL is a silently wrong number.
@@ -41,11 +41,11 @@ pub struct Server {
     /// passed `--mcp-write`; the write tools do not exist otherwise.
     pub write: bool,
     /// The one plan waiting to be applied.  A single slot on purpose: entering
-    /// `qrow_write` clears it whatever happens next, so a plan can never outlive the
+    /// `rowq_write` clears it whatever happens next, so a plan can never outlive the
     /// conversation that produced it and be applied in place of a newer one.
     pub pending: Option<write::Pending>,
     /// Numbers the plans.  Not a secret — the point of the id is that
-    /// `qrow_write_apply` runs the plan the model just read and refuses any other, and
+    /// `rowq_write_apply` runs the plan the model just read and refuses any other, and
     /// a counter does that as well as a nonce would.
     pub plan_seq: u64,
     /// The size, in bytes, from which a file Polars scans is streamed rather than
@@ -120,8 +120,8 @@ fn initialize_result(server: &Server, params: &Value) -> Value {
         "protocolVersion": rpc::negotiate_version(requested),
         "capabilities": {"tools": {}},
         "serverInfo": {
-            "name": "qrow",
-            "title": "qrow — query rows in tables, documents and databases",
+            "name": "rowq",
+            "title": "rowq — query rows in tables, documents and databases",
             "version": env!("CARGO_PKG_VERSION"),
         },
         "instructions": tools::instructions(server.write),
@@ -175,7 +175,7 @@ fn tool_response(
                 .unwrap_or_else(|| "no message".to_string());
             rpc::success(
                 id,
-                rpc::tool_error(format!("qrow crashed on this call (a bug): {}", why)),
+                rpc::tool_error(format!("rowq crashed on this call (a bug): {}", why)),
             )
         }
     }

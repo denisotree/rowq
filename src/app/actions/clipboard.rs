@@ -9,7 +9,7 @@ use ratatui::widgets::ScrollbarState;
 /// empty string: `""` is not a number and would fail the strict cast for every numeric
 /// column it touched. An empty field that is actually there is only NULL for a column
 /// that cannot hold text; in a text column the empty string is a value, and turning it
-/// into NULL behind the user's back is exactly what qrow promises not to do.
+/// into NULL behind the user's back is exactly what rowq promises not to do.
 fn paste_field(field: Option<&str>, text_col: bool) -> Option<String> {
     match field {
         None => None,

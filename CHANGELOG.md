@@ -7,17 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.1] - 2026-11-05
+## [1.0.0] - 2026-11-09
 
-### Fixed
+### Breaking
 
-- The API documentation on docs.rs builds. 1.1.0's docs build still failed: without the
-  bundled DuckDB, the DuckDB crate's build script downloaded a pre-built library, and
-  docs.rs builds without network. The download is now off.
-- A `--no-default-features` build links the system DuckDB, as the README says. It used to
-  download a pre-built libduckdb instead, before looking for the installed one.
+**rowq 1.0.0 is the first release of rowq, which continues tuitab.** The engine is the same,
+developed further under a new name. tuitab stays available at 0.11.1 on every channel as a
+separate product and gets no further releases; the two install side by side. From here the
+versions follow 1.{update}.{patch}: a feature update raises the middle number, a fix the last.
 
-## [1.1.0] - 2026-11-05
+- The crate and the command are `rowq`. tuitab's short names `ttab` and `ttb` are gone
+  (`ttab` also collided with mklement0/ttab, a macOS tool), and there is no new alias.
+- The MCP server reports itself as `rowq`, and its tools are `rowq_inspect`,
+  `rowq_query`, `rowq_describe`, `rowq_jq`, `rowq_calc`, `rowq_write` and
+  `rowq_write_apply`. Register it — `claude mcp add -s user rowq -- rowq --mcp`, adding
+  `--mcp-write` if you want writes — and rename permission rules:
+  `mcp__tuitab__tuitab_query` becomes `mcp__rowq__rowq_query`, `mcp__tuitab` becomes
+  `mcp__rowq`.
+- The repository is [denisotree/rowq](https://github.com/denisotree/rowq) and the site
+  [rowq.dev](https://rowq.dev). [denisotree/tuitab](https://github.com/denisotree/tuitab)
+  keeps tuitab 0.11.1 and earlier.
+- Packages: crates.io `rowq`; Homebrew `brew install denisotree/rowq/rowq` (its own tap);
+  AUR `rowq` and `rowq-bin`; APT at `https://rowq.dev/apt` with the key `rowq.gpg`. None
+  of them touches tuitab — install rowq side by side, and remove tuitab when you want.
 
 ### Changed
 
@@ -26,52 +38,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- The API documentation on docs.rs builds again. It failed twice over: Polars 0.53 turns
-  on nightly-only code under the nightly compiler docs.rs uses, and that code no longer
-  compiles there; and compiling the bundled DuckDB ran past docs.rs's memory limit, so the
-  docs are now built without it.
-
-## [1.0.0] - 2026-11-05
-
-### Breaking
-
-**qrow 1.0.0 is the first release of qrow, which continues tuitab.** The engine is the same,
-developed further under a new name. tuitab stays available at 0.11.1 on every channel as a
-separate product and gets no further releases; the two install side by side. From here the
-versions follow 1.{update}.{patch}: a feature update raises the middle number, a fix the last.
-
-- The crate is `qrow` and the commands are `qrow` and its short alias `qrw` (tuitab's
-  `ttab` also collided with mklement0/ttab, a macOS tool). The `aliases` feature builds
-  `qrw`; `cargo binstall qrow` installs `qrow` alone.
-- The MCP server reports itself as `qrow`, and its tools are `qrow_inspect`,
-  `qrow_query`, `qrow_describe`, `qrow_jq`, `qrow_calc`, `qrow_write` and
-  `qrow_write_apply`. Register it — `claude mcp add -s user qrow -- qrow --mcp`, adding
-  `--mcp-write` if you want writes — and rename permission rules:
-  `mcp__tuitab__tuitab_query` becomes `mcp__qrow__qrow_query`, `mcp__tuitab` becomes
-  `mcp__qrow`.
-- The repository is [denisotree/qrow](https://github.com/denisotree/qrow) and the site
-  [qrow.dev](https://qrow.dev). [denisotree/tuitab](https://github.com/denisotree/tuitab)
-  keeps tuitab 0.11.1 and earlier.
-- Packages: crates.io `qrow`; Homebrew `brew install denisotree/qrow/qrow` (its own tap);
-  AUR `qrow` and `qrow-bin`; APT at `https://qrow.dev/apt` with the key `qrow.gpg`. None
-  of them touches tuitab — install qrow side by side, and remove tuitab when you want.
-
-### Fixed
-
+- The API documentation on docs.rs builds. Polars 0.53 turned on nightly-only code under
+  the nightly compiler docs.rs uses, and that code no longer compiled there; compiling the
+  bundled DuckDB ran past docs.rs's memory limit, so the docs are built without it; and
+  without the bundled DuckDB, the DuckDB crate's build script downloaded a pre-built
+  library, while docs.rs builds without network. The download is now off.
+- A `--no-default-features` build links the system DuckDB, as the README says. It used to
+  download a pre-built libduckdb instead, before looking for the installed one.
 - The MCP descriptions of the write tools no longer carry runs of spaces.
 - The MCP guide said the server offers four tools, or six with `--mcp-write`; it offers
   five, or seven.
-- SECURITY.md said qrow has no server component; it describes the MCP server now.
+- SECURITY.md said the project has no server component; it describes the MCP server now.
 
 ## [0.11.1] - 2026-11-04
 
 ### Notice
 
-- **tuitab stays at 0.11.1; development continues as the separate project qrow.**
-  This release remains available on every channel and keeps working. qrow starts at
-  1.0.0 with the same engine, the commands `qrow` and `qrw` and the MCP tools `qrow_*`;
-  it installs side by side with tuitab. See https://github.com/denisotree/qrow and
-  https://qrow.dev.
+- **tuitab stays at 0.11.1; development continues as the separate project rowq.**
+  This release remains available on every channel and keeps working. rowq starts at
+  1.0.0 with the same engine, the command `rowq` and the MCP tools `rowq_*`; it installs
+  side by side with tuitab. See https://github.com/denisotree/rowq and https://rowq.dev.
 
 ### Added
 
@@ -1542,10 +1528,8 @@ versions follow 1.{update}.{patch}: a feature update raises the middle number, a
 - Non-English keyboard remapping
 - Three binary aliases: `tuitab`, `ttab`, `tt`
 
-[Unreleased]: https://github.com/denisotree/qrow/compare/v1.1.1...HEAD
-[1.1.1]: https://github.com/denisotree/qrow/compare/v1.1.0...v1.1.1
-[1.1.0]: https://github.com/denisotree/qrow/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/denisotree/qrow/compare/v0.11.1...v1.0.0
+[Unreleased]: https://github.com/denisotree/rowq/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/denisotree/rowq/compare/v0.11.1...v1.0.0
 [0.11.1]: https://github.com/denisotree/tuitab/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/denisotree/tuitab/compare/v0.10.3...v0.11.0
 [0.10.3]: https://github.com/denisotree/tuitab/compare/v0.10.2...v0.10.3

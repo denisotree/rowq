@@ -1,4 +1,4 @@
-//! Sheet stack — the navigation model for qrow.
+//! Sheet stack — the navigation model for rowq.
 //!
 //! A [`Sheet`] holds one data view: a [`crate::data::dataframe::DataFrame`] plus all UI
 //! state that belongs to it (cursor position, active sort, search pattern, undo history,

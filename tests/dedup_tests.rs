@@ -1,8 +1,8 @@
 //! Duplicate detection and removal, shared by both surfaces.
 
-use qrow::data::dataframe::DataFrame;
-use qrow::data::dedup::{deduplicate, duplicate_rows, Keep};
-use qrow::data::io::load_file;
+use rowq::data::dataframe::DataFrame;
+use rowq::data::dedup::{deduplicate, duplicate_rows, Keep};
+use rowq::data::io::load_file;
 use std::path::Path;
 use std::sync::Arc;
 
@@ -102,9 +102,9 @@ fn an_out_of_range_column_is_refused_rather_than_ignored() {
 /// `gD` in the terminal and `{"dedup": …}` over MCP run the same function.
 #[test]
 fn the_gd_key_produces_the_shared_dedup() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
+    let mut app = rowq::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
     {
         let s = app.stack.active_mut();
         let dept = s.dataframe.column_index("department").unwrap();
@@ -125,7 +125,7 @@ fn the_gd_key_produces_the_shared_dedup() {
 
 // ── sampling ────────────────────────────────────────────────────────────────
 
-use qrow::data::dedup::sample_rows;
+use rowq::data::dedup::sample_rows;
 
 #[test]
 fn a_sample_is_reproducible_from_its_seed_and_keeps_table_order() {
@@ -173,7 +173,7 @@ fn a_sample_draws_only_from_the_visible_rows() {
 #[test]
 fn sampling_from_a_large_table_finishes() {
     use polars::prelude::{Column, NamedFrom, Series};
-    use qrow::data::column::ColumnMeta;
+    use rowq::data::column::ColumnMeta;
 
     let n = 200_000;
     let values: Vec<i64> = (0..n as i64).collect();
@@ -199,8 +199,8 @@ fn sampling_from_a_large_table_finishes() {
 #[test]
 fn rows_that_merely_display_alike_are_not_duplicates() {
     use polars::prelude::{Column, NamedFrom, Series};
-    use qrow::data::column::ColumnMeta;
-    use qrow::types::ColumnType;
+    use rowq::data::column::ColumnMeta;
+    use rowq::types::ColumnType;
 
     let pdf = polars::prelude::DataFrame::new_infer_height(vec![Column::from(Series::new(
         "amount".into(),

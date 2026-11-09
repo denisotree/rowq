@@ -6,11 +6,11 @@ A pivot table cross-tabulates your data: one set of columns becomes the **rows**
 another column's values become the **columns**, and an aggregation fills the
 cells.
 
-![Pivot table](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/pivot.gif)
+![Pivot table](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/pivot.gif)
 
 ## How it works
 
-Unlike a spreadsheet wizard, qrow reads the pivot layout from the table state:
+Unlike a spreadsheet wizard, rowq reads the pivot layout from the table state:
 
 1. **Rows (index)** — the columns you've **pinned** with `!`.
 2. **Columns (spread)** — the column under the **cursor**.
@@ -43,7 +43,7 @@ The input remembers history (`↑` / `↓`) and autocompletes column names (`Tab
 ## Step by step
 
 ```sh
-qrow sales.csv     # columns: date, region, category, units, revenue
+rowq sales.csv     # columns: date, region, category, units, revenue
 ```
 
 1. Move to `region` and pin it with `!` — this becomes the row index.

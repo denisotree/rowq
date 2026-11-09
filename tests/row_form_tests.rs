@@ -10,8 +10,8 @@ mod keys;
 
 use crossterm::event::KeyCode;
 use keys::{key, open, press};
-use qrow::app::App;
-use qrow::types::{AppMode, ColumnType};
+use rowq::app::App;
+use rowq::types::{AppMode, ColumnType};
 
 const TYPED: &str = "test_data/typed.csv";
 

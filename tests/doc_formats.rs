@@ -1,9 +1,9 @@
 //! End-to-end checks for the JSON / JSONL / YAML / TOML pipeline: open a real file,
 //! project it, edit through the tree, save it back, and convert between formats.
 
-use qrow::data::doc::{Format, Seg};
-use qrow::data::io::{doc_io::Shape, load_file_as, load_file_with_doc, save_file_as};
-use qrow::data::view::ViewMode;
+use rowq::data::doc::{Format, Seg};
+use rowq::data::io::{doc_io::Shape, load_file_as, load_file_with_doc, save_file_as};
+use rowq::data::view::ViewMode;
 use std::path::{Path, PathBuf};
 
 fn fixture(name: &str) -> PathBuf {
@@ -91,7 +91,7 @@ fn toml_converts_to_yaml_and_json_by_changing_the_extension() {
         .root
         .get(&[Seg::Key("db".into()), Seg::Key("host".into())])
         .cloned();
-    assert_eq!(host, Some(qrow::data::doc::Node::Str("localhost".into())));
+    assert_eq!(host, Some(rowq::data::doc::Node::Str("localhost".into())));
 }
 
 #[test]
@@ -137,9 +137,9 @@ fn a_json_file_holding_json_lines_opens_and_saves_as_lines() {
     assert_eq!(df.visible_row_count(), 2);
     assert_eq!(df.col_count(), 2);
 
-    let format = qrow::data::doc::Format::of_file(&path);
+    let format = rowq::data::doc::Format::of_file(&path);
     assert_eq!(format, Some(Format::Jsonl));
-    qrow::data::io::save_file_in(&df, doc.as_ref(), &path, format, Shape::Records, "lines")
+    rowq::data::io::save_file_in(&df, doc.as_ref(), &path, format, Shape::Records, "lines")
         .unwrap();
     let text = std::fs::read_to_string(&path).unwrap();
     assert_eq!(text.lines().count(), 2, "{}", text);
@@ -176,7 +176,7 @@ fn nested_json_dives_into_subtrees_and_edits_are_visible_from_the_root() {
         .root
         .get(&[Seg::Idx(0), Seg::Key("tags".into()), Seg::Idx(0)])
         .cloned();
-    assert_eq!(value, Some(qrow::data::doc::Node::Str("z".into())));
+    assert_eq!(value, Some(rowq::data::doc::Node::Str("z".into())));
 }
 
 #[test]
@@ -214,9 +214,9 @@ fn forcing_a_format_overrides_the_extension() {
 fn a_toml_file_renders_as_key_value_rows_in_the_real_ui() {
     use ratatui::{backend::TestBackend, Terminal};
 
-    let mut app = qrow::app::App::new(&fixture("app.toml"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("app.toml"), None).unwrap();
     let mut terminal = Terminal::new(TestBackend::new(120, 24)).unwrap();
-    terminal.draw(|f| qrow::ui::render(f, &mut app)).unwrap();
+    terminal.draw(|f| rowq::ui::render(f, &mut app)).unwrap();
 
     let screen: String = terminal
         .backend()
@@ -248,9 +248,9 @@ fn a_toml_file_renders_as_key_value_rows_in_the_real_ui() {
 /// `m` to change the projection, and pop back out.
 #[test]
 fn enter_dives_into_a_nested_node_and_esc_pops_back() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("app.toml"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("app.toml"), None).unwrap();
     let root_title = app.stack.active().title.clone();
 
     // walk down to the `servers` row
@@ -297,9 +297,9 @@ fn enter_dives_into_a_nested_node_and_esc_pops_back() {
 /// flat array of tables.
 #[test]
 fn drilling_in_from_a_directory_keeps_the_document() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(Path::new("test_data"), None).unwrap();
+    let mut app = rowq::app::App::new(Path::new("test_data"), None).unwrap();
     assert!(app.stack.active().is_dir_sheet);
 
     // find the app.toml row and open it
@@ -339,9 +339,9 @@ fn drilling_in_from_a_directory_keeps_the_document() {
 /// not just in the saved file.
 #[test]
 fn popping_back_from_a_dive_shows_the_edit() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     // row 0, column `meta` holds a container rendered as `{1} ok=true`
     let meta_col = app
         .stack
@@ -364,7 +364,7 @@ fn popping_back_from_a_dive_shows_the_edit() {
         let s = app.stack.active_mut();
         s.edit_row = 0;
         s.edit_col = 1;
-        s.edit_input = qrow::ui::text_input::TextInput::with_value("false".into());
+        s.edit_input = rowq::ui::text_input::TextInput::with_value("false".into());
     }
     app.handle_action(Action::ApplyEdit);
     app.handle_action(Action::PopSheet);
@@ -380,8 +380,8 @@ fn popping_back_from_a_dive_shows_the_edit() {
 /// with bare scalar rows, must not confuse that key with the synthetic bare-value column.
 #[test]
 fn a_key_named_value_is_not_mistaken_for_the_bare_column() {
-    use qrow::data::doc::{Doc, Node};
-    use qrow::data::io::doc_io::DocState;
+    use rowq::data::doc::{Doc, Node};
+    use rowq::data::io::doc_io::DocState;
 
     let doc = Doc::from_str(r#"[{"value":"real"}, 7]"#, Format::Json).unwrap();
     let (df, mut state) = DocState::from_doc(doc).unwrap();
@@ -410,9 +410,9 @@ fn a_key_named_value_is_not_mistaken_for_the_bare_column() {
 /// expansion, and fold it back.
 #[test]
 fn expand_and_contract_a_nested_column_from_the_app() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     let meta_col = app
         .stack
         .active()
@@ -446,7 +446,7 @@ fn expand_and_contract_a_nested_column_from_the_app() {
         let s = app.stack.active_mut();
         s.edit_row = 0;
         s.edit_col = ok_col;
-        s.edit_input = qrow::ui::text_input::TextInput::with_value("false".into());
+        s.edit_input = rowq::ui::text_input::TextInput::with_value("false".into());
     }
     app.handle_action(Action::ApplyEdit);
     let doc = app.stack.active().doc.as_ref().unwrap();
@@ -456,7 +456,7 @@ fn expand_and_contract_a_nested_column_from_the_app() {
             Seg::Key("meta".into()),
             Seg::Key("ok".into())
         ]),
-        Some(&qrow::data::doc::Node::Bool(false)),
+        Some(&rowq::data::doc::Node::Bool(false)),
         "editing an expanded column must write into the nested node"
     );
 
@@ -480,9 +480,9 @@ fn expand_and_contract_a_nested_column_from_the_app() {
 /// Expansion survives a reprojection — it lives on the view, not on the columns.
 #[test]
 fn expansion_survives_switching_back_from_a_dive() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     let meta_col = app
         .stack
         .active()
@@ -514,9 +514,9 @@ fn expansion_survives_switching_back_from_a_dive() {
 /// structure, not flattened `meta.ok` keys.  (VisiData writes the flattened names.)
 #[test]
 fn expanding_columns_does_not_leak_into_the_saved_file() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     let meta_col = app
         .stack
         .active()
@@ -551,9 +551,9 @@ fn expanding_columns_does_not_leak_into_the_saved_file() {
 /// shapes: the next edit would then write into the wrong node, silently.
 #[test]
 fn undo_after_expanding_keeps_the_table_and_the_node_mapping_in_step() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
 
     // one document edit, so there is something on the undo stack
     {
@@ -565,7 +565,7 @@ fn undo_after_expanding_keeps_the_table_and_the_node_mapping_in_step() {
             .iter()
             .position(|c| c.name == "name")
             .unwrap();
-        s.edit_input = qrow::ui::text_input::TextInput::with_value("ALPHA".into());
+        s.edit_input = rowq::ui::text_input::TextInput::with_value("ALPHA".into());
     }
     app.handle_action(Action::ApplyEdit);
 
@@ -604,9 +604,9 @@ fn undo_after_expanding_keeps_the_table_and_the_node_mapping_in_step() {
 /// refused on a doc-backed sheet rather than desync the cell→node mapping.
 #[test]
 fn column_ops_are_refused_on_a_doc_sheet() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     let before: Vec<String> = app
         .stack
         .active()
@@ -630,7 +630,7 @@ fn column_ops_are_refused_on_a_doc_sheet() {
         let s = app.stack.active_mut();
         s.edit_row = 0;
         s.edit_col = before.iter().position(|n| n == "name").unwrap();
-        s.edit_input = qrow::ui::text_input::TextInput::with_value("ALPHA".into());
+        s.edit_input = rowq::ui::text_input::TextInput::with_value("ALPHA".into());
     }
     app.handle_action(Action::ApplyEdit);
     let s = app.stack.active();
@@ -643,7 +643,7 @@ fn column_ops_are_refused_on_a_doc_sheet() {
             .unwrap()
             .root
             .get(&[Seg::Idx(0), Seg::Key("name".into())]),
-        Some(&qrow::data::doc::Node::Str("ALPHA".into()))
+        Some(&rowq::data::doc::Node::Str("ALPHA".into()))
     );
 }
 
@@ -651,8 +651,8 @@ fn column_ops_are_refused_on_a_doc_sheet() {
 /// cell→node mapping valid, save, and undo.
 #[test]
 fn column_ops_on_a_doc_sheet_change_the_document() {
-    use qrow::types::Action;
-    use qrow::ui::text_input::TextInput;
+    use rowq::types::Action;
+    use rowq::ui::text_input::TextInput;
 
     let path = out("column-ops.json");
     std::fs::write(
@@ -660,8 +660,8 @@ fn column_ops_on_a_doc_sheet_change_the_document() {
         r#"[{"id":1,"name":"a","tmp":0},{"id":2,"name":"b"}]"#,
     )
     .unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
-    let cols = |app: &qrow::app::App| -> Vec<String> {
+    let mut app = rowq::app::App::new(&path, None).unwrap();
+    let cols = |app: &rowq::app::App| -> Vec<String> {
         app.stack
             .active()
             .dataframe
@@ -753,7 +753,7 @@ fn column_ops_on_a_doc_sheet_change_the_document() {
 /// its document tree — otherwise saving it flattens the structure.
 #[test]
 fn a_large_json_loaded_in_the_background_keeps_its_document() {
-    use qrow::data::async_loader::{load_in_background, LoadEvent};
+    use rowq::data::async_loader::{load_in_background, LoadEvent};
 
     // just over the 10 MB threshold that switches App::new to the async path
     let path = out("big.json");
@@ -846,15 +846,15 @@ fn an_array_rooted_document_can_still_be_saved_as_toml() {
 /// answer, and does not ask a doc-backed sheet at all.
 #[test]
 fn saving_a_plain_table_asks_for_a_shape() {
-    use qrow::types::{Action, AppMode};
+    use rowq::types::{Action, AppMode};
 
-    let mut app = qrow::app::App::new(&fixture("prices.csv"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("prices.csv"), None).unwrap();
     let target = out("shape-choice.json");
     let _ = std::fs::remove_file(&target); // a leftover from an earlier run would mask the check
 
     app.handle_action(Action::SaveFile);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(target.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(target.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     assert_eq!(app.mode, AppMode::SaveShapeSelect, "must ask first");
     assert!(
@@ -875,7 +875,7 @@ fn saving_a_plain_table_asks_for_a_shape() {
     let second = out("shape-choice-2.json");
     app.handle_action(Action::SaveFile);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(second.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(second.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     assert_eq!(app.mode, AppMode::SaveShapeSelect);
     app.handle_action(Action::ApplySaveShape);
@@ -887,18 +887,18 @@ fn saving_a_plain_table_asks_for_a_shape() {
 /// different column count offers a different list, and an index would land elsewhere.
 #[test]
 fn the_remembered_shape_survives_a_shorter_option_list() {
-    use qrow::data::io::doc_io::Shape;
-    use qrow::types::{Action, AppMode};
+    use rowq::data::io::doc_io::Shape;
+    use rowq::types::{Action, AppMode};
 
     // a two-column table: key/value is offered as the third option
     let two_col = out("pairs.csv");
     std::fs::write(&two_col, "k,v\na,1\nb,2\n").unwrap();
-    let mut app = qrow::app::App::new(&two_col, None).unwrap();
+    let mut app = rowq::app::App::new(&two_col, None).unwrap();
     let target = out("kv-shape.json");
     let _ = std::fs::remove_file(&target);
     app.handle_action(Action::SaveFile);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(target.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(target.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     assert_eq!(app.save.shapes.len(), 3, "records, columns, key/value");
     app.handle_action(Action::ChoiceDown);
@@ -909,12 +909,12 @@ fn the_remembered_shape_survives_a_shorter_option_list() {
     // now a sheet with more columns: key/value is not on offer, and the cursor must not
     // silently land on `columns` just because index 2 no longer exists
     app.handle_action(Action::PopSheet);
-    let mut app = qrow::app::App::new(&fixture("sample.csv"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("sample.csv"), None).unwrap();
     app.save.shape = Shape::KeyValue;
     app.handle_action(Action::SaveFile);
     let wide = out("wide-shape.json");
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(wide.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(wide.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     assert_eq!(app.mode, AppMode::SaveShapeSelect);
     assert_eq!(
@@ -932,13 +932,13 @@ fn the_remembered_shape_survives_a_shorter_option_list() {
 /// A doc-backed sheet is never asked for a shape — its tree already has one.
 #[test]
 fn saving_a_document_sheet_does_not_ask_for_a_shape() {
-    use qrow::types::{Action, AppMode};
+    use rowq::types::{Action, AppMode};
 
-    let mut app = qrow::app::App::new(&fixture("app.toml"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("app.toml"), None).unwrap();
     let target = out("no-shape-question.yaml");
     app.handle_action(Action::SaveFile);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(target.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(target.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     assert_eq!(app.mode, AppMode::Normal, "{}", app.status_message);
     assert!(std::fs::read_to_string(&target)
@@ -950,12 +950,12 @@ fn saving_a_document_sheet_does_not_ask_for_a_shape() {
 /// overriding both the extension and content sniffing.
 #[test]
 fn open_as_forces_a_format_from_the_directory_listing() {
-    use qrow::types::{Action, AppMode};
+    use rowq::types::{Action, AppMode};
 
     // a YAML file wearing a .txt extension: sniffing declines, the extension lies
     std::fs::write(fixture("mislabelled.txt"), "alpha: 1\nbeta: 2\n").unwrap();
 
-    let mut app = qrow::app::App::new(Path::new("test_data"), None).unwrap();
+    let mut app = rowq::app::App::new(Path::new("test_data"), None).unwrap();
     let df = &app.stack.active().dataframe;
     let row = (0..df.visible_row_count())
         .find(|r| df.get_physical(*r, 0).contains("mislabelled.txt"))
@@ -982,16 +982,16 @@ fn open_as_forces_a_format_from_the_directory_listing() {
 /// user cannot undo from inside the tool.
 #[test]
 fn saving_an_edited_toml_config_over_itself_keeps_its_comments() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("commented.toml");
     std::fs::write(
         &path,
-        "# qrow demo config\nname = \"demo\"  # display name\nport = 8080\n\n# database\n[db]\nhost = \"localhost\"\n",
+        "# rowq demo config\nname = \"demo\"  # display name\nport = 8080\n\n# database\n[db]\nhost = \"localhost\"\n",
     )
     .unwrap();
 
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
     let row = (0..app.stack.active().dataframe.visible_row_count())
         .find(|r| app.stack.active().dataframe.get_physical(*r, 0) == "port")
         .unwrap();
@@ -999,18 +999,18 @@ fn saving_an_edited_toml_config_over_itself_keeps_its_comments() {
         let s = app.stack.active_mut();
         s.edit_row = row;
         s.edit_col = 1;
-        s.edit_input = qrow::ui::text_input::TextInput::with_value("9090".into());
+        s.edit_input = rowq::ui::text_input::TextInput::with_value("9090".into());
     }
     app.handle_action(Action::ApplyEdit);
 
     app.handle_action(Action::SaveFile);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
 
     let text = std::fs::read_to_string(&path).unwrap();
     assert!(text.contains("port = 9090"), "the edit landed: {}", text);
-    assert!(text.contains("# qrow demo config"), "{}", text);
+    assert!(text.contains("# rowq demo config"), "{}", text);
     assert!(text.contains("# display name"), "{}", text);
     assert!(text.contains("# database"), "{}", text);
 }
@@ -1033,11 +1033,11 @@ fn converting_a_commented_toml_to_yaml_drops_the_comments() {
 /// the view only would look like a deletion and then undo itself on the next save.
 #[test]
 fn deleting_rows_removes_them_from_the_document() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("delete-rows.json");
     std::fs::write(&path, r#"[{"id":1},{"id":2},{"id":3}]"#).unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     // select rows 0 and 2
     app.stack.active_mut().dataframe.selected_rows.insert(0);
@@ -1051,7 +1051,7 @@ fn deleting_rows_removes_them_from_the_document() {
 
     app.handle_action(Action::SaveFile);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     let text = std::fs::read_to_string(&path).unwrap();
     assert!(
@@ -1069,11 +1069,11 @@ fn deleting_rows_removes_them_from_the_document() {
 /// In key/value mode a row is an object key, so deleting one removes the key.
 #[test]
 fn deleting_a_row_in_key_value_mode_removes_the_key() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("delete-key.toml");
     std::fs::write(&path, "a = 1\nb = 2\nc = 3\n").unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     let row = (0..3)
         .find(|r| app.stack.active().dataframe.get_physical(*r, 0) == "b")
@@ -1100,9 +1100,9 @@ fn deleting_a_row_in_key_value_mode_removes_the_key() {
 /// refused, so the cell→node mapping can never drift.
 #[test]
 fn table_reshaping_operations_are_refused_on_a_doc_sheet() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     let before = app.stack.active().dataframe.columns.len();
 
     for action in [
@@ -1124,14 +1124,14 @@ fn table_reshaping_operations_are_refused_on_a_doc_sheet() {
 /// A one-way conversion says so at the moment of saving, not afterwards.
 #[test]
 fn a_lossy_conversion_is_named_in_the_status_line() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     // multi-document YAML written as JSON loses the document separation
-    let mut app = qrow::app::App::new(&fixture("k8s.yaml"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("k8s.yaml"), None).unwrap();
     app.handle_action(Action::SaveFile);
     let target = out("k8s-lossy.json");
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(target.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(target.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     assert!(
         app.status_message.contains("document separators"),
@@ -1142,11 +1142,11 @@ fn a_lossy_conversion_is_named_in_the_status_line() {
     // a commented TOML written as YAML loses the comments
     let src = out("lossy-src.toml");
     std::fs::write(&src, "# a note\nname = \"x\"\n").unwrap();
-    let mut app = qrow::app::App::new(&src, None).unwrap();
+    let mut app = rowq::app::App::new(&src, None).unwrap();
     app.handle_action(Action::SaveFile);
     let yaml = out("lossy-out.yaml");
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(yaml.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(yaml.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     assert!(
         app.status_message.contains("comments"),
@@ -1158,7 +1158,7 @@ fn a_lossy_conversion_is_named_in_the_status_line() {
     app.handle_action(Action::SaveFile);
     let toml = out("lossy-out.toml");
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(toml.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(toml.to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     assert!(
         !app.status_message.contains("note:"),
@@ -1171,10 +1171,10 @@ fn a_lossy_conversion_is_named_in_the_status_line() {
 /// urgent to say — nothing else shows it, and it is what you need to refer to a value.
 #[test]
 fn the_node_path_is_shown_in_the_status_line_when_idle() {
-    use qrow::types::Action;
     use ratatui::{backend::TestBackend, Terminal};
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     let host_col = app
         .stack
         .active()
@@ -1188,7 +1188,7 @@ fn the_node_path_is_shown_in_the_status_line_when_idle() {
     app.status_message.clear();
 
     let mut terminal = Terminal::new(TestBackend::new(140, 12)).unwrap();
-    terminal.draw(|f| qrow::ui::render(f, &mut app)).unwrap();
+    terminal.draw(|f| rowq::ui::render(f, &mut app)).unwrap();
     let screen: String = terminal
         .backend()
         .buffer()
@@ -1217,11 +1217,11 @@ fn the_node_path_is_shown_in_the_status_line_when_idle() {
 /// claim an ordering the table no longer has.
 #[test]
 fn deleting_rows_from_a_sorted_view_leaves_no_stale_sort() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("sorted-delete.json");
     std::fs::write(&path, r#"[{"n":3},{"n":1},{"n":2}]"#).unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     app.stack.active_mut().cursor_col = 0;
     app.handle_action(Action::SortAscending);
@@ -1253,11 +1253,11 @@ fn deleting_rows_from_a_sorted_view_leaves_no_stale_sort() {
 /// Deleting an element from a scalar array view.
 #[test]
 fn deleting_from_a_scalar_view_removes_the_element() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("scalar-delete.json");
     std::fs::write(&path, "[10, 20, 30]").unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
     assert_eq!(app.stack.active().dataframe.visible_row_count(), 3);
 
     app.stack.active_mut().dataframe.selected_rows.insert(1);
@@ -1288,7 +1288,7 @@ fn deleting_from_a_scalar_view_removes_the_element() {
 /// the user can look through — nothing is opened behind their back.
 #[test]
 fn document_search_finds_nodes_that_are_not_on_screen() {
-    use qrow::types::{Action, AppMode};
+    use rowq::types::{Action, AppMode};
 
     let path = out("deep-search.json");
     std::fs::write(
@@ -1297,7 +1297,7 @@ fn document_search_finds_nodes_that_are_not_on_screen() {
             {"id":2,"meta":{"owner":"bob","tags":["alice-backup"]}}]"#,
     )
     .unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     // `alice` appears only inside nested containers, never as a cell of the top view
     app.handle_action(Action::StartDocSearch);
@@ -1355,11 +1355,11 @@ fn document_search_finds_nodes_that_are_not_on_screen() {
 /// Searching for a key name finds the key, and says that is what matched.
 #[test]
 fn document_search_matches_key_names_too() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("key-search.toml");
     std::fs::write(&path, "[db]\nhostname = \"h\"\n[cache]\nhost = \"c\"\n").unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     app.handle_action(Action::StartDocSearch);
     for c in "^host".chars() {
@@ -1376,9 +1376,9 @@ fn document_search_matches_key_names_too() {
 /// A pattern with no match says so instead of pushing an empty sheet.
 #[test]
 fn document_search_with_no_match_pushes_nothing() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     let depth = app.stack.depth();
     app.handle_action(Action::StartDocSearch);
     for c in "zzzznope".chars() {
@@ -1398,11 +1398,11 @@ fn document_search_with_no_match_pushes_nothing() {
 /// every later index. Navigating there without a word would be worse than refusing.
 #[test]
 fn a_hit_list_does_not_navigate_after_the_document_changed() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("stale-hits.json");
     std::fs::write(&path, r#"[{"tag":"keep"},{"tag":"keep"},{"tag":"needle"}]"#).unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     app.handle_action(Action::StartDocSearch);
     for c in "needle".chars() {
@@ -1431,7 +1431,7 @@ fn a_hit_list_does_not_navigate_after_the_document_changed() {
 /// would open something the user never searched for.
 #[test]
 fn a_stale_hit_refuses_rather_than_opening_the_wrong_node() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("stale-hits-2.json");
     std::fs::write(
@@ -1439,7 +1439,7 @@ fn a_stale_hit_refuses_rather_than_opening_the_wrong_node() {
         r#"[{"tag":"a"},{"tag":"b"},{"tag":"needle"},{"tag":"d"}]"#,
     )
     .unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     app.handle_action(Action::StartDocSearch);
     for c in "needle".chars() {
@@ -1473,7 +1473,7 @@ fn a_stale_hit_refuses_rather_than_opening_the_wrong_node() {
 /// shows, so the three agree.
 #[test]
 fn goto_path_jumps_to_the_node_and_reports_a_wrong_path_usefully() {
-    use qrow::types::{Action, AppMode};
+    use rowq::types::{Action, AppMode};
 
     let path = out("goto.json");
     std::fs::write(
@@ -1481,12 +1481,12 @@ fn goto_path_jumps_to_the_node_and_reports_a_wrong_path_usefully() {
         r#"{"servers":[{"host":"a"},{"host":"b"}],"awkward.key":{"x":1}}"#,
     )
     .unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     app.handle_action(Action::StartPathGoto);
     assert_eq!(app.mode, AppMode::PathInput);
     app.stack.active_mut().path_input =
-        qrow::ui::text_input::TextInput::with_value("servers[1].host".into());
+        rowq::ui::text_input::TextInput::with_value("servers[1].host".into());
     app.handle_action(Action::ApplyPathGoto);
 
     let s = app.stack.active();
@@ -1506,7 +1506,7 @@ fn goto_path_jumps_to_the_node_and_reports_a_wrong_path_usefully() {
     app.handle_action(Action::PopSheet);
     app.handle_action(Action::StartPathGoto);
     app.stack.active_mut().path_input =
-        qrow::ui::text_input::TextInput::with_value("[\"awkward.key\"]".into());
+        rowq::ui::text_input::TextInput::with_value("[\"awkward.key\"]".into());
     app.handle_action(Action::ApplyPathGoto);
     assert_eq!(
         app.stack.active().doc.as_ref().unwrap().view.anchor,
@@ -1520,7 +1520,7 @@ fn goto_path_jumps_to_the_node_and_reports_a_wrong_path_usefully() {
     let depth = app.stack.depth();
     app.handle_action(Action::StartPathGoto);
     app.stack.active_mut().path_input =
-        qrow::ui::text_input::TextInput::with_value("servers[1].nope".into());
+        rowq::ui::text_input::TextInput::with_value("servers[1].nope".into());
     app.handle_action(Action::ApplyPathGoto);
     assert_eq!(app.stack.depth(), depth);
     assert!(
@@ -1533,7 +1533,7 @@ fn goto_path_jumps_to_the_node_and_reports_a_wrong_path_usefully() {
     // stacking a duplicate
     app.handle_action(Action::StartPathGoto);
     app.stack.active_mut().path_input =
-        qrow::ui::text_input::TextInput::with_value("servers[0].host".into());
+        rowq::ui::text_input::TextInput::with_value("servers[0].host".into());
     app.handle_action(Action::ApplyPathGoto);
     let depth_before = app.stack.depth();
     let anchor = app.stack.active().doc.as_ref().unwrap().view.anchor.clone();
@@ -1546,7 +1546,7 @@ fn goto_path_jumps_to_the_node_and_reports_a_wrong_path_usefully() {
     // and a malformed path is refused rather than guessed at
     app.handle_action(Action::StartPathGoto);
     app.stack.active_mut().path_input =
-        qrow::ui::text_input::TextInput::with_value("servers[1".into());
+        rowq::ui::text_input::TextInput::with_value("servers[1".into());
     app.handle_action(Action::ApplyPathGoto);
     assert!(
         app.status_message.contains("Bad path"),
@@ -1559,7 +1559,7 @@ fn goto_path_jumps_to_the_node_and_reports_a_wrong_path_usefully() {
 /// and saving all work on it, because a query result is just another document.
 #[test]
 fn a_jq_query_opens_its_result_as_a_sheet() {
-    use qrow::types::{Action, AppMode};
+    use rowq::types::{Action, AppMode};
 
     let path = out("query.json");
     std::fs::write(
@@ -1567,7 +1567,7 @@ fn a_jq_query_opens_its_result_as_a_sheet() {
         r#"[{"n":1,"ok":true},{"n":2,"ok":false},{"n":3,"ok":true}]"#,
     )
     .unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     app.handle_action(Action::StartQuery);
     assert_eq!(app.mode, AppMode::QueryInput);
@@ -1611,7 +1611,7 @@ fn a_jq_query_opens_its_result_as_a_sheet() {
 /// something that was not.
 #[test]
 fn a_jq_query_can_reshape_a_document_into_a_table() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("reshape.yaml");
     std::fs::write(
@@ -1619,7 +1619,7 @@ fn a_jq_query_can_reshape_a_document_into_a_table() {
         "users:\n  alice:\n    age: 30\n  bob:\n    age: 40\n",
     )
     .unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     app.handle_action(Action::StartQuery);
     for c in ".users | to_entries | map({name: .key, age: .value.age})".chars() {
@@ -1647,13 +1647,13 @@ fn a_jq_query_can_reshape_a_document_into_a_table() {
 /// legitimate answer, not a failure.
 #[test]
 fn a_query_matching_nothing_opens_an_empty_sheet() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     let depth = app.stack.depth();
     app.handle_action(Action::StartQuery);
     app.stack.active_mut().query_input =
-        qrow::ui::text_input::TextInput::with_value(".[] | select(.id == 999)".into());
+        rowq::ui::text_input::TextInput::with_value(".[] | select(.id == 999)".into());
     app.handle_action(Action::ApplyQuery);
 
     assert_eq!(app.stack.depth(), depth + 1, "{}", app.status_message);
@@ -1668,15 +1668,15 @@ fn a_query_matching_nothing_opens_an_empty_sheet() {
 /// A broken program says so and pushes nothing.
 #[test]
 fn a_failing_query_reports_and_pushes_nothing() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("nested.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("nested.json"), None).unwrap();
     let depth = app.stack.depth();
 
     for program in [".[ | broken", ".a | .[0]"] {
         app.handle_action(Action::StartQuery);
         app.stack.active_mut().query_input =
-            qrow::ui::text_input::TextInput::with_value(program.into());
+            rowq::ui::text_input::TextInput::with_value(program.into());
         app.handle_action(Action::ApplyQuery);
         assert_eq!(app.stack.depth(), depth, "no sheet for `{}`", program);
         assert!(
@@ -1692,11 +1692,11 @@ fn a_failing_query_reports_and_pushes_nothing() {
 /// program text, which is not a path.
 #[test]
 fn a_query_result_offers_a_usable_save_name() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
     let path = out("savename.json");
     std::fs::write(&path, r#"[{"n":1,"ok":true},{"n":2,"ok":false}]"#).unwrap();
-    let mut app = qrow::app::App::new(&path, None).unwrap();
+    let mut app = rowq::app::App::new(&path, None).unwrap();
 
     app.handle_action(Action::StartQuery);
     for c in ".[] | select(.ok)".chars() {
@@ -1717,7 +1717,7 @@ fn a_query_result_offers_a_usable_save_name() {
     // repository, when the suite runs from it. Point it somewhere disposable before
     // saving, having already asserted the part that matters.
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(out(&prefill).to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(out(&prefill).to_string_lossy().into_owned());
     app.handle_action(Action::ApplySave);
     assert!(
         app.status_message.contains("Saved"),
@@ -1731,7 +1731,7 @@ fn a_query_result_offers_a_usable_save_name() {
 /// object, a string and two numbers.  Built after auditing a real Grafana dashboard.
 #[test]
 fn a_deeply_nested_document_survives_every_conversion() {
-    use qrow::data::doc::{Doc, Format as F, SaveOpts};
+    use rowq::data::doc::{Doc, Format as F, SaveOpts};
 
     let original = std::fs::read_to_string(fixture("deep.json")).unwrap();
     let doc = Doc::from_str(&original, F::Json).unwrap();
@@ -1755,7 +1755,7 @@ fn a_deeply_nested_document_survives_every_conversion() {
 /// says so.
 #[test]
 fn jsonl_turns_a_document_into_a_one_record_stream_and_warns() {
-    use qrow::data::doc::{Doc, Format as F, Node, SaveOpts};
+    use rowq::data::doc::{Doc, Format as F, Node, SaveOpts};
 
     let doc = Doc::from_str(r#"{"a":1,"b":[2,3]}"#, F::Json).unwrap();
     let text = doc.to_string_as(F::Jsonl, &SaveOpts::default()).unwrap();
@@ -1768,13 +1768,13 @@ fn jsonl_turns_a_document_into_a_one_record_stream_and_warns() {
     assert_eq!(items.len(), 1);
     assert_eq!(items[0], doc.root, "the data itself is intact");
 
-    let (_, state) = qrow::data::io::doc_io::DocState::from_doc(doc).unwrap();
+    let (_, state) = rowq::data::io::doc_io::DocState::from_doc(doc).unwrap();
     let note = state.conversion_loss(F::Jsonl).expect("must warn");
     assert!(note.contains("one-record stream"), "{}", note);
 
     // a document that is already a list converts cleanly and says nothing
     let list = Doc::from_str(r#"[{"a":1},{"a":2}]"#, F::Json).unwrap();
-    let (_, state) = qrow::data::io::doc_io::DocState::from_doc(list).unwrap();
+    let (_, state) = rowq::data::io::doc_io::DocState::from_doc(list).unwrap();
     assert_eq!(state.conversion_loss(F::Jsonl), None);
 }
 
@@ -1782,9 +1782,9 @@ fn jsonl_turns_a_document_into_a_one_record_stream_and_warns() {
 /// view shows its first line — and editing it does not flatten it.
 #[test]
 fn multi_line_values_survive_the_table_and_the_editor() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("deep.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("deep.json"), None).unwrap();
     let row = (0..app.stack.active().dataframe.visible_row_count())
         .find(|r| app.stack.active().dataframe.get_physical(*r, 0) == "panels")
         .unwrap();
@@ -1811,7 +1811,7 @@ fn multi_line_values_survive_the_table_and_the_editor() {
         let s = app.stack.active_mut();
         s.edit_row = 0;
         s.edit_col = sql;
-        s.edit_input = qrow::ui::text_input::TextInput::with_value(before.clone());
+        s.edit_input = rowq::ui::text_input::TextInput::with_value(before.clone());
     }
     app.handle_action(Action::ApplyEdit);
     let after = app
@@ -1824,11 +1824,11 @@ fn multi_line_values_survive_the_table_and_the_editor() {
         .read()
         .unwrap()
         .root
-        .get(&qrow::data::doc::parse_path("panels[0].sql").unwrap())
+        .get(&rowq::data::doc::parse_path("panels[0].sql").unwrap())
         .cloned();
     assert_eq!(
         after,
-        Some(qrow::data::doc::Node::Str(before)),
+        Some(rowq::data::doc::Node::Str(before)),
         "a single-line editor must not flatten a multi-line value"
     );
 }
@@ -1837,10 +1837,10 @@ fn multi_line_values_survive_the_table_and_the_editor() {
 /// and keeps every cell addressing its real node.
 #[test]
 fn expanding_deep_nesting_keeps_cells_addressable() {
-    use qrow::data::doc::{parse_path, Node};
-    use qrow::types::Action;
+    use rowq::data::doc::{parse_path, Node};
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new(&fixture("deep.json"), None).unwrap();
+    let mut app = rowq::app::App::new(&fixture("deep.json"), None).unwrap();
     let row = (0..app.stack.active().dataframe.visible_row_count())
         .find(|r| app.stack.active().dataframe.get_physical(*r, 0) == "panels")
         .unwrap();
@@ -1888,7 +1888,7 @@ fn expanding_deep_nesting_keeps_cells_addressable() {
 /// with the app's own writer and reads it back, so a calamine upgrade cannot break
 /// Excel support silently.
 #[test]
-fn an_xlsx_written_by_qrow_reads_back() {
+fn an_xlsx_written_by_rowq_reads_back() {
     let (df, _) = load_file_with_doc(&fixture("prices.csv"), None).unwrap();
     let path = out("roundtrip.xlsx");
     let _ = std::fs::remove_file(&path);
@@ -1902,7 +1902,7 @@ fn an_xlsx_written_by_qrow_reads_back() {
 }
 
 #[test]
-fn an_arrow_file_written_by_qrow_reads_back() {
+fn an_arrow_file_written_by_rowq_reads_back() {
     let (df, _) = load_file_with_doc(&fixture("prices.csv"), None).unwrap();
     let path = out("roundtrip.arrow");
     let _ = std::fs::remove_file(&path);

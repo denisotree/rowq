@@ -1,7 +1,7 @@
 use polars::prelude::NamedFrom;
-use qrow::data::dataframe::DataFrame;
-use qrow::data::loader::load_csv;
-use qrow::types::ColumnType;
+use rowq::data::dataframe::DataFrame;
+use rowq::data::loader::load_csv;
+use rowq::types::ColumnType;
 use std::path::Path;
 
 fn sample_path() -> &'static Path {
@@ -51,7 +51,7 @@ fn test_get_value() {
 #[test]
 fn test_currency_dirty_float_parsing() {
     use polars::prelude::Series;
-    use qrow::data::column::ColumnMeta;
+    use rowq::data::column::ColumnMeta;
 
     let mut df = DataFrame::empty();
     let series = Series::new(
@@ -78,8 +78,8 @@ fn test_currency_dirty_float_parsing() {
 #[test]
 fn test_expression_after_rename() {
     use polars::prelude::Series;
-    use qrow::data::column::ColumnMeta;
-    use qrow::data::expression::Expr;
+    use rowq::data::column::ColumnMeta;
+    use rowq::data::expression::Expr;
 
     let mut df = DataFrame::empty();
     let s1 = Series::new("old_sum".into(), &[10.0, 20.0]);
@@ -127,7 +127,7 @@ fn identity_row_order_shares_one_allocation() {
 /// kept a second full copy of the file for nothing.
 #[test]
 fn only_toml_keeps_its_source_text() {
-    use qrow::data::doc::{Doc, Format};
+    use rowq::data::doc::{Doc, Format};
     let jsonl = Doc::from_str("{\"a\":1}\n{\"a\":2}\n", Format::Jsonl).unwrap();
     assert!(jsonl.source_text.is_none());
     let json = Doc::from_str("{\"a\":1}", Format::Json).unwrap();
@@ -141,7 +141,7 @@ fn only_toml_keeps_its_source_text() {
 #[test]
 fn rows_pushed_at_the_end_take_the_types_of_the_table() {
     use polars::prelude::*;
-    let mut df = qrow::data::dataframe::DataFrame::from_parts(
+    let mut df = rowq::data::dataframe::DataFrame::from_parts(
         df!("a" => [1i64, 2], "b" => [10i64, 20]).unwrap(),
         Vec::new(),
     );
@@ -175,7 +175,7 @@ fn rows_pushed_at_the_end_take_the_types_of_the_table() {
 /// A cell's line breaks fold to one space; the spaces a value holds stay as written.
 #[test]
 fn one_line_folds_only_breaks_and_tabs() {
-    use qrow::data::dataframe::one_line;
+    use rowq::data::dataframe::one_line;
     assert_eq!(one_line("a  b"), "a  b");
     assert_eq!(one_line("{\r\n    \"a\": 1\n}"), "{ \"a\": 1 }");
     assert_eq!(one_line("x\ty"), "x y");

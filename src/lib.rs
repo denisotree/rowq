@@ -18,11 +18,11 @@ use clap::Parser;
 use color_eyre::Result;
 use std::path::PathBuf;
 
-/// qrow — query rows in tables, documents and databases
+/// rowq — query rows in tables, documents and databases
 #[derive(Parser, Debug)]
 #[command(
     version,
-    about = "qrow — query rows in tables, documents and databases"
+    about = "rowq — query rows in tables, documents and databases"
 )]
 pub struct Cli {
     /// One or more files to open. Pass multiple files to browse them as a list.
@@ -41,7 +41,7 @@ pub struct Cli {
     pub data_type: Option<String>,
 
     /// Run as an MCP server on stdio, so a language model can query data files
-    /// through qrow's engine instead of computing over them itself.
+    /// through rowq's engine instead of computing over them itself.
     #[arg(long)]
     pub mcp: bool,
 
@@ -65,7 +65,7 @@ pub fn run() -> Result<()> {
         // stderr — which the transport allows for logging — rather than let it
         // vanish.
         if !cli.files.is_empty() {
-            eprintln!("qrow: --mcp ignores file arguments; the model names the files it wants.");
+            eprintln!("rowq: --mcp ignores file arguments; the model names the files it wants.");
         }
         return mcp::serve(cli.mcp_write);
     }
@@ -84,8 +84,8 @@ pub fn run() -> Result<()> {
         if cli.data_type.is_none() {
             eprintln!("Error: When reading from stdin, you must specify the data type using the -t or --type argument.");
             eprintln!("Examples:");
-            eprintln!("  cat data.csv | qrow -t csv");
-            eprintln!("  echo '[{{\"a\":1}}]' | qrow -t json");
+            eprintln!("  cat data.csv | rowq -t csv");
+            eprintln!("  echo '[{{\"a\":1}}]' | rowq -t json");
             std::process::exit(1);
         }
         app::App::from_stdin_typed(cli.data_type.unwrap().as_str(), cli.delimiter)?
@@ -163,7 +163,7 @@ pub fn run() -> Result<()> {
     // is no terminal to draw on, and that deserves a sentence rather than a crash report.
     let mut terminal = ratatui::try_init().map_err(|e| {
         let _ = ratatui::try_restore();
-        color_eyre::eyre::eyre!("qrow needs a terminal to show its interface: {}", e)
+        color_eyre::eyre::eyre!("rowq needs a terminal to show its interface: {}", e)
     })?;
     let result = app.run(&mut terminal);
     ratatui::restore();

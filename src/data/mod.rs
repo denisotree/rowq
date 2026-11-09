@@ -1,4 +1,4 @@
-//! Data model and I/O layer for qrow.
+//! Data model and I/O layer for rowq.
 //!
 //! This module contains everything needed to load, store, and manipulate tabular data:
 //!

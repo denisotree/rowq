@@ -1,6 +1,6 @@
 //! Aggregates over the rows a filter picks, side by side in one `group_by`.
 
-use qrow::mcp::{handle_message, Server};
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -33,7 +33,7 @@ fn write_responses() -> PathBuf {
 
 fn call(ops: Value) -> Value {
     let message = json!({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-        "params": {"name": "qrow_query",
+        "params": {"name": "rowq_query",
                    "arguments": {"source": responses().to_string_lossy(), "ops": ops}}});
     handle_message(&mut Server::new(), &message.to_string()).unwrap()["result"].clone()
 }

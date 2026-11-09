@@ -1,11 +1,11 @@
-# qrow
+# rowq
 
 <div align="center">
 
-[![CI](https://github.com/denisotree/qrow/actions/workflows/ci.yml/badge.svg)](https://github.com/denisotree/qrow/actions/workflows/ci.yml)
-[![crates.io](https://img.shields.io/crates/v/qrow.svg)](https://crates.io/crates/qrow)
-[![docs.rs](https://img.shields.io/docsrs/qrow)](https://docs.rs/qrow)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/denisotree/qrow/blob/master/LICENSE)
+[![CI](https://github.com/denisotree/rowq/actions/workflows/ci.yml/badge.svg)](https://github.com/denisotree/rowq/actions/workflows/ci.yml)
+[![crates.io](https://img.shields.io/crates/v/rowq.svg)](https://crates.io/crates/rowq)
+[![docs.rs](https://img.shields.io/docsrs/rowq)](https://docs.rs/rowq)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/denisotree/rowq/blob/master/LICENSE)
 
 **Query rows in tables, documents and databases — from the terminal or through an AI assistant.**
 
@@ -13,23 +13,23 @@ Open **CSV · JSON · YAML · TOML · Parquet · Excel · SQLite · DuckDB** str
 filter, sort, pivot, join, compute columns, and chart distributions without
 leaving the terminal.
 
-![qrow demo — open, sort, chart, describe](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/demo.gif)
+![rowq demo — open, sort, chart, describe](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/demo.gif)
 
 </div>
 
-> **qrow continues [tuitab](https://github.com/denisotree/tuitab)**, which stays at 0.11.1.
+> **rowq continues [tuitab](https://github.com/denisotree/tuitab)**, which stays at 0.11.1.
 > Coming from it? See [Coming from tuitab](#coming-from-tuitab).
 
 ```sh
-qrow data.csv                   # open a file
-qrow config.toml                # JSON / YAML / TOML open as a browsable tree
-qrow deploy.conf                # unknown extension? the contents decide
-qrow -t yaml weird.dat          # or force a format outright
-qrow orders.csv customers.csv   # browse several files as a list
-cat data.csv | qrow -t csv      # read from a pipe
+rowq data.csv                   # open a file
+rowq config.toml                # JSON / YAML / TOML open as a browsable tree
+rowq deploy.conf                # unknown extension? the contents decide
+rowq -t yaml weird.dat          # or force a format outright
+rowq orders.csv customers.csv   # browse several files as a list
+cat data.csv | rowq -t csv      # read from a pipe
 ```
 
-> **New to qrow?** Jump to the [Quick start](#quick-start), or read the full
+> **New to rowq?** Jump to the [Quick start](#quick-start), or read the full
 > [**Documentation**](#documentation) — available in **English** and **Русский**.
 
 ---
@@ -59,15 +59,15 @@ cat data.csv | qrow -t csv      # read from a pipe
   lag/lead, share of a group) from an expression language with `and` / `or` / `not`.
 - **Clean, fast, type-aware** — Polars-backed engine, Everforest theme, undo/redo,
   currency / percentage / date column types.
-- **Build a database from nothing** — `qrow inventory.sqlite` on a file that does not
+- **Build a database from nothing** — `rowq inventory.sqlite` on a file that does not
   exist opens a blank sheet. Add columns (`zi`), give them types (`t`), add rows (`o`,
-  or `O` for a form that checks each value against its column type), `Ctrl+S`. qrow
+  or `O` for a form that checks each value against its column type), `Ctrl+S`. rowq
   asks what to call the table and writes a real
   typed one: an Integer column is declared `INTEGER` and stores integers, NULL stays
   NULL. SQLite and DuckDB both.
 - **Edit a database table and save it back** — open a SQLite or DuckDB table, edit
   cells, delete or paste rows, add/drop/rename columns, then `Ctrl+S` onto the same
-  file. qrow shows every `ALTER TABLE`/`UPDATE`/`INSERT`/`DELETE` it is about to run
+  file. rowq shows every `ALTER TABLE`/`UPDATE`/`INSERT`/`DELETE` it is about to run
   and waits for confirmation, then runs them in one transaction; the rest of the
   database — other tables, indexes, views, triggers — is untouched. Reordering columns
   (and changing a type on SQLite) rebuilds the table, which the popup says out loud
@@ -80,7 +80,7 @@ cat data.csv | qrow -t csv      # read from a pipe
   different extension: open `config.toml`, save as `config.yaml`. Markdown is read
   only — a page comes in as a row, and nothing writes one back out. Yank rows to the
   clipboard as TSV, CSV, JSON, or Markdown.
-- **MCP server** — `qrow --mcp` exposes the same engine to an AI assistant, so it
+- **MCP server** — `rowq --mcp` exposes the same engine to an AI assistant, so it
   computes over your data instead of guessing at it. It reads databases properly:
   tables *and* views, with each column's declared SQL type, keys and defaults.
   Add `--mcp-write` and it can change things too — rows in a table, a table
@@ -100,14 +100,14 @@ Press `V` on any column. Numeric columns get a Freedman–Diaconis histogram;
 categorical columns get a frequency bar chart. [Pin](#keybindings) a date or
 category column first with `!` to draw line charts and grouped bars.
 
-![Charts](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/charts.gif)
+![Charts](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/charts.gif)
 
 ### Pivot tables
 
 Pin the column(s) to group by, place the cursor on the column to spread across,
 press `W`, and type an aggregation formula such as `sum(revenue)`.
 
-![Pivot](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/pivot.gif)
+![Pivot](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/pivot.gif)
 
 ### JOIN across files
 
@@ -116,14 +116,14 @@ choose `INNER` / `LEFT` / `RIGHT` / `OUTER` / `ANTI` / `SEMI`, and select the ke
 columns. `DIFF` compares two tables like `git diff`: unchanged, changed (with the
 differing cells marked), removed and added rows, each in its own colour.
 
-![JOIN](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/join.gif)
+![JOIN](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/join.gif)
 
 ### Computed columns
 
 Press `=` and type an expression. Arithmetic, string and date functions, and
 conditionals are all supported — the new column appears right next to the cursor.
 
-![Computed columns](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/compute.gif)
+![Computed columns](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/compute.gif)
 
 ### Editing a database table
 
@@ -131,7 +131,7 @@ Open a SQLite or DuckDB table, edit it, and `Ctrl+S` back onto the same file.
 Every `UPDATE`, `INSERT`, `DELETE` and `ALTER TABLE` is shown before anything
 runs, and the whole list goes in one transaction.
 
-![Editing a database table](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/database.gif)
+![Editing a database table](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/database.gif)
 
 ### The new-row form
 
@@ -139,14 +139,14 @@ runs, and the whole list goes in one transaction.
 and checked as you type. A value the column cannot hold is refused with the
 reason instead of quietly turning the column into text.
 
-![The new-row form](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/rowform.gif)
+![The new-row form](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/rowform.gif)
 
 ### JSON, YAML and TOML as a document
 
 `Enter` dives into a nested object or list, edits write back into the document
 rather than a flattened copy, and converting is just a different extension.
 
-![Structured formats as a tree](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/tree.gif)
+![Structured formats as a tree](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/tree.gif)
 
 ---
 
@@ -155,52 +155,52 @@ rather than a flattened copy, and converting is just a different extension.
 ### Cargo (crates.io)
 
 ```sh
-cargo install qrow
+cargo install rowq
 ```
 
-Installs two commands: `qrow` and its short alias `qrw`.
+Installs the `rowq` command.
 
 To skip the build, [cargo-binstall](https://github.com/cargo-bins/cargo-binstall)
-fetches the pre-built binary from the release instead — `qrow` only, without the
+fetches the pre-built binary from the release instead — `rowq` only, without the
 alias:
 
 ```sh
-cargo binstall qrow
+cargo binstall rowq
 ```
 
 ### Homebrew (macOS / Linux)
 
 ```sh
-brew tap denisotree/qrow
-brew install qrow
+brew tap denisotree/rowq
+brew install rowq
 ```
 
 ### Arch Linux (AUR)
 
 ```sh
-yay -S qrow            # pre-built binary: qrow-bin
+yay -S rowq            # pre-built binary: rowq-bin
 # or build from source:
-git clone https://aur.archlinux.org/qrow.git && cd qrow && makepkg -si
+git clone https://aur.archlinux.org/rowq.git && cd rowq && makepkg -si
 ```
 
 ### Debian / Ubuntu (APT)
 
 ```sh
-curl -fsSL https://qrow.dev/apt/qrow.gpg \
-  | sudo tee /usr/share/keyrings/qrow.gpg > /dev/null
-echo "deb [signed-by=/usr/share/keyrings/qrow.gpg] https://qrow.dev/apt stable main" \
-  | sudo tee /etc/apt/sources.list.d/qrow.list
-sudo apt update && sudo apt install qrow
+curl -fsSL https://rowq.dev/apt/rowq.gpg \
+  | sudo tee /usr/share/keyrings/rowq.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/rowq.gpg] https://rowq.dev/apt stable main" \
+  | sudo tee /etc/apt/sources.list.d/rowq.list
+sudo apt update && sudo apt install rowq
 ```
 
 `apt upgrade` then picks up new releases. amd64 and arm64; Debian 12+ and Ubuntu
 22.04+. A single `.deb` is also attached to every
-[release](https://github.com/denisotree/qrow/releases): `sudo apt install ./qrow_*.deb`.
+[release](https://github.com/denisotree/rowq/releases): `sudo apt install ./rowq_*.deb`.
 
 ### Pre-built binaries
 
 Grab a tarball for your platform (Linux / macOS, x86_64 / aarch64) from the
-[Releases page](https://github.com/denisotree/qrow/releases).
+[Releases page](https://github.com/denisotree/rowq/releases).
 
 <details>
 <summary><b>Building from source</b></summary>
@@ -219,13 +219,12 @@ some distributions do not ship yet:
 ```sh
 brew install duckdb                # macOS
 sudo apt install libduckdb-dev     # Debian / Ubuntu
-cargo build --release --no-default-features --features aliases
+cargo build --release --no-default-features
 ```
 
 | Feature | Default | Description |
 |---------|:-------:|-------------|
 | `bundled-duckdb` | ✓ | Compile DuckDB from source; no system `libduckdb` needed |
-| `aliases` | ✓ | Build the `qrw` alias |
 
 </details>
 
@@ -234,8 +233,8 @@ cargo build --release --no-default-features --features aliases
 ## Quick start
 
 ```sh
-cargo install qrow
-qrow data.csv
+cargo install rowq
+rowq data.csv
 ```
 
 - Move with `h` `j` `k` `l`; jump with `gg` / `G`.
@@ -252,7 +251,7 @@ qrow data.csv
 ## Usage
 
 ```text
-qrow [OPTIONS] [FILES]...
+rowq [OPTIONS] [FILES]...
 
 Arguments:
   [FILES]...  One or more files to open, a directory, a quoted glob pattern,
@@ -278,7 +277,7 @@ Options:
 ### Browse several files
 
 ```sh
-qrow orders.csv customers.csv products.parquet
+rowq orders.csv customers.csv products.parquet
 ```
 
 A directory-style listing opens with each file as a row. Press `Enter` to open
@@ -287,11 +286,11 @@ one; `Esc` or `q` to go back.
 ### Many files as one table
 
 ```sh
-qrow 'data/*.csv'
-qrow 'content/**/index.md'
+rowq 'data/*.csv'
+rowq 'content/**/index.md'
 ```
 
-Quoted, the pattern reaches qrow and every file it matches is stacked into one
+Quoted, the pattern reaches rowq and every file it matches is stacked into one
 table — the listing above is for picking a file, this is for reading them together.
 Unquoted, the shell expands it first and you get the listing instead. Tabular files
 have to hold the same columns, and the one that does not is named rather than
@@ -302,8 +301,8 @@ arrives NULL. A pattern is not a file, so the sheet has nothing to reload from a
 ### Pipe mode
 
 ```sh
-psql -c "SELECT * FROM orders" --csv | qrow -t csv
-sqlite3 app.db ".mode csv" ".headers on" "SELECT * FROM users" | qrow -t csv
+psql -c "SELECT * FROM orders" --csv | rowq -t csv
+sqlite3 app.db ".mode csv" ".headers on" "SELECT * FROM users" | rowq -t csv
 ```
 
 > Stdin accepts `csv`, `tsv`, `txt`, `json`, `jsonl`, `yaml`, and `toml`. For
@@ -311,34 +310,34 @@ sqlite3 app.db ".mode csv" ".headers on" "SELECT * FROM users" | qrow -t csv
 
 ### MCP server — let an AI assistant use the engine
 
-`qrow --mcp` speaks the [Model Context Protocol](https://modelcontextprotocol.io)
+`rowq --mcp` speaks the [Model Context Protocol](https://modelcontextprotocol.io)
 over stdio. An assistant handed a data file can then compute over it with
-qrow instead of doing the arithmetic in its head:
+rowq instead of doing the arithmetic in its head:
 
 ```sh
-claude mcp add qrow -- qrow --mcp
+claude mcp add rowq -- rowq --mcp
 ```
 
 A source may be a glob — `content/**/index.md` reads every page of a static site as
 one table, each page a row of its frontmatter — so a site can be checked against a
 database in one call rather than through an export script.
 
-Five tools: `qrow_inspect` (columns, types, row count, sample rows),
-`qrow_query` (seventeen operations composed as a pipeline — filter, group by,
+Five tools: `rowq_inspect` (columns, types, row count, sample rows),
+`rowq_query` (seventeen operations composed as a pipeline — filter, group by,
 window functions, pivot, join, dedup and the rest — returning JSON or writing
-xlsx/csv/parquet/sqlite), `qrow_describe` (per-column statistics),
-`qrow_jq` (jq programs over nested JSON/YAML/TOML), and `qrow_calc` — any
+xlsx/csv/parquet/sqlite), `rowq_describe` (per-column statistics),
+`rowq_jq` (jq programs over nested JSON/YAML/TOML), and `rowq_calc` — any
 calculation, file or no file, in 28-digit decimals with math, statistics and
 finance functions, each value labelled exact, rounded or approximate. Several questions can share
 one call, and one of them failing does not cost the answers beside it.
 
-Two more appear with `--mcp-write`: `qrow_write` works out what a change would
+Two more appear with `--mcp-write`: `rowq_write` works out what a change would
 do and answers with the exact SQL, the rows it would touch and a plan id —
-writing nothing — and `qrow_write_apply` runs precisely that plan, in one
+writing nothing — and `rowq_write_apply` runs precisely that plan, in one
 transaction, refusing if the table moved underneath it.
 
 There is no SQL and no arbitrary code: the model sends structured operations,
-each mapping onto a function qrow already had, and gets back numbers Polars
+each mapping onto a function rowq already had, and gets back numbers Polars
 computed. The server documents itself — the tool list and usage notes are sent
 to the model on connect.
 
@@ -347,16 +346,16 @@ holds the two surfaces together: adding an action to the terminal fails to
 compile until someone says how a model reaches it.
 
 The protocol is newline-delimited JSON-RPC, which `serde_json` already covers;
-`qrow_calc` adds `rust_decimal` for exact arithmetic and `libm` for the normal
+`rowq_calc` adds `rust_decimal` for exact arithmetic and `libm` for the normal
 distribution, and implements the other distributions itself.
 
-Full details in the [MCP server guide](https://github.com/denisotree/qrow/blob/master/docs/en/mcp.md).
+Full details in the [MCP server guide](https://github.com/denisotree/rowq/blob/master/docs/en/mcp.md).
 
 ---
 
 ## Keybindings
 
-The essentials — see the [full keybinding reference](https://github.com/denisotree/qrow/blob/master/docs/en/keybindings.md)
+The essentials — see the [full keybinding reference](https://github.com/denisotree/rowq/blob/master/docs/en/keybindings.md)
 for every command (column ops, clipboard, dedup, and more).
 
 | Key | Action | Key | Action |
@@ -385,37 +384,36 @@ for every command (column ops, clipboard, dedup, and more).
 
 ## Coming from tuitab
 
-qrow 1.0.0 continues tuitab: the same engine, developed further under a new name. tuitab
+rowq 1.0.0 continues tuitab: the same engine, developed further under a new name. tuitab
 stays available at 0.11.1 on every channel and keeps working; it gets no further releases.
-The two install side by side — the commands differ (`tuitab`, `ttab`, `ttb` against `qrow`,
-`qrw`), and so do the MCP tools (`tuitab_*` against `qrow_*`). To move over, install qrow,
+The two install side by side — the commands differ (`tuitab`, `ttab`, `ttb` against `rowq`), and so do the MCP tools (`tuitab_*` against `rowq_*`). To move over, install rowq,
 then remove tuitab when you no longer need it.
 
-- **Cargo:** `cargo install qrow`, later `cargo uninstall tuitab`.
-- **Homebrew:** qrow has its own tap: `brew install denisotree/qrow/qrow`, later
+- **Cargo:** `cargo install rowq`, later `cargo uninstall tuitab`.
+- **Homebrew:** rowq has its own tap: `brew install denisotree/rowq/rowq`, later
   `brew uninstall tuitab`.
-- **AUR:** install `qrow` or `qrow-bin`; remove `tuitab` or `tuitab-bin` when you want.
-- **APT:** add the qrow repository as in [Debian / Ubuntu (APT)](#debian--ubuntu-apt) and
-  `apt install qrow`. The tuitab repository can stay or go; to remove it:
+- **AUR:** install `rowq` or `rowq-bin`; remove `tuitab` or `tuitab-bin` when you want.
+- **APT:** add the rowq repository as in [Debian / Ubuntu (APT)](#debian--ubuntu-apt) and
+  `apt install rowq`. The tuitab repository can stay or go; to remove it:
 
   ```sh
   sudo apt remove tuitab
   sudo rm /etc/apt/sources.list.d/tuitab.list /usr/share/keyrings/tuitab.gpg
   ```
-- **MCP in Claude Code:** register qrow, keeping `--mcp-write` if you had it, and drop the
+- **MCP in Claude Code:** register rowq, keeping `--mcp-write` if you had it, and drop the
   tuitab server once you have switched:
 
   ```sh
-  claude mcp add -s user qrow -- qrow --mcp
+  claude mcp add -s user rowq -- rowq --mcp
   claude mcp remove tuitab
   ```
 
   Permission rules follow the server's name: a rule like `mcp__tuitab__tuitab_query`
-  becomes `mcp__qrow__qrow_query`, and `mcp__tuitab` becomes `mcp__qrow`.
-- **MCP clients configured with JSON** (Claude Desktop, Cursor, Zed and others): add a `qrow`
-  entry with `"command": "qrow"` — the full path if the client needs one, such as
-  `/opt/homebrew/bin/qrow`. The client derives tool names from the key: a key left as
-  `tuitab` gives `mcp__tuitab__qrow_*`.
+  becomes `mcp__rowq__rowq_query`, and `mcp__tuitab` becomes `mcp__rowq`.
+- **MCP clients configured with JSON** (Claude Desktop, Cursor, Zed and others): add a `rowq`
+  entry with `"command": "rowq"` — the full path if the client needs one, such as
+  `/opt/homebrew/bin/rowq`. The client derives tool names from the key: a key left as
+  `tuitab` gives `mcp__tuitab__rowq_*`.
 
 ## Documentation
 
@@ -423,32 +421,32 @@ Full guides, organised by topic, in two languages:
 
 | 🇬🇧 English | 🇷🇺 Русский |
 |------------|------------|
-| [Documentation index](https://github.com/denisotree/qrow/blob/master/docs/en/README.md) | [Оглавление документации](https://github.com/denisotree/qrow/blob/master/docs/ru/README.md) |
-| [Getting started](https://github.com/denisotree/qrow/blob/master/docs/en/getting-started.md) | [Начало работы](https://github.com/denisotree/qrow/blob/master/docs/ru/getting-started.md) |
-| [Keybindings](https://github.com/denisotree/qrow/blob/master/docs/en/keybindings.md) | [Горячие клавиши](https://github.com/denisotree/qrow/blob/master/docs/ru/keybindings.md) |
-| [Expressions](https://github.com/denisotree/qrow/blob/master/docs/en/expressions.md) | [Выражения](https://github.com/denisotree/qrow/blob/master/docs/ru/expressions.md) |
-| [Charts](https://github.com/denisotree/qrow/blob/master/docs/en/charts.md) | [Графики](https://github.com/denisotree/qrow/blob/master/docs/ru/charts.md) |
-| [JOIN](https://github.com/denisotree/qrow/blob/master/docs/en/join.md) | [JOIN](https://github.com/denisotree/qrow/blob/master/docs/ru/join.md) |
-| [Pivot tables](https://github.com/denisotree/qrow/blob/master/docs/en/pivot.md) | [Сводные таблицы](https://github.com/denisotree/qrow/blob/master/docs/ru/pivot.md) |
-| [Databases](https://github.com/denisotree/qrow/blob/master/docs/en/database.md) | [Базы данных](https://github.com/denisotree/qrow/blob/master/docs/ru/database.md) |
-| [MCP server](https://github.com/denisotree/qrow/blob/master/docs/en/mcp.md) | [MCP-сервер](https://github.com/denisotree/qrow/blob/master/docs/ru/mcp.md) |
-| [Recipes](https://github.com/denisotree/qrow/blob/master/docs/en/recipes.md) | [Рецепты](https://github.com/denisotree/qrow/blob/master/docs/ru/recipes.md) |
+| [Documentation index](https://github.com/denisotree/rowq/blob/master/docs/en/README.md) | [Оглавление документации](https://github.com/denisotree/rowq/blob/master/docs/ru/README.md) |
+| [Getting started](https://github.com/denisotree/rowq/blob/master/docs/en/getting-started.md) | [Начало работы](https://github.com/denisotree/rowq/blob/master/docs/ru/getting-started.md) |
+| [Keybindings](https://github.com/denisotree/rowq/blob/master/docs/en/keybindings.md) | [Горячие клавиши](https://github.com/denisotree/rowq/blob/master/docs/ru/keybindings.md) |
+| [Expressions](https://github.com/denisotree/rowq/blob/master/docs/en/expressions.md) | [Выражения](https://github.com/denisotree/rowq/blob/master/docs/ru/expressions.md) |
+| [Charts](https://github.com/denisotree/rowq/blob/master/docs/en/charts.md) | [Графики](https://github.com/denisotree/rowq/blob/master/docs/ru/charts.md) |
+| [JOIN](https://github.com/denisotree/rowq/blob/master/docs/en/join.md) | [JOIN](https://github.com/denisotree/rowq/blob/master/docs/ru/join.md) |
+| [Pivot tables](https://github.com/denisotree/rowq/blob/master/docs/en/pivot.md) | [Сводные таблицы](https://github.com/denisotree/rowq/blob/master/docs/ru/pivot.md) |
+| [Databases](https://github.com/denisotree/rowq/blob/master/docs/en/database.md) | [Базы данных](https://github.com/denisotree/rowq/blob/master/docs/ru/database.md) |
+| [MCP server](https://github.com/denisotree/rowq/blob/master/docs/en/mcp.md) | [MCP-сервер](https://github.com/denisotree/rowq/blob/master/docs/ru/mcp.md) |
+| [Recipes](https://github.com/denisotree/rowq/blob/master/docs/en/recipes.md) | [Рецепты](https://github.com/denisotree/rowq/blob/master/docs/ru/recipes.md) |
 
 ---
 
 ## Acknowledgements
 
-qrow is inspired by [VisiData](https://www.visidata.org) — a brilliant terminal
+rowq is inspired by [VisiData](https://www.visidata.org) — a brilliant terminal
 spreadsheet multitool by [Saul Pwanson](https://github.com/saulpw). If you find
-qrow useful, check out VisiData too. Built with
+rowq useful, check out VisiData too. Built with
 [ratatui](https://github.com/ratatui/ratatui), [Polars](https://www.pola.rs),
 and [crossterm](https://github.com/crossterm-rs/crossterm).
 
 ## Contributing
 
 Bug reports, feature requests, and pull requests are welcome.
-See [CONTRIBUTING.md](https://github.com/denisotree/qrow/blob/master/CONTRIBUTING.md).
+See [CONTRIBUTING.md](https://github.com/denisotree/rowq/blob/master/CONTRIBUTING.md).
 
 ## License
 
-Apache-2.0 — see [LICENSE](https://github.com/denisotree/qrow/blob/master/LICENSE).
+Apache-2.0 — see [LICENSE](https://github.com/denisotree/rowq/blob/master/LICENSE).

@@ -240,7 +240,7 @@ pub fn open_target_opts(
 ///
 /// `Path::exists` is false for `db/*.csv` however many files it would match, so a
 /// pattern has to be recognised before anything asks the filesystem about it — which is
-/// what used to answer "No such file" to the very form qrow's own error advised.
+/// what used to answer "No such file" to the very form rowq's own error advised.
 /// A path that exists is never one: `report[1].csv` is a real name a browser hands
 /// out, and it is read as that file.
 pub fn is_pattern(path: &Path) -> bool {

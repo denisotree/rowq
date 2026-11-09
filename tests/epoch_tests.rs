@@ -1,8 +1,8 @@
 //! Integer epoch columns read as datetimes, and written back as the integers they were.
 
-use qrow::data::io::{load_file, save_file_as};
-use qrow::mcp::{handle_message, Server};
-use qrow::types::ColumnType;
+use rowq::data::io::{load_file, save_file_as};
+use rowq::mcp::{handle_message, Server};
+use rowq::types::ColumnType;
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -48,7 +48,7 @@ fn column<'a>(inspect: &'a Value, name: &str) -> &'a Value {
 #[test]
 fn epoch_ms_column_named_time_becomes_datetime() {
     let path = csv("grafana.csv", "Time,v\n1787569800000,1\n1787570400000,2\n");
-    let out = call(&mut Server::new(), "qrow_inspect", json!({"source": path}));
+    let out = call(&mut Server::new(), "rowq_inspect", json!({"source": path}));
     let time = column(&out, "Time");
     assert_eq!(time["type"], "datetime", "{}", out);
     assert!(
@@ -89,13 +89,13 @@ fn epoch_detection_leaves_other_integers_alone() {
 fn seconds_and_microseconds_are_told_apart() {
     let s = csv("s.csv", "created_at\n1787569800\n");
     let us = csv("us.csv", "event_ts\n1787569800000000\n");
-    let out = call(&mut Server::new(), "qrow_inspect", json!({"source": s}));
+    let out = call(&mut Server::new(), "rowq_inspect", json!({"source": s}));
     assert!(column(&out, "created_at")["note"]
         .as_str()
         .unwrap()
         .contains("epoch s"));
     assert_eq!(out["sample_rows"][0][0], json!("2026-08-24 11:10:00"));
-    let out = call(&mut Server::new(), "qrow_inspect", json!({"source": us}));
+    let out = call(&mut Server::new(), "rowq_inspect", json!({"source": us}));
     assert!(column(&out, "event_ts")["note"]
         .as_str()
         .unwrap()
@@ -107,7 +107,7 @@ fn detect_epoch_false_keeps_the_integers() {
     let path = csv("off.csv", "Time\n1787569800000\n");
     let out = call(
         &mut Server::new(),
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": path, "detect_epoch": false}}),
     );
     assert_eq!(column(&out, "Time")["type"], "integer", "{}", out);
@@ -122,7 +122,7 @@ fn saving_a_detected_epoch_column_writes_the_original_integers() {
     let df = load_file(&path, None).unwrap();
     assert_eq!(df.columns[0].col_type, ColumnType::Datetime);
     let out = tmp("roundtrip-out.csv");
-    save_file_as(&df, None, &out, qrow::data::io::doc_io::Shape::Records, "t").unwrap();
+    save_file_as(&df, None, &out, rowq::data::io::doc_io::Shape::Records, "t").unwrap();
     let text = std::fs::read_to_string(&out).unwrap();
     assert!(text.contains("1787569800000"), "{}", text);
 }
@@ -145,7 +145,7 @@ fn a_glob_of_epoch_files_keeps_the_detection() {
     let pattern = tmp("glob-*.csv").to_string_lossy().into_owned();
     let out = call(
         &mut Server::new(),
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": pattern}),
     );
     assert_eq!(out["row_count"], 2, "{}", out);
@@ -163,7 +163,7 @@ fn hour_of_a_detected_column_groups_into_integers() {
     );
     let out = call(
         &mut Server::new(),
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [
             {"compute": {"name": "h", "expr": "hour(Time)"}},
             {"group_by": {"by": ["h"], "agg": [{"col": "*", "fn": "count"}]}}
@@ -196,12 +196,12 @@ fn parquet_load_and_csv_load_report_the_same_types() {
         &from_csv,
         None,
         &pq,
-        qrow::data::io::doc_io::Shape::Records,
+        rowq::data::io::doc_io::Shape::Records,
         "t",
     )
     .unwrap();
     let from_parquet = load_file(&pq, None).unwrap();
-    let types = |df: &qrow::data::dataframe::DataFrame| -> Vec<ColumnType> {
+    let types = |df: &rowq::data::dataframe::DataFrame| -> Vec<ColumnType> {
         df.columns.iter().map(|c| c.col_type).collect()
     };
     assert_eq!(types(&from_csv), types(&from_parquet));
@@ -215,11 +215,11 @@ fn saving_keeps_every_digit_and_the_number_type() {
     let path = csv("digits.csv", "x\n1.23456\n2.5\n");
     let df = load_file(&path, None).unwrap();
     let out = tmp("digits-out.csv");
-    save_file_as(&df, None, &out, qrow::data::io::doc_io::Shape::Records, "t").unwrap();
+    save_file_as(&df, None, &out, rowq::data::io::doc_io::Shape::Records, "t").unwrap();
     let text = std::fs::read_to_string(&out).unwrap();
     assert!(text.contains("1.23456"), "{}", text);
     let pq = tmp("digits.parquet");
-    save_file_as(&df, None, &pq, qrow::data::io::doc_io::Shape::Records, "t").unwrap();
+    save_file_as(&df, None, &pq, rowq::data::io::doc_io::Shape::Records, "t").unwrap();
     let back = load_file(&pq, None).unwrap();
     assert_eq!(back.columns[0].col_type, ColumnType::Float);
     assert_eq!(back.get_physical(0, 0), "1.23456");
@@ -255,7 +255,7 @@ fn a_datetime_filter_matches_the_moment_it_names() {
         let count = |filter: Value| -> Value {
             call(
                 &mut Server::new(),
-                "qrow_query",
+                "rowq_query",
                 json!({"source": path, "ops": [{"filter": filter}, {"aggregate": [{"col": "*", "fn": "count"}]}]}),
             )["rows"][0][0]
                 .clone()
@@ -296,7 +296,7 @@ fn a_datetime_filter_matches_the_moment_it_names() {
 /// still written back as the integers it was read from.
 #[test]
 fn a_joined_epoch_column_saves_as_its_integers() {
-    use qrow::data::join::{join_dataframes, JoinType};
+    use rowq::data::join::{join_dataframes, JoinType};
     let left = load_file(&csv("join-left.csv", "k,Time\na,1787569800000\n"), None).unwrap();
     let right = load_file(&csv("join-right.csv", "k,sent_at\na,1787569800\n"), None).unwrap();
     let joined = join_dataframes(
@@ -312,7 +312,7 @@ fn a_joined_epoch_column_saves_as_its_integers() {
         &joined,
         None,
         &out,
-        qrow::data::io::doc_io::Shape::Records,
+        rowq::data::io::doc_io::Shape::Records,
         "t",
     )
     .unwrap();
@@ -343,7 +343,7 @@ fn an_epoch_past_2262_saves_back_as_its_integer() {
             "1704092400000"
         };
         std::fs::write(&path, format!("id,{}\n1,{}\n2,{}\n", name, small, big)).unwrap();
-        let df = qrow::data::io::open_target(&path, None, None).unwrap().df;
+        let df = rowq::data::io::open_target(&path, None, None).unwrap().df;
         let c = df.column_index(name).unwrap();
         assert!(
             df.columns[c].epoch_unit.is_some(),
@@ -351,7 +351,7 @@ fn an_epoch_past_2262_saves_back_as_its_integer() {
             name
         );
         let out = dir.join(format!("{}-out.csv", name));
-        qrow::data::io::save_file_as(&df, None, &out, qrow::data::io::doc_io::Shape::Records, "t")
+        rowq::data::io::save_file_as(&df, None, &out, rowq::data::io::doc_io::Shape::Records, "t")
             .unwrap();
         let text = std::fs::read_to_string(&out).unwrap();
         assert!(text.contains(&format!("2,{}", big)), "{}", text);

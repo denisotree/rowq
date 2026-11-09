@@ -34,7 +34,7 @@ const BUSY_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
 
 /// Open SQLite the way every path here wants it: willing to wait its turn.
 ///
-/// Without this, a second writer — another qrow, the MCP server, `sqlite3` in a
+/// Without this, a second writer — another rowq, the MCP server, `sqlite3` in a
 /// terminal — turns a save into a bare "database is locked" the instant the two
 /// collide, even though the collision is usually over in milliseconds.
 pub(crate) fn open_sqlite(path: &Path) -> Result<rusqlite::Connection> {
@@ -43,7 +43,7 @@ pub(crate) fn open_sqlite(path: &Path) -> Result<rusqlite::Connection> {
     Ok(conn)
 }
 
-/// The storage format of a DuckDB file qrow creates: the 1.x one (version 64), which
+/// The storage format of a DuckDB file rowq creates: the 1.x one (version 64), which
 /// every DuckDB from 1.0 to 2.x opens.  DuckDB 2.0 would otherwise write its own
 /// format, which 1.x refuses outright.  An existing file — 1.x or 2.x — keeps the
 /// format it was made with whatever this says.
@@ -468,7 +468,7 @@ pub fn declared_type(kind: DbKind, t: ColumnType) -> &'static str {
             DbKind::DuckDb => "DOUBLE",
         },
         ColumnType::Boolean => "BOOLEAN",
-        // Dates and times travel as text in both directions: every value qrow holds is
+        // Dates and times travel as text in both directions: every value rowq holds is
         // a string, `Val` binds them as text, and the loaders read them back as text, so
         // text round-trips with no cast on either side.
         _ => match kind {
@@ -1447,7 +1447,7 @@ pub fn create_table(kind: DbKind, path: &Path, table: &str, df: &DataFrame) -> R
 /// `None` for a file that is neither, or too short to tell (a database yet to be made).
 ///
 /// Only a regular file is opened.  This is asked of every path now, not only of those
-/// named like a database, and reading the head of a pipe (`qrow <(cmd)`) would eat
+/// named like a database, and reading the head of a pipe (`rowq <(cmd)`) would eat
 /// bytes the real reader needs — or, with no writer on the other end, never return.
 pub fn kind_of_file(path: &Path) -> Option<DbKind> {
     use std::io::Read;
@@ -1770,7 +1770,7 @@ pub fn copy_db(src: &TableSource, dest: &Path) -> Result<()> {
             Ok(())
         }
         // DuckDB has no VACUUM INTO.  CHECKPOINT folds the WAL into the main file,
-        // after which a byte copy is a valid snapshot — and qrow holds no long-lived
+        // after which a byte copy is a valid snapshot — and rowq holds no long-lived
         // connection of its own to race with.
         DbKind::DuckDb => {
             {
@@ -1889,10 +1889,10 @@ pub(crate) fn mentions_word(sql: &str, word: &str) -> bool {
 }
 
 /// The scratch name a column is parked under while a cycle of renames unwinds.
-const SWAP_SUFFIX: &str = "__qrow_swap";
+const SWAP_SUFFIX: &str = "__rowq_swap";
 
 /// The scratch name a rebuild builds under before taking the real one.
-const REBUILD_SUFFIX: &str = "__qrow_rebuild";
+const REBUILD_SUFFIX: &str = "__rowq_rebuild";
 
 /// Whether a change needs the table rebuilt rather than altered.
 ///
@@ -1933,7 +1933,7 @@ fn preflight_rebuild_sqlite(
     let table = quote_ident(&src.table);
     let refuse = |why: String| -> Result<()> {
         Err(eyre!(
-            "'{}' has to be rebuilt to do this, and qrow will not rebuild it: {}. \
+            "'{}' has to be rebuilt to do this, and rowq will not rebuild it: {}. \
              Save to a different file instead.",
             src.table,
             why
@@ -2059,7 +2059,7 @@ fn preflight_rebuild_duckdb(src: &TableSource) -> Result<()> {
     let conn = open_duckdb(&src.db_path)?;
     let refuse = |why: String| -> Result<()> {
         Err(eyre!(
-            "'{}' has to be rebuilt to reorder its columns, and qrow will not rebuild \
+            "'{}' has to be rebuilt to reorder its columns, and rowq will not rebuild \
              it: {}. Save to a different file instead.",
             src.table,
             why

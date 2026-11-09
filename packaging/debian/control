@@ -1,19 +1,19 @@
-Source: qrow
+Source: rowq
 Section: utils
 Priority: optional
 Maintainer: denisotree <denisotree@users.noreply.github.com>
 Build-Depends: debhelper-compat (= 13), cargo, rustc
 Standards-Version: 4.6.2
-Homepage: https://qrow.dev
-Vcs-Git: https://github.com/denisotree/qrow.git
-Vcs-Browser: https://github.com/denisotree/qrow
+Homepage: https://rowq.dev
+Vcs-Git: https://github.com/denisotree/rowq.git
+Vcs-Browser: https://github.com/denisotree/rowq
 Rules-Requires-Root: no
 
-Package: qrow
+Package: rowq
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: Query rows in tables, documents and databases from the terminal
- qrow is a fast, keyboard-driven terminal viewer for tabular data, with an
+ rowq is a fast, keyboard-driven terminal viewer for tabular data, with an
  MCP server that lets AI assistants compute over the same files.
  It supports CSV, TSV, JSON, JSONL, YAML, TOML, Parquet, Arrow, Excel
  (xlsx/xls), SQLite and DuckDB files.  JSON, YAML and TOML open as a table over
@@ -23,5 +23,4 @@ Description: Query rows in tables, documents and databases from the terminal
  Features include filtering, sorting, pivot tables, computed columns,
  column statistics, histograms and line/bar charts, transposing, and export.
  .
- The package provides two command names: qrow and its short alias qrw.
  It continues tuitab, which stays at 0.11.1; the two install side by side.

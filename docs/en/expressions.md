@@ -2,13 +2,13 @@
 
 > 🇷🇺 [Эта страница на русском](../ru/expressions.md) · [← Documentation index](README.md)
 
-qrow has a small expression language used in two places:
+rowq has a small expression language used in two places:
 
 - **Computed columns** — press `=` and type an expression to add a new column.
 - **Expression row-select** — press `|`, then `!=` followed by an expression, to
   select every row where the expression is true (e.g. `|!=amount > 1000`).
 
-![Adding a computed column](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/compute.gif)
+![Adding a computed column](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/compute.gif)
 
 ## Referencing columns
 
@@ -120,7 +120,7 @@ one JSON column, the `expand_json` operation (`zJ`) parses each cell once.
 | `sqrt(x)` `exp(x)` | Square root, eˣ |
 | `ln(x)` `log10(x)` `log(x, base)` | Logarithms |
 
-The names and rounding are the same as in `qrow_calc`. A result outside the
+The names and rounding are the same as in `rowq_calc`. A result outside the
 function's domain — `sqrt(-1)`, `ln(0)` — is NULL, and so is a value that is not
 a number. The result is always a decimal number.
 
@@ -156,13 +156,13 @@ named like a time — `time`, `ts`, `timestamp`, `datetime`, `date`, `epoch`, or
 name ending `_time`, `_ts`, `_timestamp`, `_at` — whose every value is an epoch
 in one unit (s, ms, µs or ns, years 2001–2286) is shown as a UTC datetime. The
 file still holds the integers: saving writes them back, and `t` → Integer
-restores them. In the MCP server `qrow_inspect` notes such a column, and
+restores them. In the MCP server `rowq_inspect` notes such a column, and
 `"detect_epoch": false` on the source keeps the integers. JSON, JSON Lines, YAML,
 TOML and markdown are left as they are: their numbers are the values the JSON holds.
 
 A datetime that carries a time zone (Parquet, Arrow) is shown, compared and
 computed in UTC — write a filter's moment in UTC. Saving to Parquet or Arrow puts
-the zone back; `qrow_inspect` names it.
+the zone back; `rowq_inspect` names it.
 
 ### Conditionals
 

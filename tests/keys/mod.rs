@@ -10,8 +10,8 @@
 //! can_pop)` then `handle_action` — and nothing more.
 
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
-use qrow::app::App;
-use qrow::event::handle_key_event;
+use rowq::app::App;
+use rowq::event::handle_key_event;
 
 /// Send one key, exactly as the event loop would.
 pub fn key(app: &mut App, code: KeyCode) {
@@ -67,8 +67,8 @@ pub fn columns(app: &App) -> Vec<String> {
 /// action twice.
 #[allow(dead_code)] // not every test file in this suite drills down
 pub fn drill(app: &mut App) {
-    app.handle_action(qrow::types::Action::OpenFrequencyTable);
-    app.handle_action(qrow::types::Action::OpenFrequencyTable);
+    app.handle_action(rowq::types::Action::OpenFrequencyTable);
+    app.handle_action(rowq::types::Action::OpenFrequencyTable);
     app.stack.active_mut().table_state.select(Some(0));
     key(app, KeyCode::Enter);
     assert!(

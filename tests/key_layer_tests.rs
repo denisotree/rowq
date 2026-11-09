@@ -7,7 +7,7 @@ mod keys;
 
 use crossterm::event::KeyCode;
 use keys::{columns, key, open, press};
-use qrow::types::AppMode;
+use rowq::types::AppMode;
 
 const SAMPLE: &str = "test_data/sample.csv";
 
@@ -390,11 +390,11 @@ fn chords_work_on_a_cyrillic_layout() {
 // ── the direction picker ────────────────────────────────────────────────────
 
 /// Read one column's values in display order.
-fn cells(app: &qrow::app::App, column: &str) -> Vec<String> {
+fn cells(app: &rowq::app::App, column: &str) -> Vec<String> {
     let df = &app.stack.active().dataframe;
     let col = df.column_index(column).unwrap();
     (0..df.visible_row_count())
-        .map(|r| qrow::data::dataframe::DataFrame::anyvalue_to_string_fmt(&df.get_val(r, col)))
+        .map(|r| rowq::data::dataframe::DataFrame::anyvalue_to_string_fmt(&df.get_val(r, col)))
         .collect()
 }
 

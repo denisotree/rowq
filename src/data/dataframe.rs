@@ -2324,8 +2324,8 @@ impl DataFrame {
         // shaped like a regex (`^total$`) would be matched as one and the index would
         // silently vanish. The pivot therefore runs on placeholder names, and the index
         // columns get their real names back afterwards.
-        const PIVOT_ON: &str = "__qrow_pivot_on";
-        let placeholder = |i: usize| format!("__qrow_pivot_index_{}", i);
+        const PIVOT_ON: &str = "__rowq_pivot_on";
+        let placeholder = |i: usize| format!("__rowq_pivot_index_{}", i);
         let mut from: Vec<String> = row_index_cols.to_vec();
         let mut to: Vec<String> = (0..row_index_cols.len()).map(placeholder).collect();
         if !row_index_cols.iter().any(|c| c == pivot_col) {

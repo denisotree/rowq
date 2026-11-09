@@ -2,8 +2,8 @@
 
 > 🇷🇺 [Эта страница на русском](../ru/mcp.md) · [← Documentation index](README.md)
 
-`qrow --mcp` turns the binary into a [Model Context Protocol](https://modelcontextprotocol.io)
-server. An assistant handed a data file can then compute over it with qrow's
+`rowq --mcp` turns the binary into a [Model Context Protocol](https://modelcontextprotocol.io)
+server. An assistant handed a data file can then compute over it with rowq's
 engine instead of doing the arithmetic in its head.
 
 The point is narrow and worth stating plainly: **a language model asked to sum a
@@ -20,7 +20,7 @@ client's config and permission rules.
 **Claude Code** — one command:
 
 ```sh
-claude mcp add qrow -- qrow --mcp
+claude mcp add rowq -- rowq --mcp
 ```
 
 Add `-s user` to make it available in every project rather than the current one.
@@ -31,8 +31,8 @@ on macOS, `%APPDATA%\Claude\claude_desktop_config.json` on Windows:
 ```json
 {
   "mcpServers": {
-    "qrow": {
-      "command": "/opt/homebrew/bin/qrow",
+    "rowq": {
+      "command": "/opt/homebrew/bin/rowq",
       "args": ["--mcp"]
     }
   }
@@ -40,7 +40,7 @@ on macOS, `%APPDATA%\Claude\claude_desktop_config.json` on Windows:
 ```
 
 The full path matters more than it looks: a desktop app does not start from your
-shell and may not see your `PATH`. `which qrow` will tell you yours.
+shell and may not see your `PATH`. `which rowq` will tell you yours.
 
 **Cursor, Windsurf, Zed** — the same block in their `mcp.json`.
 
@@ -56,7 +56,7 @@ Without any client at all:
 printf '%s\n' \
  '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}' \
  '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
- '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | qrow --mcp
+ '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' | rowq --mcp
 ```
 
 The second reply lists the tools — five, or seven with `--mcp-write`. In Claude
@@ -66,13 +66,13 @@ Code, `/mcp` shows the same thing.
 
 | Tool | What it answers |
 |------|-----------------|
-| `qrow_inspect` | What is in this file — sheets, tables and views, column names, inferred types, row count, a few sample rows. For a database also each column's declared SQL type, NOT NULL, PRIMARY KEY and DEFAULT, the `CREATE` statement, and every table's row and column counts |
-| `qrow_query` | Everything computational, as a pipeline of operations |
-| `qrow_describe` | A statistical profile of every column |
-| `qrow_jq` | A jq program over nested JSON, JSONL, YAML or TOML |
-| `qrow_calc` | Any calculation, with or without a file — see [Calculations](#calculations) |
+| `rowq_inspect` | What is in this file — sheets, tables and views, column names, inferred types, row count, a few sample rows. For a database also each column's declared SQL type, NOT NULL, PRIMARY KEY and DEFAULT, the `CREATE` statement, and every table's row and column counts |
+| `rowq_query` | Everything computational, as a pipeline of operations |
+| `rowq_describe` | A statistical profile of every column |
+| `rowq_jq` | A jq program over nested JSON, JSONL, YAML or TOML |
+| `rowq_calc` | Any calculation, with or without a file — see [Calculations](#calculations) |
 
-`qrow_inspect` comes first in any session. Column names guessed from a file
+`rowq_inspect` comes first in any session. Column names guessed from a file
 name are wrong often enough to cost a round trip. It takes `sample_rows` (default
 5) if the default is too few or too many.
 
@@ -82,17 +82,17 @@ extension (`{"path": "deploy.conf", "format": "yaml"}`), and `detect_epoch: fals
 integer epoch columns as integers (see [Dates & time](expressions.md#dates--time)), and
 `null_values` — a list such as `["undefined", "-"]` — for text that means "no value"
 in every column of a CSV. A misspelt field is refused with the one it was close to,
-rather than ignored. A bare path string works too. `qrow_describe` takes `columns` to profile only some of them;
-`qrow_query` takes `output.limit` (default 100 rows).
+rather than ignored. A bare path string works too. `rowq_describe` takes `columns` to profile only some of them;
+`rowq_query` takes `output.limit` (default 100 rows).
 
-Started with `--mcp-write`, the server has two more — `qrow_write` and
-`qrow_write_apply` — and everything under [Changing what already
+Started with `--mcp-write`, the server has two more — `rowq_write` and
+`rowq_write_apply` — and everything under [Changing what already
 exists](#changing-what-already-exists) applies. Without the flag they do not
 exist at all, and asking for one by name says which flag turns it on.
 
 ## Operations
 
-`qrow_query` takes a `source` and a list of `ops` applied in order, each to the
+`rowq_query` takes a `source` and a list of `ops` applied in order, each to the
 result of the last.
 
 ```json
@@ -147,7 +147,7 @@ To negate, wrap a predicate — or an `any_of` — in `not`:
 
 It keeps every row where the predicate is not true. A row with nothing in the
 column is kept, so `not` and the filter it negates add up to every row. One
-level: `not` inside `not` is refused. The same works in `qrow_write`'s `where`.
+level: `not` inside `not` is refused. The same works in `rowq_write`'s `where`.
 
 To compare two columns, give a column where a constant would go:
 
@@ -241,7 +241,7 @@ Use `window` with `over` for a share within a group, and `compute` with
 
 Not every question is about a table. A loan payment, a percentage change, the mean
 of numbers the user pasted — a model does that arithmetic in its head just as
-unreliably as it sums a column. `qrow_calc` takes expressions as text and computes
+unreliably as it sums a column. `rowq_calc` takes expressions as text and computes
 them:
 
 ```json
@@ -277,7 +277,7 @@ strings, so no digit is lost in JSON, each with a `precision`:
 | Rank tests | `mannwhitney(a, b, alternative[, method])` (Mann–Whitney U) and `ks2(a, b, alternative[, method])` (two-sample Kolmogorov–Smirnov) return the p-value; `mannwhitney_u(a, b)` and `ks2_d(a, b, alternative)` the statistic. `alternative` is `two_sided`, `less` or `greater`; `method` is `auto`, `exact` or `asymptotic` (`asymp` for `ks2`). They follow `scipy.stats` 1.18 — the same statistic, the same choice of method, the same p-values; an asymptotic two-sided `ks2` p-value below about 10⁻¹⁵ reads 0. Where the exact distribution is out of reach (two large samples), `auto` uses the asymptotic one and `exact` is refused |
 
 Samples rarely fit in an expression. `lists` binds a name to a numeric column of a
-query's result — the same `source` and `ops` as `qrow_query` — and every step can
+query's result — the same `source` and `ops` as `rowq_query` — and every step can
 use it as a list:
 
 ```json
@@ -307,8 +307,8 @@ they need, and the plan runs on Polars' streaming engine:
   and `unpivot` join the plan;
 - `group_by`, `aggregate` and `frequency` run the same grouping over the stream and
   collect only the groups;
-- `qrow_inspect` reads the sample in one pass and counts the rows in a second;
-  `qrow_describe` collects only the `columns` it is asked to profile.
+- `rowq_inspect` reads the sample in one pass and counts the rows in a second;
+  `rowq_describe` collects only the `columns` it is asked to profile.
 
 So `frequency` over a 16 GB JSONL file holds the counts, not the file — and as many
 counts as there are groups: a `group_by` on a key nearly every row has its own holds
@@ -414,7 +414,7 @@ confirmation popup, and where it runs unattended there is nobody to read the
 answer either. A second, deliberate call is the only gate that does not depend on
 the model behaving.
 
-**Rows in a table** — `qrow_write` plans, `qrow_write_apply` performs:
+**Rows in a table** — `rowq_write` plans, `rowq_write_apply` performs:
 
 ```json
 {"source": {"path": "/data/shop.db", "container": "orders"},
@@ -450,7 +450,7 @@ Replacing a table answers with the `DROP`, `CREATE` and `INSERT` statements, how
 many rows the old table holds against how many the new one will, and warnings for
 every index, trigger and view that goes with it. Overwriting a plain file answers
 with its size and when it was last written. Neither writes anything until
-`qrow_write_apply` runs the plan.
+`rowq_write_apply` runs the plan.
 
 Without `output.overwrite` the refusal says what is at stake — `'inventory'
 already exists and holds 47 rows` — rather than naming the flag that would do it.
@@ -463,7 +463,7 @@ A query cannot write into the file it read.
 relative to wherever the client launched the process, which is rarely where the
 data is. Give absolute paths.
 
-**A database always needs a `container`.** `qrow_inspect` without one lists the
+**A database always needs a `container`.** `rowq_inspect` without one lists the
 tables and views; every other call is refused — `'shop.db' holds 4 tables and
 views; pass 'container' to pick one` — because a database with no table named is
 a listing, not data. An `.xlsx` is gentler: without a `container` it lists its
@@ -473,8 +473,8 @@ sheets.
 for. The listing is how you find your way around; `dir/*.csv` is how you compute
 over what is in there.
 
-**Nested data has a limit.** `qrow_query` flattens JSON, YAML and TOML into a
-table. When the structure is deeper than that survives, `qrow_jq` takes a jq
+**Nested data has a limit.** `rowq_query` flattens JSON, YAML and TOML into a
+table. When the structure is deeper than that survives, `rowq_jq` takes a jq
 program instead.
 
 **Random results report their seed.** An unseeded `sample` or `dedup` returns the
@@ -482,15 +482,15 @@ seed it drew, so the same answer can be had again by passing it back.
 
 ## What it will not do
 
-There is no SQL and no arbitrary code — `qrow_calc` reads a closed arithmetic
+There is no SQL and no arbitrary code — `rowq_calc` reads a closed arithmetic
 language, not a programming one. The model sends structured operations,
-each one mapping onto a function qrow already had, and gets back numbers Polars
+each one mapping onto a function rowq already had, and gets back numbers Polars
 computed. That is a deliberate limit, not an unfinished one: an operation
 validated against a schema fails loudly when it is wrong, where a mistyped SQL
 string quietly returns the wrong number.
 
 Not supported: subqueries, self-joins, and SQL of any kind. The model never
-writes SQL even when changing a table — qrow composes the statements and shows
+writes SQL even when changing a table — rowq composes the statements and shows
 them, and the model's part is to relay them and apply the plan by name.
 
 ## Where the documentation lives

@@ -16,8 +16,9 @@ fn docs_rs_flags() -> Vec<String> {
     if meta["no-default-features"].as_bool() == Some(true) {
         flags.push("--no-default-features".to_string());
     }
-    let features: Vec<&str> = meta["features"]
-        .as_array()
+    let features: Vec<&str> = meta
+        .get("features")
+        .and_then(|f| f.as_array())
         .map(|a| a.iter().filter_map(|v| v.as_str()).collect())
         .unwrap_or_default();
     if !features.is_empty() {
@@ -57,10 +58,7 @@ fn the_docs_rs_build_downloads_nothing() {
 /// Homebrew on Apple Silicon puts it in /opt/homebrew/lib, off the linker's path.
 #[test]
 fn the_system_duckdb_build_finds_libduckdb_through_pkg_config() {
-    let flags = vec![
-        "--no-default-features".to_string(),
-        "--features=aliases".to_string(),
-    ];
+    let flags = vec!["--no-default-features".to_string()];
     let (ok, text) = cargo_tree(&flags, &["-e", "features", "-i", "libduckdb-sys"]);
     assert!(ok, "{text}");
     assert!(

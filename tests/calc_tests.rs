@@ -1,6 +1,6 @@
-//! `qrow_calc`: exact decimals, honest precision labels, named steps.
+//! `rowq_calc`: exact decimals, honest precision labels, named steps.
 
-use qrow::mcp::calc::run;
+use rowq::mcp::calc::run;
 use serde_json::{json, Value};
 
 /// The value and precision of a single expression.
@@ -212,15 +212,15 @@ fn mistakes_are_named() {
 
 #[test]
 fn the_server_runs_it() {
-    let mut server = qrow::mcp::Server::default();
-    let call = |server: &mut qrow::mcp::Server, message: Value| -> Value {
-        qrow::mcp::handle_message(server, &message.to_string()).unwrap()
+    let mut server = rowq::mcp::Server::default();
+    let call = |server: &mut rowq::mcp::Server, message: Value| -> Value {
+        rowq::mcp::handle_message(server, &message.to_string()).unwrap()
     };
 
     let response = call(
         &mut server,
         json!({"jsonrpc": "2.0", "id": 2, "method": "tools/call",
-               "params": {"name": "qrow_calc", "arguments": {"expr": "0.1 + 0.2"}}}),
+               "params": {"name": "rowq_calc", "arguments": {"expr": "0.1 + 0.2"}}}),
     );
     assert_eq!(response["result"]["isError"], false);
     assert_eq!(

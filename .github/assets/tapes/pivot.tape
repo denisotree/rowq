@@ -16,7 +16,7 @@ Type "clear"
 Enter
 Show
 
-Type "qrow .github/assets/data/sales.csv"
+Type "rowq .github/assets/data/sales.csv"
 Sleep 500ms
 Enter
 Sleep 1800ms

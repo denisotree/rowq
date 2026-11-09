@@ -1,6 +1,6 @@
 //! Tokens that mean "no value" in a CSV, and a source whose keys are checked.
 
-use qrow::mcp::{handle_message, Server};
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -46,7 +46,7 @@ fn types(inspect: &Value) -> Vec<(String, String)> {
 #[test]
 fn undefined_does_not_turn_a_numeric_column_into_text() {
     let path = csv("grafana.csv", "PK,IN\n1.5,2\nundefined,3\n4,undefined\n");
-    let out = ok("qrow_inspect", json!({"source": path}));
+    let out = ok("rowq_inspect", json!({"source": path}));
     assert_eq!(
         types(&out),
         [
@@ -60,7 +60,7 @@ fn undefined_does_not_turn_a_numeric_column_into_text() {
 #[test]
 fn builtin_null_tokens_leave_a_text_column_alone() {
     let path = csv("names.csv", "name,n\nNone,1\nAnn,null\nN/A,3\n");
-    let out = ok("qrow_inspect", json!({"source": path}));
+    let out = ok("rowq_inspect", json!({"source": path}));
     assert_eq!(
         types(&out),
         [
@@ -76,7 +76,7 @@ fn builtin_null_tokens_leave_a_text_column_alone() {
 #[test]
 fn na_is_not_a_builtin_token() {
     let path = csv("countries.csv", "code,v\nNA,1\n2,2\n");
-    let out = ok("qrow_inspect", json!({"source": path}));
+    let out = ok("rowq_inspect", json!({"source": path}));
     assert_eq!(types(&out)[0].1, "string");
 }
 
@@ -84,7 +84,7 @@ fn na_is_not_a_builtin_token() {
 fn null_values_option_applies_to_every_column() {
     let path = csv("dashes.csv", "label,v\n-,1\nb,-\n");
     let out = ok(
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": path, "null_values": ["-"]}}),
     );
     assert_eq!(
@@ -102,7 +102,7 @@ fn null_values_option_applies_to_every_column() {
 fn null_values_must_be_a_list_of_text() {
     let path = csv("bad.csv", "a\n1\n");
     let result = call(
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": path, "null_values": "undefined"}}),
     );
     assert_eq!(result["isError"], json!(true));
@@ -116,7 +116,7 @@ fn null_values_must_be_a_list_of_text() {
 fn a_misspelt_source_key_is_named() {
     let path = csv("typo.csv", "a\n1\n");
     let result = call(
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": path, "null_value": ["x"]}}),
     );
     assert_eq!(result["isError"], json!(true), "{}", result);
@@ -129,7 +129,7 @@ fn a_misspelt_source_key_is_named() {
 fn a_count_over_a_column_with_tokens_counts_the_values() {
     let path = csv("count.csv", "BR\n1\nundefined\n3\n");
     let out = ok(
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [{"aggregate": [{"col": "BR", "fn": "count"}]}]}),
     );
     assert_eq!(out["rows"][0][0], json!(2));
@@ -140,7 +140,7 @@ fn a_count_over_a_column_with_tokens_counts_the_values() {
 #[test]
 fn csv_from_a_pipe_reads_null_tokens_as_a_file_does() {
     let (df, _) =
-        qrow::data::io::load_from_bytes(b"v\n1\nundefined\n3\n".to_vec(), "csv", None).unwrap();
+        rowq::data::io::load_from_bytes(b"v\n1\nundefined\n3\n".to_vec(), "csv", None).unwrap();
     assert_eq!(
         df.df.column("v").unwrap().dtype(),
         &polars::prelude::DataType::Int64

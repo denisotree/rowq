@@ -14,8 +14,8 @@
 //! The mirror match over the server's `Op` does the same in the other
 //! direction.
 
-use qrow::mcp::pipeline::Op;
-use qrow::types::Action;
+use rowq::mcp::pipeline::Op;
+use rowq::types::Action;
 
 #[derive(Debug, PartialEq, Eq)]
 enum Parity {
@@ -272,7 +272,7 @@ fn parity(action: &Action) -> Parity {
         Action::AddSortKeyDescending => Parity::Shared("sort"),
         Action::TransposeRow => Parity::Shared("transpose"),
         Action::TransposeTable => Parity::Shared("transpose"),
-        Action::DescribeSheet => Parity::Shared("qrow_describe"),
+        Action::DescribeSheet => Parity::Shared("rowq_describe"),
         Action::DeduplicateByPinned => Parity::Shared("dedup"),
         Action::ResetSort => Parity::Composable("omitting the sort"),
         Action::ReloadFile => Parity::UiOnly("the server loads the file on every call"),
@@ -303,7 +303,7 @@ fn parity(action: &Action) -> Parity {
         Action::StartPathGoto => Parity::UiOnly("opens an input"),
         Action::ApplyPathGoto => Parity::UiOnly("navigation"),
         Action::StartQuery => Parity::UiOnly("opens an input"),
-        Action::ApplyQuery => Parity::Shared("qrow_jq"),
+        Action::ApplyQuery => Parity::Shared("rowq_jq"),
         Action::ApplySaveShape => Parity::UiOnly("a save-time prompt"),
         Action::OpenAs => Parity::UiOnly("opens a menu"),
         Action::ApplyOpenAs => Parity::UiOnly("the server takes a format argument"),
@@ -312,18 +312,18 @@ fn parity(action: &Action) -> Parity {
         Action::ApplySave => Parity::Gap(3),
         Action::ApplyTableName => Parity::Shared("output.table"),
         // The terminal confirms a write with a keypress; the server confirms it with a
-        // handshake it cannot fake — qrow_write returns the SQL and a plan id,
-        // qrow_write_apply runs exactly that plan, and neither tool exists unless the
+        // handshake it cannot fake — rowq_write returns the SQL and a plan id,
+        // rowq_write_apply runs exactly that plan, and neither tool exists unless the
         // server was started with --mcp-write.
-        Action::ApplySql => Parity::Shared("qrow_write_apply"),
+        Action::ApplySql => Parity::Shared("rowq_write_apply"),
         Action::EnterZPrefix => Parity::UiOnly("a chord prefix"),
         Action::StartRenameColumn => Parity::UiOnly("opens an input"),
         // Renaming a sheet column is a view concern, but renaming a *table's* column
-        // reaches the server through qrow_write's 'alter'.
-        Action::ApplyRenameColumn => Parity::Shared("qrow_write's 'alter'"),
+        // reaches the server through rowq_write's 'alter'.
+        Action::ApplyRenameColumn => Parity::Shared("rowq_write's 'alter'"),
         Action::DeleteColumn => Parity::Composable("select, listing the columns to keep"),
         Action::StartInsertColumn => Parity::UiOnly("opens an input"),
-        Action::ApplyInsertColumn => Parity::Shared("qrow_write's 'alter'"),
+        Action::ApplyInsertColumn => Parity::Shared("rowq_write's 'alter'"),
         Action::SelectColumn => Parity::Shared("select"),
         Action::UnselectColumn => Parity::Shared("select"),
         Action::MoveColumnLeft => Parity::Gap(4),
@@ -346,7 +346,7 @@ fn parity(action: &Action) -> Parity {
         Action::ApplyColSplit => Parity::Gap(1),
         Action::ExitColumnMove => Parity::UiOnly("column order is a view concern"),
         Action::StartBulkEdit => Parity::UiOnly("cell editing"),
-        Action::ApplyBulkEdit => Parity::Shared("qrow_write's 'set'"),
+        Action::ApplyBulkEdit => Parity::Shared("rowq_write's 'set'"),
         Action::OpenAggregatorSelect => Parity::UiOnly("opens a picker"),
         Action::ApplyAggregators => Parity::Composable("aggregate"),
         Action::ToggleAggregatorSelection => Parity::UiOnly("a picker"),
@@ -361,10 +361,10 @@ fn parity(action: &Action) -> Parity {
         Action::PasteRows => Parity::UiOnly("clipboard"),
         Action::PasteCell => Parity::UiOnly("clipboard"),
         // A blank row to type into is a terminal idea, but the row itself reaches the
-        // server as qrow_write's 'insert'.
-        Action::AddRowBelow => Parity::Shared("qrow_write's 'insert'"),
+        // server as rowq_write's 'insert'.
+        Action::AddRowBelow => Parity::Shared("rowq_write's 'insert'"),
         // The form is a way of typing a row; the row it produces is the same insert.
-        Action::ApplyRowForm => Parity::Shared("qrow_write's 'insert'"),
+        Action::ApplyRowForm => Parity::Shared("rowq_write's 'insert'"),
         Action::OpenRowForm
         | Action::RowFormInput(_)
         | Action::RowFormBackspace
@@ -464,7 +464,7 @@ fn the_data_operations_are_shared() {
         (Action::ApplySelectRandom, "sample"),
         (Action::ApplyWindowFnSelect, "window"),
         (Action::CreatePctColumn, "window"),
-        (Action::DescribeSheet, "qrow_describe"),
+        (Action::DescribeSheet, "rowq_describe"),
         (Action::ApplyExpression, "compute"),
     ] {
         assert_eq!(

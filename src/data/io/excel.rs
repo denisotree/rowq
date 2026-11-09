@@ -164,7 +164,7 @@ fn typed_series(name: &str, values: Vec<String>) -> Series {
 /// One cell as text.
 ///
 /// A date in a spreadsheet is a number with a format on it, and calamine renders it as
-/// that number: the day qrow showed as `46051` was the 29th of January 2026. What a
+/// that number: the day rowq showed as `46051` was the 29th of January 2026. What a
 /// spreadsheet holds is a date, so it is written the way every other reader here writes
 /// one — `2026-01-29`, or with the time when there is one — which is also what the CSV
 /// loader leaves in a date column.

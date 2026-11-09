@@ -1,8 +1,8 @@
 //! Transposition, and that both surfaces get the same table.
 
-use qrow::data::dataframe::DataFrame;
-use qrow::data::io::load_file;
-use qrow::data::transpose::{is_transposed, transpose_row, transpose_table};
+use rowq::data::dataframe::DataFrame;
+use rowq::data::io::load_file;
+use rowq::data::transpose::{is_transposed, transpose_row, transpose_table};
 use std::path::Path;
 
 fn sample() -> DataFrame {
@@ -86,9 +86,9 @@ fn transposing_an_empty_table_is_refused_rather_than_silent() {
 /// `T` in the terminal and `{"transpose": {}}` over MCP run the same function.
 #[test]
 fn the_t_key_produces_the_shared_transpose() {
-    use qrow::types::Action;
+    use rowq::types::Action;
 
-    let mut app = qrow::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
+    let mut app = rowq::app::App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
     app.handle_action(Action::TransposeTable);
 
     let produced = &app.stack.active().dataframe;

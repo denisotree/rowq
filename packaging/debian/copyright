@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: qrow
+Upstream-Name: rowq
 Upstream-Contact: denisotree <denisotree@users.noreply.github.com>
-Source: https://github.com/denisotree/qrow
+Source: https://github.com/denisotree/rowq
 
 Files: *
 Copyright: 2026 denisotree

@@ -4,8 +4,8 @@
 //! reachable through a pattern, and a pattern is only worth having if what it matches
 //! can be read.
 
-use qrow::app::App;
-use qrow::mcp::{handle_message, Server};
+use rowq::app::App;
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 use std::path::{Path, PathBuf};
 
@@ -42,7 +42,7 @@ fn call(server: &mut Server, name: &str, arguments: Value) -> (bool, Value) {
 fn rows(server: &mut Server, path: &str) -> (bool, Value) {
     call(
         server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path}, "ops": []}),
     )
 }
@@ -115,7 +115,7 @@ fn a_directory_is_a_list_of_its_files() {
     let mut server = Server::new();
     let (err, out) = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": base.to_string_lossy()}}),
     );
     assert!(!err, "{}", out);
@@ -177,7 +177,7 @@ fn a_page_is_a_row_of_its_frontmatter() {
     // And the point of the exercise: arithmetic over a directory of pages.
     let (err, total) = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": format!("{}/*/index.md", base.display())},
                "ops": [{"aggregate": [{"col": "price", "fn": "sum"}]}]}),
     );
@@ -219,7 +219,7 @@ fn the_terminal_stacks_what_a_pattern_matches() {
     // the prefill falls back through the hint to the sheet title, and the title is the
     // pattern.  Without the hint this offers to create a file with a `*` in its name.
     let mut app = app;
-    app.handle_action(qrow::types::Action::SaveFile);
+    app.handle_action(rowq::types::Action::SaveFile);
     let offered = app.save.input.as_str();
     assert!(
         !offered.contains('*'),

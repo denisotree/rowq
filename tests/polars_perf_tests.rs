@@ -1,5 +1,5 @@
-use qrow::data::dataframe::DataFrame;
-use qrow::data::loader::load_csv;
+use rowq::data::dataframe::DataFrame;
+use rowq::data::loader::load_csv;
 use std::path::Path;
 
 fn load_sample() -> DataFrame {

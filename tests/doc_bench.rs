@@ -10,7 +10,7 @@ use std::time::Instant;
 fn measure_document_load() {
     let home = std::env::var("HOME").unwrap();
     for name in ["bench-50.json", "bench-200.json"] {
-        let path = Path::new(&home).join(".tmp/qrow-bench").join(name);
+        let path = Path::new(&home).join(".tmp/rowq-bench").join(name);
         if !path.exists() {
             println!("{}: missing, skipped", name);
             continue;
@@ -18,7 +18,7 @@ fn measure_document_load() {
         let size = std::fs::metadata(&path).unwrap().len() as f64 / 1024.0 / 1024.0;
 
         let t = Instant::now();
-        let (df, doc) = qrow::data::io::load_file_with_doc(&path, None).unwrap();
+        let (df, doc) = rowq::data::io::load_file_with_doc(&path, None).unwrap();
         let load = t.elapsed();
 
         let t = Instant::now();
@@ -29,8 +29,8 @@ fn measure_document_load() {
             .read()
             .unwrap()
             .to_string_as(
-                qrow::data::doc::Format::Json,
-                &qrow::data::doc::SaveOpts::default(),
+                rowq::data::doc::Format::Json,
+                &rowq::data::doc::SaveOpts::default(),
             )
             .unwrap();
         let save = t.elapsed();

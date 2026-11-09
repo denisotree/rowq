@@ -9,7 +9,7 @@
 //!
 //! Both live here rather than in either surface, so `gg` in the terminal and
 //! `group_by` over MCP cannot drift apart. The arithmetic itself is still
-//! qrow's: [`AggregatorKind::to_expr`] is what defines its median, its p95
+//! rowq's: [`AggregatorKind::to_expr`] is what defines its median, its p95
 //! and its sample standard deviation.
 
 use crate::data::aggregator::AggregatorKind;

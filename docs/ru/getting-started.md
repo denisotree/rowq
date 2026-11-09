@@ -7,23 +7,23 @@
 Самый быстрый способ — через Cargo:
 
 ```sh
-cargo install qrow
+cargo install rowq
 ```
 
-Устанавливаются две одинаковые команды — `qrow` и короткий псевдоним `qrw`.
-`cargo binstall qrow` обходится без сборки и берёт готовый `qrow` из релиза,
+Устанавливается команда `rowq`.
+`cargo binstall rowq` обходится без сборки и берёт готовый `rowq` из релиза,
 без псевдонима. Остальные способы (Homebrew, AUR, Debian,
-готовые сборки) описаны в [основном README](https://github.com/denisotree/qrow/blob/master/README.md#installation).
+готовые сборки) описаны в [основном README](https://github.com/denisotree/rowq/blob/master/README.md#installation).
 
 ## Открыть файл
 
 Передайте поддерживаемый файл первым аргументом:
 
 ```sh
-qrow data.csv
-qrow report.parquet
-qrow books.xlsx
-qrow app.db
+rowq data.csv
+rowq report.parquet
+rowq books.xlsx
+rowq app.db
 ```
 
 | Формат | Расширения | Примечания |
@@ -40,7 +40,7 @@ qrow app.db
 | SQLite | `.sqlite`, `.sqlite3`, `.db` или любое имя | Таблицы открываются списком таблиц; база узнаётся по заголовку файла, так что `.aup3`, `.gnucash` и файл без расширения тоже открываются |
 | DuckDB | `.duckdb`, `.ddb`, `.db` или любое имя | Какой это движок, решает заголовок самого файла, а не его имя |
 
-Для книг и баз данных qrow сначала показывает обзор (листы или таблицы);
+Для книг и баз данных rowq сначала показывает обзор (листы или таблицы);
 нажмите `Enter` на строке, чтобы открыть её, и `Esc` / `q`, чтобы вернуться.
 Таблицу можно править и сохранить обратно — см. [Базы данных](database.md).
 
@@ -70,7 +70,7 @@ MCP-сервер читает JSONL так же. Сохранение запис
 `[first … of …]`, а сохранение поверх самого файла запрещено — оно бы выбросило
 остальное.
 
-![TOML-файл, отредактированный на месте и сохранённый как YAML](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/tree.gif)
+![TOML-файл, отредактированный на месте и сохранённый как YAML](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/tree.gif)
 
 ### Задать формат принудительно
 
@@ -78,8 +78,8 @@ MCP-сервер читает JSONL так же. Сохранение запис
 Для файла он перекрывает и расширение, и содержимое:
 
 ```sh
-qrow -t yaml deploy.conf     # YAML-файл, который называется не .yaml
-qrow -t csv export.dat       # CSV под именем, которое ничего не говорит
+rowq -t yaml deploy.conf     # YAML-файл, который называется не .yaml
+rowq -t csv export.dat       # CSV под именем, которое ничего не говорит
 ```
 
 Неизвестное расширение определяется по содержимому, так что `deploy.conf`
@@ -89,10 +89,10 @@ qrow -t csv export.dat       # CSV под именем, которое ниче�
 ### Открыть базу, которой ещё нет
 
 ```sh
-qrow inventory.sqlite        # файла нет — открывается пустой лист
+rowq inventory.sqlite        # файла нет — открывается пустой лист
 ```
 
-Добавьте столбцы, задайте им типы, добавьте строки, `Ctrl+S` — и qrow запишет
+Добавьте столбцы, задайте им типы, добавьте строки, `Ctrl+S` — и rowq запишет
 настоящую типизированную таблицу. См. [Базы данных](database.md).
 
 ### Задать разделитель
@@ -100,7 +100,7 @@ qrow inventory.sqlite        # файла нет — открывается пу
 Когда автоопределение ошибается (или файл разделён `;`):
 
 ```sh
-qrow data.csv -d ';'
+rowq data.csv -d ';'
 ```
 
 ### Пропуски в CSV
@@ -114,11 +114,11 @@ qrow data.csv -d ';'
 
 ## Просмотр нескольких файлов
 
-Передайте больше одного пути — и qrow откроет **список файлов** вместо одной
+Передайте больше одного пути — и rowq откроет **список файлов** вместо одной
 таблицы:
 
 ```sh
-qrow orders.csv customers.csv products.parquet
+rowq orders.csv customers.csv products.parquet
 ```
 
 Каждый файл становится строкой с именем, размером и временем изменения. `Enter`
@@ -126,12 +126,12 @@ qrow orders.csv customers.csv products.parquet
 
 ## Много файлов как одна таблица
 
-Шаблон в кавычках достаётся qrow, а не шеллу, и все файлы, которые он назвал,
+Шаблон в кавычках достаётся rowq, а не шеллу, и все файлы, которые он назвал,
 читаются как одна таблица:
 
 ```sh
-qrow 'data/*.csv'
-qrow 'content/**/index.md'
+rowq 'data/*.csv'
+rowq 'content/**/index.md'
 ```
 
 Кавычки — и есть вся разница. Без них шелл раскроет шаблон в несколько аргументов,
@@ -149,11 +149,11 @@ qrow 'content/**/index.md'
 
 ## Просмотр каталога
 
-Укажите qrow папку (или запустите без аргументов, чтобы взять текущую):
+Укажите rowq папку (или запустите без аргументов, чтобы взять текущую):
 
 ```sh
-qrow ./reports/
-qrow               # текущий каталог
+rowq ./reports/
+rowq               # текущий каталог
 ```
 
 Откроется навигатор по файлам — открывайте файлы по `Enter`, выходите назад по
@@ -161,19 +161,19 @@ qrow               # текущий каталог
 
 ## Чтение из конвейера
 
-qrow читает stdin, когда данные передаются по конвейеру. Укажите формат через
+rowq читает stdin, когда данные передаются по конвейеру. Укажите формат через
 `-t`:
 
 ```sh
-cat data.csv | qrow -t csv
-psql -c "SELECT * FROM orders" --csv | qrow -t csv
-echo '[{"id":1,"name":"Alice"}]'   | qrow -t json
+cat data.csv | rowq -t csv
+psql -c "SELECT * FROM orders" --csv | rowq -t csv
+echo '[{"id":1,"name":"Alice"}]'   | rowq -t json
 ```
 
 Из stdin понимаются `csv`, `tsv`, `txt`, `json`, `jsonl`/`ndjson`, `yaml`/`yml`
 и `toml` (`txt` обрабатывается как CSV). Чтобы прочитать Parquet, Arrow, Excel,
 Markdown, SQLite или DuckDB, открывайте файл по пути, а не через конвейер. `-`
-работает как явный путь-stdin: `cat data.csv | qrow -t csv -`.
+работает как явный путь-stdin: `cat data.csv | rowq -t csv -`.
 
 ## Экран
 
@@ -200,5 +200,5 @@ Markdown, SQLite или DuckDB, открывайте файл по пути, а 
 - Попробуйте [графики](charts.md), [сводные таблицы](pivot.md) и [JOIN](join.md).
 - Отредактируйте таблицу и запишите её обратно — [Базы данных](database.md).
 - Дайте ассистенту считать по вашим файлам через [MCP-сервер](mcp.md)
-  (`qrow --mcp`).
+  (`rowq --mcp`).
 - Загляните в практические [рецепты](recipes.md).

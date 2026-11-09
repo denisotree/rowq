@@ -250,7 +250,7 @@ pub fn with_epochs(lf: LazyFrame, epochs: &[(String, EpochUnit)]) -> LazyFrame {
 
 /// Datetime columns with a time zone, the zone set aside: the same instants as UTC
 /// without one.  Polars without its zone database cannot show, compare or format a
-/// zoned value — some of it panics — and UTC is what qrow shows anyway.  The
+/// zoned value — some of it panics — and UTC is what rowq shows anyway.  The
 /// expressions that strip them, and each column's zone.
 pub fn zone_free(schema: &Schema) -> (Vec<Expr>, Vec<(String, String)>) {
     schema

@@ -87,7 +87,7 @@ jobs:
           # resolve to the fixed 0.41 (0.39.4 is the last of its line, no backport).
           # polars 0.54 and 0.55 do not help — same object_store (0.13.2 with 0.55.2). object_store 0.14 DOES use
           # quick-xml 0.41, so the fix is one dependency bump inside polars; no released
-          # polars has it yet. qrow never makes a cloud request, so the code is linked
+          # polars has it yet. rowq never makes a cloud request, so the code is linked
           # but never called. Drop these two the moment polars ships object_store 0.14.
           cargo audit \
             --ignore RUSTSEC-2025-0141 \

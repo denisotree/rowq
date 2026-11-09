@@ -7,7 +7,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  BIN_NAME: qrow
+  BIN_NAME: rowq
   CARGO_INCREMENTAL: "0"
   RUSTFLAGS: "-C debuginfo=0"
 

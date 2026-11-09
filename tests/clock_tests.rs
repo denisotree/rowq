@@ -1,7 +1,7 @@
 //! `now()` and `today()` against the clock — in a binary of their own, since the test
 //! sets the process's time zone.
 
-use qrow::mcp::{handle_message, Server};
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 
 /// Every datetime column is held in UTC, so the clock the expressions read is UTC too:
@@ -16,7 +16,7 @@ fn now_and_today_read_the_utc_clock() {
     let path = dir.join("one.csv");
     std::fs::write(&path, "a\n1\n").unwrap();
     let message = json!({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-        "params": {"name": "qrow_query", "arguments": {"source": path, "ops": [
+        "params": {"name": "rowq_query", "arguments": {"source": path, "ops": [
             {"compute": {"name": "n", "expr": "text(now())"}},
             {"compute": {"name": "d", "expr": "text(today())"}}]}}});
     let out: Value =

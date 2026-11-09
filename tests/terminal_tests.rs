@@ -1,13 +1,13 @@
-//! Started without a terminal, qrow says so and exits instead of panicking.
+//! Started without a terminal, rowq says so and exits instead of panicking.
 
 #[cfg(unix)]
 #[test]
-fn without_a_terminal_qrow_exits_with_an_error_not_a_panic() {
+fn without_a_terminal_rowq_exits_with_an_error_not_a_panic() {
     use std::os::unix::process::CommandExt;
     use std::process::{Command, Stdio};
     use std::time::{Duration, Instant};
 
-    let mut cmd = Command::new(env!("CARGO_BIN_EXE_qrow"));
+    let mut cmd = Command::new(env!("CARGO_BIN_EXE_rowq"));
     cmd.arg("test_data/sample.csv")
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .stdin(Stdio::null())
@@ -29,7 +29,7 @@ fn without_a_terminal_qrow_exits_with_an_error_not_a_panic() {
         }
         if started.elapsed() > Duration::from_secs(30) {
             let _ = child.kill();
-            panic!("qrow kept running without a terminal");
+            panic!("rowq kept running without a terminal");
         }
         std::thread::sleep(Duration::from_millis(50));
     };
@@ -38,35 +38,5 @@ fn without_a_terminal_qrow_exits_with_an_error_not_a_panic() {
 
     assert!(!status.success());
     assert!(!stderr.contains("panicked"), "{}", stderr);
-    assert!(stderr.contains("qrow needs a terminal"), "{}", stderr);
-}
-
-/// The short name is the same program: the version names the product, the usage the
-/// name it was started under.
-#[cfg(feature = "aliases")]
-#[test]
-fn qrw_reports_itself_as_qrow() {
-    let bin = env!("CARGO_BIN_EXE_qrw");
-    let out = std::process::Command::new(bin)
-        .arg("--version")
-        .output()
-        .unwrap();
-    assert!(out.status.success());
-    assert_eq!(
-        String::from_utf8(out.stdout).unwrap(),
-        format!("qrow {}\n", env!("CARGO_PKG_VERSION"))
-    );
-    let help = String::from_utf8(
-        std::process::Command::new(bin)
-            .arg("--help")
-            .output()
-            .unwrap()
-            .stdout,
-    )
-    .unwrap();
-    assert!(
-        help.starts_with("qrow — query rows in tables, documents and databases"),
-        "{help}"
-    );
-    assert!(help.contains("Usage: qrw"), "{help}");
+    assert!(stderr.contains("rowq needs a terminal"), "{}", stderr);
 }

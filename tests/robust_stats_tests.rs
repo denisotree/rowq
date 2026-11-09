@@ -1,9 +1,9 @@
 //! The median absolute deviation, and median and MAD as windows: the pieces of a
 //! robust z-score per group.
 
-use qrow::data::aggregator::AggregatorKind;
-use qrow::mcp::{handle_message, Server};
-use qrow::types::ColumnType;
+use rowq::data::aggregator::AggregatorKind;
+use rowq::mcp::{handle_message, Server};
+use rowq::types::ColumnType;
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -19,7 +19,7 @@ fn csv(name: &str, text: &str) -> PathBuf {
 
 fn query(path: &std::path::Path, ops: Value) -> Value {
     let message = json!({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-        "params": {"name": "qrow_query",
+        "params": {"name": "rowq_query",
                    "arguments": {"source": path.to_string_lossy(), "ops": ops}}});
     let response = handle_message(&mut Server::new(), &message.to_string()).unwrap();
     let result = &response["result"];
@@ -68,7 +68,7 @@ fn mad_as_a_grand_total() {
 fn mad_refuses_text() {
     let path = csv("text.csv", "s\na\nb\n");
     let message = json!({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-        "params": {"name": "qrow_query", "arguments": {"source": path.to_string_lossy(),
+        "params": {"name": "rowq_query", "arguments": {"source": path.to_string_lossy(),
             "ops": [{"aggregate": [{"col": "s", "fn": "mad"}]}]}}});
     let response = handle_message(&mut Server::new(), &message.to_string()).unwrap();
     assert_eq!(response["result"]["isError"], json!(true));
@@ -134,7 +134,7 @@ fn window_median_and_mad_over_a_partition() {
 fn median_and_mad_windows_refuse_an_order() {
     let path = csv("order.csv", "v\n1\n2\n");
     let message = json!({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-        "params": {"name": "qrow_query", "arguments": {"source": path.to_string_lossy(),
+        "params": {"name": "rowq_query", "arguments": {"source": path.to_string_lossy(),
             "ops": [{"window": {"fn": "mad", "col": "v", "order_by": ["v"]}}]}}});
     let response = handle_message(&mut Server::new(), &message.to_string()).unwrap();
     assert_eq!(response["result"]["isError"], json!(true));
@@ -144,8 +144,8 @@ fn median_and_mad_windows_refuse_an_order() {
 /// numeric column is read — not as text, where 10 sorts before 9.
 #[test]
 fn footer_min_and_max_read_percentages_as_numbers() {
-    use qrow::data::aggregator::AggregatorKind;
-    use qrow::types::ColumnType;
+    use rowq::data::aggregator::AggregatorKind;
+    use rowq::types::ColumnType;
     // As text, "10" comes before "2".
     let values: Vec<String> = ["2", "10"].iter().map(|s| s.to_string()).collect();
     let min = AggregatorKind::Min.compute(&values, ColumnType::Percentage, 0, None);

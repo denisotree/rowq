@@ -5,7 +5,7 @@
 //! for a process.  One test at the end does spawn the binary, to check the
 //! framing and that nothing leaks onto stdout.
 
-use qrow::mcp::{handle_message, Server};
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -83,7 +83,7 @@ fn call_expecting_failure(server: &mut Server, name: &str, arguments: Value) -> 
 fn query(server: &mut Server, ops: Value) -> Value {
     call(
         server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": "test_data/sample.csv"}, "ops": ops}),
     )
 }
@@ -124,15 +124,15 @@ fn initialize_answers_with_the_requested_version_and_the_instructions() {
 
     let result = &response["result"];
     assert_eq!(result["protocolVersion"], "2025-06-18");
-    assert_eq!(result["serverInfo"]["name"], "qrow");
+    assert_eq!(result["serverInfo"]["name"], "rowq");
     assert_eq!(
         result["serverInfo"]["title"],
-        "qrow — query rows in tables, documents and databases"
+        "rowq — query rows in tables, documents and databases"
     );
     assert!(result["capabilities"]["tools"].is_object());
 
     let instructions = result["instructions"].as_str().unwrap();
-    assert!(instructions.contains("qrow_inspect"), "{}", instructions);
+    assert!(instructions.contains("rowq_inspect"), "{}", instructions);
     assert!(instructions.contains("group_by"), "{}", instructions);
 }
 
@@ -182,11 +182,11 @@ fn tools_list_offers_the_five_tools() {
     assert_eq!(
         names,
         vec![
-            "qrow_inspect",
-            "qrow_query",
-            "qrow_describe",
-            "qrow_jq",
-            "qrow_calc"
+            "rowq_inspect",
+            "rowq_query",
+            "rowq_describe",
+            "rowq_jq",
+            "rowq_calc"
         ]
     );
 
@@ -222,23 +222,23 @@ fn an_unknown_tool_is_a_protocol_error() {
     let response = send(
         &mut server,
         json!({"jsonrpc": "2.0", "id": 1, "method": "tools/call",
-               "params": {"name": "qrow_nonesuch", "arguments": {}}}),
+               "params": {"name": "rowq_nonesuch", "arguments": {}}}),
     );
     assert_eq!(response["error"]["code"], -32602);
     assert!(response["error"]["message"]
         .as_str()
         .unwrap()
-        .contains("qrow_nonesuch"));
+        .contains("rowq_nonesuch"));
 }
 
-// ── qrow_inspect ──────────────────────────────────────────────────────────
+// ── rowq_inspect ──────────────────────────────────────────────────────────
 
 #[test]
 fn inspect_reports_columns_types_and_a_sample() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": "test_data/sample.csv"}),
     );
 
@@ -273,7 +273,7 @@ fn inspect_lists_tables_before_showing_columns() {
 
     call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": db.to_string_lossy()}}),
     );
@@ -281,7 +281,7 @@ fn inspect_lists_tables_before_showing_columns() {
     // Without a container, the answer is the list of tables, not rows.
     let listing = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": db.to_string_lossy()}}),
     );
     let tables: Vec<&str> = listing["containers"]
@@ -311,7 +311,7 @@ fn inspect_lists_tables_before_showing_columns() {
     // With one, it is an ordinary table.
     let table = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": db.to_string_lossy(), "container": "result"}}),
     );
     assert_eq!(table["row_count"], 20);
@@ -319,7 +319,7 @@ fn inspect_lists_tables_before_showing_columns() {
     // And it queries like any other source.
     let result = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": db.to_string_lossy(), "container": "result"},
                "ops": [{"frequency": {"by": ["department"]}}]}),
     );
@@ -333,7 +333,7 @@ fn inspect_reports_a_missing_file_as_a_tool_error() {
     let mut server = Server::new();
     let message = call_expecting_failure(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": "test_data/does_not_exist.csv"}),
     );
     assert!(message.contains("No such file"), "{}", message);
@@ -466,7 +466,7 @@ fn not_keeps_rows_where_the_predicate_is_not_true() {
     let mut server = Server::new();
     let out = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [
             {"filter": {"not": {"col": "msg", "op": "contains", "value": "https?://"}}}
         ]}),
@@ -481,7 +481,7 @@ fn not_keeps_rows_where_the_predicate_is_not_true() {
 
     let none_of = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [
             {"filter": [{"not": {"any_of": [
                 {"col": "id", "op": "eq", "value": 1},
@@ -498,7 +498,7 @@ fn not_inside_not_is_refused() {
     std::fs::write(&path, "id\n1\n").unwrap();
     let err = call_expecting_failure(
         &mut Server::new(),
-        "qrow_query",
+        "rowq_query",
         json!({"source": path, "ops": [
             {"filter": {"not": {"not": {"col": "id", "op": "eq", "value": 1}}}}
         ]}),
@@ -512,7 +512,7 @@ fn a_write_where_can_say_not() {
     let db = db_fixture("where_not.sqlite");
     let out = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "set": {"name": "X"},
                "where": [{"not": {"col": "id", "op": "eq", "value": 1}}]}),
@@ -549,7 +549,7 @@ fn a_filter_on_an_unknown_column_names_the_ones_that_exist() {
     let mut server = Server::new();
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv",
                "ops": [{"filter": [{"col": "salary_usd", "op": "gt", "value": 1}]}]}),
     );
@@ -717,7 +717,7 @@ fn an_aggregate_that_cannot_apply_is_an_error_not_a_silent_omission() {
     let mut server = Server::new();
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv",
                "ops": [{"group_by": {"by": ["department"],
                                      "agg": [{"col": "name", "fn": "sum"}]}}]}),
@@ -783,7 +783,7 @@ fn templates_by_regexp_replace_then_frequency() {
     .unwrap();
     let result = call(
         &mut Server::new(),
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path}, "ops": [
             {"compute": {"name": "tmpl", "expr":
                 "regexp_replace(regexp_replace(message, \"[0-9a-f]{8,}\", \"H\"), \"[0-9]+\", \"N\")"}},
@@ -805,7 +805,7 @@ fn compute_round_abs_on_a_csv() {
     std::fs::write(&path, "v\n3\n18\n-6\n").unwrap();
     let result = call(
         &mut Server::new(),
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path}, "ops": [
             {"compute": {"name": "z", "expr": "round(abs(v - 10) / 4, 2)"}},
             {"filter": [{"col": "z", "op": "ge", "value": 2}]}
@@ -823,7 +823,7 @@ fn compute_with_a_misspelt_function_fails_instead_of_filling_nulls() {
     std::fs::write(&path, "name\nann\n").unwrap();
     let err = call_expecting_failure(
         &mut Server::new(),
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path}, "ops": [
             {"compute": {"name": "x", "expr": "lenn(name)"}}
         ]}),
@@ -838,7 +838,7 @@ fn compute_string_functions_return_text() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path}, "ops": [
             {"compute": {"name": "s_s", "expr": "concat('a', 'b')"}},
             {"compute": {"name": "s_col", "expr": "concat(updated_at, '-x')"}},
@@ -875,7 +875,7 @@ fn compute_keeps_a_text_column_as_written() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path}, "ops": [
             {"compute": {"name": "label", "expr": "concat(sku, '|', name)"}},
             {"compute": {"name": "head", "expr": "substring(name, 0, 3)"}}
@@ -898,7 +898,7 @@ fn an_operation_error_comes_without_the_polars_query_plan() {
     let mut server = Server::new();
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": "test_data/sample.csv"}, "ops": [
             {"group_by": {"by": ["department"],
                           "agg": [{"col": "salary", "fn": "sum"}, {"col": "salary", "fn": "sum"}]}}
@@ -916,7 +916,7 @@ fn compute_row_by_row_results_keep_their_type() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path}, "ops": [
             {"compute": {"name": "d", "expr": "date(updated_at)"}},
             {"compute": {"name": "late", "expr": "month(updated_at) > 2"}},
@@ -977,7 +977,7 @@ fn diff_join_marks_each_row() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": "test_data/diff_march.csv"}, "ops": [
             {"join": {"source": {"path": "test_data/diff_april.csv"},
                       "left_on": ["id"], "how": "diff"}}
@@ -998,7 +998,7 @@ fn a_truncated_result_says_so_and_still_reports_the_real_count() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [], "output": {"limit": 2}}),
     );
 
@@ -1013,7 +1013,7 @@ fn several_pipelines_run_against_one_load() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "pipelines": [
             {"name": "headcount", "ops": [{"frequency": {"by": ["department"]}}]},
             {"name": "seniors", "ops": [{"filter": [{"col": "age", "op": "ge", "value": 45}]}]}
@@ -1037,7 +1037,7 @@ fn output_path_writes_a_file_and_refuses_to_clobber_one() {
     let ops = json!([{"frequency": {"by": ["department"]}}]);
     let result = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": ops,
                "output": {"path": path.to_string_lossy()}}),
     );
@@ -1049,7 +1049,7 @@ fn output_path_writes_a_file_and_refuses_to_clobber_one() {
     // A second run must not quietly replace it.
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": ops,
                "output": {"path": path.to_string_lossy()}}),
     );
@@ -1059,7 +1059,7 @@ fn output_path_writes_a_file_and_refuses_to_clobber_one() {
     // for, the same as replacing a table.
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": ops,
                "output": {"path": path.to_string_lossy(), "overwrite": true}}),
     );
@@ -1069,7 +1069,7 @@ fn output_path_writes_a_file_and_refuses_to_clobber_one() {
     let mut on = writable_server();
     let planned = call(
         &mut on,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [{"limit": 1}],
                "output": {"path": path.to_string_lossy(), "overwrite": true}}),
     );
@@ -1086,7 +1086,7 @@ fn output_path_writes_a_file_and_refuses_to_clobber_one() {
     );
 
     let id = planned["plan_id"].as_str().unwrap().to_string();
-    call(&mut on, "qrow_write_apply", json!({"plan_id": id}));
+    call(&mut on, "rowq_write_apply", json!({"plan_id": id}));
     let after = std::fs::read_to_string(&path).unwrap();
     assert!(
         after.starts_with("id,name,age,salary,department"),
@@ -1104,7 +1104,7 @@ fn describe_labels_the_population_standard_deviation_unambiguously() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_describe",
+        "rowq_describe",
         json!({"source": "test_data/sample.csv", "columns": ["age"]}),
     );
 
@@ -1135,7 +1135,7 @@ fn jq_walks_a_nested_document() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_jq",
+        "rowq_jq",
         json!({"source": "test_data/nested.json", "program": "map(.name)"}),
     );
     assert_eq!(result["result"], json!(["alpha", "beta"]));
@@ -1146,10 +1146,10 @@ fn jq_on_a_csv_points_at_the_right_tool() {
     let mut server = Server::new();
     let message = call_expecting_failure(
         &mut server,
-        "qrow_jq",
+        "rowq_jq",
         json!({"source": "test_data/sample.csv", "program": "."}),
     );
-    assert!(message.contains("qrow_query"), "{}", message);
+    assert!(message.contains("rowq_query"), "{}", message);
 }
 
 // ── the wire ────────────────────────────────────────────────────────────────
@@ -1161,7 +1161,7 @@ fn the_binary_speaks_the_protocol_over_stdio() {
     use std::io::Write;
     use std::process::{Command, Stdio};
 
-    let mut child = Command::new(env!("CARGO_BIN_EXE_qrow"))
+    let mut child = Command::new(env!("CARGO_BIN_EXE_rowq"))
         .arg("--mcp")
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .stdin(Stdio::piped())
@@ -1174,7 +1174,7 @@ fn the_binary_speaks_the_protocol_over_stdio() {
         r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"t","version":"0"}}}"#,
         r#"{"jsonrpc":"2.0","method":"notifications/initialized"}"#,
         r#"{"jsonrpc":"2.0","id":2,"method":"tools/list"}"#,
-        r#"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"qrow_inspect","arguments":{"source":"test_data/sample.csv"}}}"#,
+        r#"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"rowq_inspect","arguments":{"source":"test_data/sample.csv"}}}"#,
     ]
     .join("\n");
 
@@ -1293,7 +1293,7 @@ fn inspect_reports_declared_types_keys_and_defaults() {
     let db = db_fixture("meta.sqlite");
     let out = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"}}),
     );
 
@@ -1315,7 +1315,7 @@ fn inspect_lists_row_counts_and_views() {
     let db = db_fixture("listing.sqlite");
     let out = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": db.to_string_lossy()}),
     );
 
@@ -1338,7 +1338,7 @@ fn a_view_reads_but_is_not_writable() {
     let db = db_fixture("view.sqlite");
     let out = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": db.to_string_lossy(), "container": "big"}}),
     );
     assert_eq!(out["row_count"], 1, "the view reads");
@@ -1353,11 +1353,11 @@ fn a_database_without_a_container_points_at_container() {
     let db = db_fixture("nocontainer.sqlite");
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": db.to_string_lossy(), "ops": []}),
     );
     assert!(message.contains("pass 'container'"), "{}", message);
-    assert!(message.contains("qrow_inspect"), "{}", message);
+    assert!(message.contains("rowq_inspect"), "{}", message);
     std::fs::remove_file(&db).unwrap();
 }
 
@@ -1367,7 +1367,7 @@ fn a_numeric_filter_over_a_database_compares_numerically() {
     let db = db_fixture("numeric.sqlite");
     let out = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "ops": [{"filter": [{"col": "score", "op": "gt", "value": 100}]}]}),
     );
@@ -1384,7 +1384,7 @@ fn output_table_names_the_table_and_can_sit_beside_others() {
     let db = db_fixture("output.sqlite");
     let res = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": db.to_string_lossy(), "table": "imported"}}),
     );
@@ -1393,7 +1393,7 @@ fn output_table_names_the_table_and_can_sit_beside_others() {
 
     let listing = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": db.to_string_lossy()}),
     );
     let names: Vec<&str> = listing["containers"]
@@ -1417,7 +1417,7 @@ fn replacing_a_table_needs_overwrite_and_the_message_names_it() {
     let db = db_fixture("replace.sqlite");
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": db.to_string_lossy(), "table": "users"}}),
     );
@@ -1435,7 +1435,7 @@ fn an_invalid_table_name_is_refused() {
     for bad in ["", "sqlite_master"] {
         let message = call_expecting_failure(
             &mut server,
-            "qrow_query",
+            "rowq_query",
             json!({"source": "test_data/sample.csv", "ops": [],
                    "output": {"path": out.to_string_lossy(), "table": bad}}),
         );
@@ -1459,7 +1459,7 @@ fn the_write_tools_are_absent_unless_the_server_allows_writing() {
         .iter()
         .map(|t| t["name"].as_str().unwrap())
         .collect();
-    assert!(!names.contains(&"qrow_write"), "{:?}", names);
+    assert!(!names.contains(&"rowq_write"), "{:?}", names);
 
     let mut on = writable_server();
     let listed = send(
@@ -1472,14 +1472,14 @@ fn the_write_tools_are_absent_unless_the_server_allows_writing() {
         .iter()
         .map(|t| t["name"].as_str().unwrap())
         .collect();
-    assert!(names.contains(&"qrow_write"), "{:?}", names);
-    assert!(names.contains(&"qrow_write_apply"), "{:?}", names);
+    assert!(names.contains(&"rowq_write"), "{:?}", names);
+    assert!(names.contains(&"rowq_write_apply"), "{:?}", names);
 }
 
 #[test]
 fn calling_a_write_tool_without_the_flag_names_the_flag() {
     let mut server = Server::new();
-    let message = call_expecting_failure(&mut server, "qrow_write", json!({"source": "x.sqlite"}));
+    let message = call_expecting_failure(&mut server, "rowq_write", json!({"source": "x.sqlite"}));
     assert!(message.contains("--mcp-write"), "{}", message);
 }
 
@@ -1491,7 +1491,7 @@ fn the_instructions_describe_writing_only_when_it_is_allowed() {
         json!({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}),
     );
     let text = init["result"]["instructions"].as_str().unwrap();
-    assert!(!text.contains("qrow_write_apply"));
+    assert!(!text.contains("rowq_write_apply"));
 
     let mut on = writable_server();
     let init = send(
@@ -1499,7 +1499,7 @@ fn the_instructions_describe_writing_only_when_it_is_allowed() {
         json!({"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}),
     );
     let text = init["result"]["instructions"].as_str().unwrap();
-    assert!(text.contains("qrow_write_apply"), "{}", text);
+    assert!(text.contains("rowq_write_apply"), "{}", text);
 }
 
 // ── Writing, phase one: says what would happen ────────────────────────────────────
@@ -1510,7 +1510,7 @@ fn a_planned_change_returns_the_sql_and_writes_nothing() {
     let db = db_fixture("plan.sqlite");
     let out = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "set": {"name": "ANN"},
                "where": [{"col": "id", "op": "eq", "value": 1}]}),
@@ -1537,7 +1537,7 @@ fn a_change_that_changes_nothing_offers_no_plan() {
     let db = db_fixture("noop.sqlite");
     let out = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "set": {"name": "ann"},
                "where": [{"col": "id", "op": "eq", "value": 1}]}),
@@ -1582,7 +1582,7 @@ fn phase_one_refuses_what_cannot_work() {
         (json!({"source": src, "insert": [{"score": 1}]}), "NOT NULL"),
     ];
     for (args, expected) in cases {
-        let message = call_expecting_failure(&mut server, "qrow_write", args);
+        let message = call_expecting_failure(&mut server, "rowq_write", args);
         assert!(
             message.to_lowercase().contains(&expected.to_lowercase()),
             "expected {:?} in {:?}",
@@ -1597,12 +1597,12 @@ fn phase_one_refuses_what_cannot_work() {
 // ── Writing, phase two: runs exactly that plan ────────────────────────────────────
 
 fn plan_then_apply(server: &mut Server, args: Value) -> Value {
-    let planned = call(server, "qrow_write", args);
+    let planned = call(server, "rowq_write", args);
     let id = planned["plan_id"]
         .as_str()
         .expect("a plan was made")
         .to_string();
-    call(server, "qrow_write_apply", json!({"plan_id": id}))
+    call(server, "rowq_write_apply", json!({"plan_id": id}))
 }
 
 #[test]
@@ -1720,7 +1720,7 @@ fn a_plan_cannot_be_applied_twice_and_an_unknown_id_is_refused() {
     let db = db_fixture("once.sqlite");
     let planned = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "set": {"name": "ANN"}, "where": [{"col": "id", "op": "eq", "value": 1}]}),
     );
@@ -1728,17 +1728,17 @@ fn a_plan_cannot_be_applied_twice_and_an_unknown_id_is_refused() {
 
     let unknown = call_expecting_failure(
         &mut server,
-        "qrow_write_apply",
+        "rowq_write_apply",
         json!({"plan_id": "write-99"}),
     );
     assert!(unknown.contains("write-99"), "{}", unknown);
 
     call(
         &mut server,
-        "qrow_write_apply",
+        "rowq_write_apply",
         json!({"plan_id": id.clone()}),
     );
-    let again = call_expecting_failure(&mut server, "qrow_write_apply", json!({"plan_id": id}));
+    let again = call_expecting_failure(&mut server, "rowq_write_apply", json!({"plan_id": id}));
     // A plan this server did hand out is a different answer from one it never made.
     assert!(again.contains("no longer valid"), "{}", again);
     assert_eq!(
@@ -1756,19 +1756,19 @@ fn a_second_plan_replaces_the_first() {
     let src = json!({"path": db.to_string_lossy(), "container": "users"});
     let first = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": src, "set": {"name": "ONE"}, "where": [{"col": "id", "op": "eq", "value": 1}]}),
     );
     let first_id = first["plan_id"].as_str().unwrap().to_string();
     call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": src, "set": {"name": "TWO"}, "where": [{"col": "id", "op": "eq", "value": 2}]}),
     );
 
     let stale = call_expecting_failure(
         &mut server,
-        "qrow_write_apply",
+        "rowq_write_apply",
         json!({"plan_id": first_id}),
     );
     assert!(stale.contains("waiting to be applied"), "{}", stale);
@@ -1782,7 +1782,7 @@ fn a_row_changed_between_the_phases_stops_the_write() {
     let db = db_fixture("drift.sqlite");
     let planned = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "set": {"name": "ANN"}, "where": [{"col": "id", "op": "eq", "value": 1}]}),
     );
@@ -1793,7 +1793,7 @@ fn a_row_changed_between_the_phases_stops_the_write() {
         .execute_batch("UPDATE users SET name = 'elsewhere' WHERE id = 1")
         .unwrap();
 
-    let message = call_expecting_failure(&mut server, "qrow_write_apply", json!({"plan_id": id}));
+    let message = call_expecting_failure(&mut server, "rowq_write_apply", json!({"plan_id": id}));
     assert!(
         message.contains("changed since it was opened"),
         "{}",
@@ -1826,7 +1826,7 @@ fn two_writes_in_one_session_both_land_and_inspect_sees_them() {
     // The cache must not answer from a frame that predates the writes.
     let out = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": src, "ops": [{"filter": [{"col": "name", "op": "eq", "value": "ONE"}]}]}),
     );
     assert_eq!(out["row_count"], 1);
@@ -1844,7 +1844,7 @@ fn duckdb_writes_the_same_way() {
                "where": [{"col": "id", "op": "eq", "value": 1}]}),
     );
 
-    let (df, _) = qrow::data::io::load_duckdb_table_full(&db, "users").unwrap();
+    let (df, _) = rowq::data::io::load_duckdb_table_full(&db, "users").unwrap();
     assert_eq!(df.get_physical(0, 1), "ANN");
     std::fs::remove_file(&db).unwrap();
 }
@@ -1858,7 +1858,7 @@ fn a_filter_over_a_view_compares_the_same_way_as_over_the_table() {
         let db = db_fixture(name);
         let via_table = call(
             &mut server,
-            "qrow_query",
+            "rowq_query",
             json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                    "ops": [{"filter": [{"col": "score", "op": "gt", "value": 100}]}]}),
         );
@@ -1867,7 +1867,7 @@ fn a_filter_over_a_view_compares_the_same_way_as_over_the_table() {
         // `big` is a view; its `id` is the same declared INTEGER.
         let via_view = call(
             &mut server,
-            "qrow_query",
+            "rowq_query",
             json!({"source": {"path": db.to_string_lossy(), "container": "big"},
                    "ops": [{"filter": [{"col": "id", "op": "gt", "value": 1}]}]}),
         );
@@ -1884,7 +1884,7 @@ fn writing_into_a_database_invalidates_the_cached_frame_of_it() {
     // Read a table first, so the server holds a frame of this file.
     let before = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"}, "ops": []}),
     );
     assert_eq!(before["row_count"], json!(3));
@@ -1892,7 +1892,7 @@ fn writing_into_a_database_invalidates_the_cached_frame_of_it() {
     // Write a second table into the same file…
     call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": db.to_string_lossy(), "table": "imported"}}),
     );
@@ -1900,7 +1900,7 @@ fn writing_into_a_database_invalidates_the_cached_frame_of_it() {
     // …and the very next read must see it rather than the snapshot from before.
     let listing = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": db.to_string_lossy()}),
     );
     let names: Vec<&str> = listing["containers"]
@@ -1933,7 +1933,7 @@ fn a_duckdb_file_named_db_is_read_as_duckdb() {
 
     let listing = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": path.to_string_lossy()}),
     );
     let names: Vec<&str> = listing["containers"]
@@ -1946,7 +1946,7 @@ fn a_duckdb_file_named_db_is_read_as_duckdb() {
 
     let rows = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": path.to_string_lossy(), "container": "users"}, "ops": []}),
     );
     assert_eq!(rows["row_count"], json!(2));
@@ -1970,7 +1970,7 @@ fn a_database_that_will_not_open_says_why_instead_of_holding_nothing() {
     bytes.extend_from_slice(&[0xffu8; 8192]);
     std::fs::write(&path, bytes).unwrap();
 
-    for tool in ["qrow_inspect", "qrow_query"] {
+    for tool in ["rowq_inspect", "rowq_query"] {
         let err =
             call_expecting_failure(&mut server, tool, json!({"source": path.to_string_lossy()}));
         assert!(!err.contains("holds 0 tables"), "{}: {}", tool, err);
@@ -1993,7 +1993,7 @@ fn a_database_that_will_not_open_says_why_instead_of_holding_nothing() {
 /// a slow runner cannot let the parent in first.
 #[test]
 fn a_locked_database_says_so_and_names_the_file_once() {
-    if let Ok(held) = std::env::var("QROW_MCP_LOCK_CHILD") {
+    if let Ok(held) = std::env::var("ROWQ_MCP_LOCK_CHILD") {
         let _conn = duckdb::Connection::open(&held).unwrap();
         let ready = PathBuf::from(format!("{}.ready", held));
         std::fs::write(&ready, b"").unwrap();
@@ -2018,7 +2018,7 @@ fn a_locked_database_says_so_and_names_the_file_once() {
             "a_locked_database_says_so_and_names_the_file_once",
             "--exact",
         ])
-        .env("QROW_MCP_LOCK_CHILD", &path)
+        .env("ROWQ_MCP_LOCK_CHILD", &path)
         .stdout(std::process::Stdio::null())
         .spawn()
         .unwrap();
@@ -2035,16 +2035,16 @@ fn a_locked_database_says_so_and_names_the_file_once() {
     let csv = tmp("mcp-locked-src.csv");
     std::fs::write(&csv, "id\n1\n").unwrap();
     let errs = [
-        call_expecting_failure(&mut server, "qrow_query", json!({"source": shown})),
+        call_expecting_failure(&mut server, "rowq_query", json!({"source": shown})),
         call_expecting_failure(
             &mut server,
-            "qrow_query",
+            "rowq_query",
             json!({"source": {"path": shown, "container": "users"}}),
         ),
         // Writing a result into it: a new table beside `users`.
         call_expecting_failure(
             &mut server,
-            "qrow_query",
+            "rowq_query",
             json!({"source": csv.to_string_lossy(), "output": {"path": shown, "table": "extra"}}),
         ),
     ];
@@ -2076,14 +2076,14 @@ fn adding_a_table_needs_no_flag_and_replacing_one_does() {
     for table in ["first", "second"] {
         call(
             &mut off,
-            "qrow_query",
+            "rowq_query",
             json!({"source": "test_data/sample.csv", "ops": [],
                    "output": {"path": fresh.to_string_lossy(), "table": table}}),
         );
     }
     let listing = call(
         &mut off,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": fresh.to_string_lossy()}),
     );
     let names: Vec<&str> = listing["containers"]
@@ -2102,7 +2102,7 @@ fn adding_a_table_needs_no_flag_and_replacing_one_does() {
     let db = db_fixture("gate-existing.sqlite");
     call(
         &mut off,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": db.to_string_lossy(), "table": "imported"}}),
     );
@@ -2112,7 +2112,7 @@ fn adding_a_table_needs_no_flag_and_replacing_one_does() {
     // and asking for overwrite does not get round it.
     let message = call_expecting_failure(
         &mut off,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": db.to_string_lossy(), "table": "users", "overwrite": true}}),
     );
@@ -2124,7 +2124,7 @@ fn adding_a_table_needs_no_flag_and_replacing_one_does() {
     let mut on = writable_server();
     let planned = call(
         &mut on,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": db.to_string_lossy(), "table": "users", "overwrite": true}}),
     );
@@ -2142,7 +2142,7 @@ fn adding_a_table_needs_no_flag_and_replacing_one_does() {
     );
 
     let id = planned["plan_id"].as_str().unwrap().to_string();
-    call(&mut on, "qrow_write_apply", json!({"plan_id": id}));
+    call(&mut on, "rowq_write_apply", json!({"plan_id": id}));
     assert_ne!(
         names_in(&db),
         ["ann", "bob", "cara"],
@@ -2158,7 +2158,7 @@ fn a_query_cannot_write_into_the_database_it_read() {
     let db = db_fixture("gate-samefile.sqlite");
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"}, "ops": [],
                "output": {"path": db.to_string_lossy(), "table": "copy", "overwrite": true}}),
     );
@@ -2172,7 +2172,7 @@ fn overwriting_a_view_is_refused_in_words() {
     let db = db_fixture("gate-view.sqlite");
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": db.to_string_lossy(), "table": "big", "overwrite": true}}),
     );
@@ -2187,7 +2187,7 @@ fn a_table_name_with_spaces_around_it_is_trimmed() {
     let _ = std::fs::remove_file(&out);
     call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": out.to_string_lossy(), "table": "  spaced  "}}),
     );
@@ -2212,7 +2212,7 @@ fn planning_again_retires_the_previous_plan_and_says_so() {
     let db = db_fixture("pending-replace.sqlite");
     let first = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "set": {"note": "one"},
                "where": [{"col": "name", "op": "eq", "value": "ann"}]}),
@@ -2221,7 +2221,7 @@ fn planning_again_retires_the_previous_plan_and_says_so() {
 
     let second = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "set": {"note": "two"},
                "where": [{"col": "name", "op": "eq", "value": "bob"}]}),
@@ -2235,7 +2235,7 @@ fn planning_again_retires_the_previous_plan_and_says_so() {
 
     let message = call_expecting_failure(
         &mut server,
-        "qrow_write_apply",
+        "rowq_write_apply",
         json!({"plan_id": first_id}),
     );
     // A newer plan is waiting, so the refusal names both.
@@ -2250,7 +2250,7 @@ fn a_failed_second_plan_does_not_leave_the_first_applicable() {
     let db = db_fixture("pending-failed.sqlite");
     let first = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "set": {"note": "one"},
                "where": [{"col": "name", "op": "eq", "value": "ann"}]}),
@@ -2260,14 +2260,14 @@ fn a_failed_second_plan_does_not_leave_the_first_applicable() {
     // A second call that fails must still retire the first: the model has moved on.
     call_expecting_failure(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "set": {"nosuchcolumn": "x"}}),
     );
 
     let message = call_expecting_failure(
         &mut server,
-        "qrow_write_apply",
+        "rowq_write_apply",
         json!({"plan_id": first_id}),
     );
     assert!(message.contains("no longer valid"), "{}", message);
@@ -2287,7 +2287,7 @@ fn alter_refuses_a_word_it_does_not_know() {
     ] {
         let message = call_expecting_failure(
             &mut server,
-            "qrow_write",
+            "rowq_write",
             json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                    "alter": spec}),
         );
@@ -2311,7 +2311,7 @@ fn an_engine_error_says_what_was_being_done() {
     // A polars failure inside `insert` used to arrive as a bare shape complaint.
     let message = call_expecting_failure(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "insert": [{"name": "eve", "score": "not a number"}]}),
     );
@@ -2320,7 +2320,7 @@ fn an_engine_error_says_what_was_being_done() {
     // A load failure names the file.
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": "test_data/sample.csv", "format": "parquet"}, "ops": []}),
     );
     assert!(message.contains("sample.csv"), "{}", message);
@@ -2328,7 +2328,7 @@ fn an_engine_error_says_what_was_being_done() {
     // A jq failure says it was jq.
     let message = call_expecting_failure(
         &mut server,
-        "qrow_jq",
+        "rowq_jq",
         json!({"source": "test_data/nested.json", "program": "this is not jq ("}),
     );
     assert!(message.contains("jq"), "{}", message);
@@ -2336,7 +2336,7 @@ fn an_engine_error_says_what_was_being_done() {
     // And a refusal from the write engine still arrives in its own words.
     let message = call_expecting_failure(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "big"},
                "set": {"name": "x"}}),
     );
@@ -2351,7 +2351,7 @@ fn an_unwritable_output_is_refused_before_the_pipeline_runs() {
     // error would be the one that came back.
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv",
                "ops": [{"sort": {"col": "nosuchcolumn"}}],
                "output": {"path": tmp("out.xyz").to_string_lossy()}}),
@@ -2360,7 +2360,7 @@ fn an_unwritable_output_is_refused_before_the_pipeline_runs() {
 
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": tmp("no/such/dir/out.csv").to_string_lossy()}}),
     );
@@ -2393,7 +2393,7 @@ fn a_caller_can_ask_for_more_statements_than_the_default() {
 
     let default = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "insert": rows}),
     );
@@ -2403,7 +2403,7 @@ fn a_caller_can_ask_for_more_statements_than_the_default() {
 
     let more = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "insert": rows, "show_statements": 50}),
     );
@@ -2413,7 +2413,7 @@ fn a_caller_can_ask_for_more_statements_than_the_default() {
     // Asking for more than the ceiling gets the ceiling, not everything.
     let capped = call(
         &mut server,
-        "qrow_write",
+        "rowq_write",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"},
                "insert": rows, "show_statements": 5000}),
     );
@@ -2436,13 +2436,13 @@ fn two_sources_read_in_turn_do_not_evict_each_other() {
     for _ in 0..3 {
         let ra = call(
             &mut server,
-            "qrow_query",
+            "rowq_query",
             json!({"source": a.to_string_lossy(), "ops": []}),
         );
         assert_eq!(ra["columns"][0]["name"], json!("x"));
         let rb = call(
             &mut server,
-            "qrow_query",
+            "rowq_query",
             json!({"source": b.to_string_lossy(), "ops": []}),
         );
         assert_eq!(rb["columns"][0]["name"], json!("y"));
@@ -2454,7 +2454,7 @@ fn two_sources_read_in_turn_do_not_evict_each_other() {
     std::fs::write(&a, "x\n1\n2\n3\n").unwrap();
     let ra = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": a.to_string_lossy(), "ops": []}),
     );
     assert_eq!(ra["row_count"], json!(3));
@@ -2474,7 +2474,7 @@ fn a_query_with_no_ops_is_the_table_itself() {
     let _ = std::fs::remove_file(&out);
     let written = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv",
                "output": {"path": out.to_string_lossy(), "table": "people"}}),
     );
@@ -2493,7 +2493,7 @@ fn a_query_with_no_ops_is_the_table_itself() {
     let _ = std::fs::remove_file(&csv);
     let written = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv",
                "output": {"path": csv.to_string_lossy()}}),
     );
@@ -2508,7 +2508,7 @@ fn a_failing_pipeline_does_not_take_the_others_with_it() {
     let mut server = Server::new();
     let out = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv",
                "pipelines": [
                    {"name": "ok", "ops": [{"frequency": {"by": "department"}}]},
@@ -2528,7 +2528,7 @@ fn a_failing_pipeline_does_not_take_the_others_with_it() {
     // Every question failing is still a failed call.
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv",
                "pipelines": [{"name": "bad", "ops": [{"group_by": {"by": ["department"]}}]}]}),
     );
@@ -2542,7 +2542,7 @@ fn a_misspelt_field_is_named_rather_than_ignored() {
     let mut server = Server::new();
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv",
                "ops": [{"group_by": {"by": ["department"],
                                      "aggregate": [{"col": "salary", "fn": "sum"}]}}]}),
@@ -2552,7 +2552,7 @@ fn a_misspelt_field_is_named_rather_than_ignored() {
     // And a list where an object belongs is a mistake of shape, not of field.
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv",
                "ops": [{"compute": [{"name": "x", "expr": "salary * 2"}]}]}),
     );
@@ -2566,19 +2566,19 @@ fn inspecting_a_spreadsheet_gives_the_size_of_every_sheet() {
     let mut server = Server::new();
     let xlsx = tmp("sizes.xlsx");
     let _ = std::fs::remove_file(&xlsx);
-    let df = qrow::data::io::load_file(std::path::Path::new("test_data/sample.csv"), None).unwrap();
-    qrow::data::io::save_file_as(
+    let df = rowq::data::io::load_file(std::path::Path::new("test_data/sample.csv"), None).unwrap();
+    rowq::data::io::save_file_as(
         &df,
         None,
         &xlsx,
-        qrow::data::io::doc_io::Shape::Records,
+        rowq::data::io::doc_io::Shape::Records,
         "Sheet1",
     )
     .unwrap();
 
     let listing = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": xlsx.to_string_lossy()}),
     );
     let sheet = &listing["containers"][0];
@@ -2603,7 +2603,7 @@ fn chained_joins_on_tables_with_a_shared_column_can_be_aggregated() {
     let mut server = Server::new();
     let result = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": {"path": a}, "ops": [
             {"join": {"source": {"path": b}, "left_on": ["b_id"], "right_on": ["id"], "how": "left"}},
             {"join": {"source": {"path": c}, "left_on": ["c_id"], "right_on": ["id"], "how": "left"}},
@@ -2644,7 +2644,7 @@ fn query_output_into_an_existing_database_named_csv_adds_a_table() {
     let db = sqlite_file("disguised.csv");
     let res = call(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": "test_data/sample.csv", "ops": [],
                "output": {"path": db.to_string_lossy(), "table": "added"}}),
     );
@@ -2659,8 +2659,8 @@ fn query_output_into_an_existing_database_named_csv_adds_a_table() {
         res
     );
     assert_eq!(
-        qrow::data::io::db_write::kind_of_file(&db),
-        Some(qrow::data::io::db_write::DbKind::Sqlite),
+        rowq::data::io::db_write::kind_of_file(&db),
+        Some(rowq::data::io::db_write::DbKind::Sqlite),
         "the database was overwritten"
     );
     assert_eq!(sqlite_tables(&db), vec!["added", "users"]);
@@ -2672,7 +2672,7 @@ fn inspect_lists_the_tables_of_a_database_without_an_extension() {
     let db = sqlite_file("noext-db");
     let listing = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": db.to_string_lossy()}}),
     );
     let tables: Vec<&str> = listing["containers"]
@@ -2690,7 +2690,7 @@ fn a_database_under_a_foreign_extension_reads_by_container() {
     let db = sqlite_file("project.aup3");
     let table = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": db.to_string_lossy(), "container": "users"}}),
     );
     assert_eq!(table["row_count"], json!(2));
@@ -2704,7 +2704,7 @@ fn a_declared_sqlite_format_and_a_container_agree() {
     let db = sqlite_file("declared.aup3");
     let table = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": db.to_string_lossy(), "format": "sqlite",
                           "container": "users"}}),
     );
@@ -2717,7 +2717,7 @@ fn querying_a_database_without_an_extension_and_no_container_asks_for_one() {
     let db = sqlite_file("noext-query");
     let message = call_expecting_failure(
         &mut server,
-        "qrow_query",
+        "rowq_query",
         json!({"source": db.to_string_lossy(), "ops": []}),
     );
     assert!(message.contains("pass 'container'"), "{}", message);
@@ -2731,7 +2731,7 @@ fn a_declared_format_wins_over_a_db_extension() {
     std::fs::write(&path, "a,b\n1,2\n").unwrap();
     let result = call(
         &mut server,
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": {"path": path.to_string_lossy(), "format": "csv"}}),
     );
     let cols: Vec<&str> = result["columns"]
@@ -2779,7 +2779,7 @@ fn the_instructions_name_the_columns_group_by_makes() {
         .iter()
         .map(|c| c["name"].as_str().unwrap())
         .collect();
-    let instructions = qrow::mcp::tools::instructions(false);
+    let instructions = rowq::mcp::tools::instructions(false);
     for name in &names[1..] {
         // `salary:sum` is the 'col:fn' pattern; anything else is named as it is.
         let written = if name.contains(':') { "col:fn" } else { name };

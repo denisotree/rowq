@@ -1,4 +1,4 @@
-//! The distribution functions behind `qrow_calc`'s statistics.
+//! The distribution functions behind `rowq_calc`'s statistics.
 //!
 //! Written here rather than taken from a statistics crate: the four distributions a
 //! test or a threshold needs rest on two special functions, and a crate brings the

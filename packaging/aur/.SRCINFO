@@ -1,14 +1,14 @@
-pkgbase = qrow
+pkgbase = rowq
 	pkgdesc = Query rows in tables, documents and databases from the terminal
-	pkgver = 1.1.1
+	pkgver = 1.0.0
 	pkgrel = 1
-	url = https://github.com/denisotree/qrow
+	url = https://github.com/denisotree/rowq
 	arch = x86_64
 	arch = aarch64
 	license = Apache-2.0
 	makedepends = rust
 	makedepends = cargo
-	source = qrow-1.1.1.tar.gz::https://github.com/denisotree/qrow/archive/refs/tags/v1.1.1.tar.gz
-	sha256sums = c4e472d9cd7a1a78f11d9a83b4f56b6177789b318732a5642fba762d8d47342c
+	source = rowq-1.0.0.tar.gz::https://github.com/denisotree/rowq/archive/refs/tags/v1.0.0.tar.gz
+	sha256sums = SKIP
 
-pkgname = qrow
+pkgname = rowq

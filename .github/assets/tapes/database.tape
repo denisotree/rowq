@@ -18,7 +18,7 @@ Type "clear"
 Enter
 Show
 
-Type "qrow inventory.sqlite"
+Type "rowq inventory.sqlite"
 Enter
 Sleep 2200ms
 

@@ -1,7 +1,7 @@
 //! Column names that look like regular expressions.
 //!
 //! Polars' `regex` feature makes `col("^…$")` select *every column matching the
-//! pattern* instead of the one column with that literal name.  qrow passes
+//! pattern* instead of the one column with that literal name.  rowq passes
 //! user-supplied column names to `col()` from several places — the aggregator
 //! (`aggregator.rs`), frequency tables and pivots (`dataframe.rs`), and the MCP
 //! filter — so a file with such a header would misbehave across the TUI too,
@@ -10,9 +10,9 @@
 //! `test_data/regex_name.csv` has headers `^total$`, `plain`, `.*` and `amount`.
 //! These tests pin what happens to them.
 
-use qrow::data::aggregator::AggregatorKind;
-use qrow::data::dataframe::DataFrame;
-use qrow::data::io::load_file;
+use rowq::data::aggregator::AggregatorKind;
+use rowq::data::dataframe::DataFrame;
+use rowq::data::io::load_file;
 use std::path::Path;
 
 fn load() -> DataFrame {
@@ -66,7 +66,7 @@ fn aggregating_over_a_regex_shaped_column_uses_that_column() {
 
 #[test]
 fn a_pivot_over_regex_shaped_columns_addresses_the_right_ones() {
-    use qrow::data::expression::Expr;
+    use rowq::data::expression::Expr;
 
     let df = load();
     let formula = Expr::parse("sum(amount)").unwrap();

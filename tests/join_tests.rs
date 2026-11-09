@@ -5,10 +5,10 @@ mod keys;
 use crossterm::event::KeyCode;
 use keys::{key, open, press};
 use polars::prelude::{Column, DataType, NamedFrom, Series};
-use qrow::data::column::ColumnMeta;
-use qrow::data::dataframe::DataFrame;
-use qrow::data::join::{join_dataframes, JoinType};
-use qrow::types::{AppMode, ColumnType};
+use rowq::data::column::ColumnMeta;
+use rowq::data::dataframe::DataFrame;
+use rowq::data::join::{join_dataframes, JoinType};
+use rowq::types::{AppMode, ColumnType};
 
 fn frame(cols: Vec<(Series, ColumnType)>) -> DataFrame {
     let metas = cols
@@ -222,8 +222,8 @@ fn mismatched_key_types_stop_the_wizard_with_a_fix() {
 
 // ── DIFF ────────────────────────────────────────────────────────────────────
 
-use qrow::data::join::diff_dataframes;
-use qrow::data::loader::load_csv;
+use rowq::data::join::diff_dataframes;
+use rowq::data::loader::load_csv;
 
 const MARCH: &str = "test_data/diff_march.csv";
 const APRIL: &str = "test_data/diff_april.csv";
@@ -339,7 +339,7 @@ fn diff_refuses_a_table_that_already_has_a_diff_column() {
     assert!(diff_dataframes(&left, &right, &id, &id).is_err());
 }
 
-fn diff_through_the_wizard() -> qrow::app::App {
+fn diff_through_the_wizard() -> rowq::app::App {
     let mut app = open(MARCH, "id");
     press(&mut app, "J");
     key(&mut app, KeyCode::Enter);
@@ -368,12 +368,12 @@ fn diff_through_the_wizard_reports_the_counts() {
 /// The colours are the feature, so read them off a drawn frame.
 #[test]
 fn diff_rows_are_drawn_in_their_status_colours() {
-    use qrow::theme::EverforestTheme as T;
     use ratatui::{backend::TestBackend, style::Color, Terminal};
+    use rowq::theme::EverforestTheme as T;
 
     let mut app = diff_through_the_wizard();
     let mut terminal = Terminal::new(TestBackend::new(120, 20)).unwrap();
-    terminal.draw(|f| qrow::ui::render(f, &mut app)).unwrap();
+    terminal.draw(|f| rowq::ui::render(f, &mut app)).unwrap();
     let buffer = terminal.backend().buffer().clone();
 
     let find = |text: &str| {
@@ -579,24 +579,24 @@ fn join_from_a_browser_file_does_not_offer_the_file_itself() {
     std::fs::write(base.join("a.csv"), "k\n1\n").unwrap();
     std::fs::write(base.join("b.csv"), "k\n2\n").unwrap();
 
-    let mut app = qrow::app::App::new_as(&base, None, None).unwrap();
+    let mut app = rowq::app::App::new_as(&base, None, None).unwrap();
     let listing = &app.stack.active().dataframe;
     let row = (0..listing.visible_row_count())
         .find(|&r| {
-            qrow::data::dataframe::DataFrame::anyvalue_to_string_fmt(&listing.get_val(r, 0))
+            rowq::data::dataframe::DataFrame::anyvalue_to_string_fmt(&listing.get_val(r, 0))
                 == "a.csv"
         })
         .unwrap();
     app.stack.active_mut().table_state.select(Some(row));
     app.open_directory_row();
-    app.handle_action(qrow::types::Action::OpenJoin);
+    app.handle_action(rowq::types::Action::OpenJoin);
 
     let offered: Vec<String> = app
         .join
         .context_items
         .iter()
         .filter_map(|item| match item {
-            qrow::types::JoinContextItem::DirectoryFile { file_path } => file_path
+            rowq::types::JoinContextItem::DirectoryFile { file_path } => file_path
                 .file_name()
                 .map(|n| n.to_string_lossy().into_owned()),
             _ => None,

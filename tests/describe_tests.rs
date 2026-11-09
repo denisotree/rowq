@@ -1,18 +1,18 @@
-//! Coverage for the per-column profile behind the `I` key and `qrow_describe`.
+//! Coverage for the per-column profile behind the `I` key and `rowq_describe`.
 //!
 //! The expected numbers are worked out from `test_data/sample.csv` by hand, so
 //! this fails if the arithmetic changes — not merely if the output changes shape.
 
-use qrow::data::describe::{describe, METRICS};
-use qrow::data::io::load_file;
+use rowq::data::describe::{describe, METRICS};
+use rowq::data::io::load_file;
 use std::path::PathBuf;
 
-fn sample() -> qrow::data::dataframe::DataFrame {
+fn sample() -> rowq::data::dataframe::DataFrame {
     load_file(&PathBuf::from("test_data/sample.csv"), None).unwrap()
 }
 
 /// Look up one metric for one column of a describe result.
-fn metric(profile: &qrow::data::dataframe::DataFrame, name: &str, column: &str) -> String {
+fn metric(profile: &rowq::data::dataframe::DataFrame, name: &str, column: &str) -> String {
     let row = METRICS
         .iter()
         .position(|m| *m == name)
@@ -87,7 +87,7 @@ fn mode_is_the_most_frequent_value() {
 /// `sample.csv` has neither, so this is the branch no other test reaches.
 #[test]
 fn currency_and_percentage_columns_are_numeric_and_use_their_precision() {
-    use qrow::types::ColumnType;
+    use rowq::types::ColumnType;
 
     let mut df = sample();
     let salary = df.columns.iter().position(|c| c.name == "salary").unwrap();
@@ -127,9 +127,9 @@ fn the_profile_follows_row_order_rather_than_the_whole_frame() {
 // `describe` is reached from the TUI through one small piece of wiring in
 // `App`.  These drive the real action so the wiring cannot rot unnoticed.
 
-fn describe_via_the_ui(path: &str) -> qrow::app::App {
-    let mut app = qrow::app::App::new_as(&PathBuf::from(path), None, None).unwrap();
-    app.handle_action(qrow::types::Action::DescribeSheet);
+fn describe_via_the_ui(path: &str) -> rowq::app::App {
+    let mut app = rowq::app::App::new_as(&PathBuf::from(path), None, None).unwrap();
+    app.handle_action(rowq::types::Action::DescribeSheet);
     app
 }
 
@@ -165,7 +165,7 @@ fn describing_a_document_sheet_works_on_its_projected_table() {
 #[test]
 fn describing_a_describe_sheet_does_not_panic() {
     let mut app = describe_via_the_ui("test_data/sample.csv");
-    app.handle_action(qrow::types::Action::DescribeSheet);
+    app.handle_action(rowq::types::Action::DescribeSheet);
 
     let sheet = app.stack.active();
     assert_eq!(sheet.title, "Describe: Describe: sample.csv");

@@ -2,7 +2,7 @@
 //! written back with their zone.
 
 use polars::prelude::*;
-use qrow::mcp::{handle_message, Server};
+use rowq::mcp::{handle_message, Server};
 use serde_json::{json, Value};
 use std::path::PathBuf;
 
@@ -43,13 +43,13 @@ fn zoned() -> PathBuf {
 }
 
 fn both(arguments: Value) -> Value {
-    let streamed = call(&mut Server::new(), "qrow_query", arguments.clone());
+    let streamed = call(&mut Server::new(), "rowq_query", arguments.clone());
     let loaded = call(
         &mut Server {
             stream_from: Some(u64::MAX),
             ..Server::new()
         },
-        "qrow_query",
+        "rowq_query",
         arguments.clone(),
     );
     assert_eq!(streamed, loaded, "paths differ for {}", arguments);
@@ -80,7 +80,7 @@ fn a_zoned_column_is_written_with_its_zone() {
                     stream_from: Some(if eager { u64::MAX } else { 0 }),
                     ..Server::new()
                 },
-                "qrow_query",
+                "rowq_query",
                 json!({"source": zoned(), "ops": [], "output": {"path": out}}),
             );
             assert_eq!(wrote["isError"], json!(false), "{}", wrote);
@@ -105,7 +105,7 @@ fn a_zoned_column_is_written_with_its_zone() {
                 stream_from: Some(if eager { u64::MAX } else { 0 }),
                 ..Server::new()
             },
-            "qrow_query",
+            "rowq_query",
             json!({"source": zoned(), "ops": [], "output": {"path": out}}),
         );
         assert_eq!(wrote["isError"], json!(false), "{}", wrote);
@@ -116,7 +116,7 @@ fn a_zoned_column_is_written_with_its_zone() {
 fn inspect_names_the_zone() {
     let out = call(
         &mut Server::new(),
-        "qrow_inspect",
+        "rowq_inspect",
         json!({"source": zoned()}),
     );
     let note = out["structuredContent"]["columns"][0]["note"]
@@ -142,7 +142,7 @@ fn a_pattern_of_zoned_files_keeps_the_zone() {
             stream_from: Some(u64::MAX),
             ..Server::new()
         },
-        "qrow_query",
+        "rowq_query",
         json!({"source": pattern, "ops": [], "output": {"path": out}}),
     );
     assert_eq!(wrote["isError"], json!(false), "{}", wrote);

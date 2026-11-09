@@ -13,7 +13,7 @@ Only the latest release receives security fixes.
 **Do not open a public GitHub issue for security vulnerabilities.**
 
 Please report them privately via email to the maintainer listed in `Cargo.toml`,
-or use [GitHub's private vulnerability reporting](https://github.com/denisotree/qrow/security/advisories/new).
+or use [GitHub's private vulnerability reporting](https://github.com/denisotree/rowq/security/advisories/new).
 
 Include:
 - A description of the vulnerability
@@ -26,7 +26,7 @@ will be disclosed publicly via a GitHub Security Advisory.
 
 ## Scope
 
-qrow reads local files and renders them in the terminal. It does not make network
+rowq reads local files and renders them in the terminal. It does not make network
 requests. With `--mcp` it also runs as an MCP server for an AI assistant: it talks over
 stdin and stdout only and opens no network port. Writing to a database through it needs
 `--mcp-write`, and every change is planned, shown and applied as one transaction.

@@ -16,9 +16,9 @@ use ratatui::{backend::TestBackend, Terminal};
 const SAMPLE: &str = "test_data/sample.csv";
 
 /// Draw a frame and return everything on it as text.
-fn screen(app: &mut qrow::app::App) -> String {
+fn screen(app: &mut rowq::app::App) -> String {
     let mut terminal = Terminal::new(TestBackend::new(100, 30)).unwrap();
-    terminal.draw(|f| qrow::ui::render(f, app)).unwrap();
+    terminal.draw(|f| rowq::ui::render(f, app)).unwrap();
     terminal
         .backend()
         .buffer()
@@ -124,7 +124,7 @@ fn the_new_row_form_reaches_the_screen() {
 fn the_help_keeps_each_note_under_its_key() {
     let mut terminal = Terminal::new(TestBackend::new(100, 400)).unwrap();
     terminal
-        .draw(|f| qrow::ui::popup::render_help_popup(f, f.area(), &mut 0))
+        .draw(|f| rowq::ui::popup::render_help_popup(f, f.area(), &mut 0))
         .unwrap();
     let cells: Vec<String> = terminal
         .backend()
@@ -205,5 +205,5 @@ fn the_help_scrolls_to_its_last_line() {
         "g did not go back to the top"
     );
     key(&mut app, KeyCode::Esc);
-    assert_eq!(app.mode, qrow::types::AppMode::Normal);
+    assert_eq!(app.mode, rowq::types::AppMode::Normal);
 }

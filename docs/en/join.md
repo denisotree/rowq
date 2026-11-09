@@ -3,11 +3,11 @@
 > 🇷🇺 [Эта страница на русском](../ru/join.md) · [← Documentation index](README.md)
 
 Press `J` to combine the current table with another one through a step-by-step
-wizard. The other table can be **any file qrow opens** (CSV, TSV, JSON, JSONL,
+wizard. The other table can be **any file rowq opens** (CSV, TSV, JSON, JSONL,
 YAML, TOML, Parquet, Arrow, Excel, Markdown, SQLite, DuckDB) or another sheet you
 already have open.
 
-![JOIN wizard](https://raw.githubusercontent.com/denisotree/qrow/master/.github/assets/join.gif)
+![JOIN wizard](https://raw.githubusercontent.com/denisotree/rowq/master/.github/assets/join.gif)
 
 ## The four steps
 
@@ -69,7 +69,7 @@ a second join with the same column — it becomes `_right_1`, `_right_2`….
 ```sh
 # orders.csv:    order_id, customer_id, amount
 # customers.csv: customer_id, name, country
-qrow orders.csv
+rowq orders.csv
 ```
 
 1. Press `J`.
@@ -86,7 +86,7 @@ DIFF compares two tables the way `git diff` compares two files. The keys say
 which rows are the same row; every other column both tables have is compared.
 
 ```sh
-qrow march.csv
+rowq march.csv
 ```
 
 1. Press `J`, choose **`[Browse file…]`**, type `april.csv`, press `Enter`.

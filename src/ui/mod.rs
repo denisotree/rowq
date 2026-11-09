@@ -1,4 +1,4 @@
-//! Rendering layer for qrow, built on top of [`ratatui`].
+//! Rendering layer for rowq, built on top of [`ratatui`].
 //!
 //! The top-level entry point is [`render`], which dispatches to sub-views based on
 //! the current [`crate::types::AppMode`]:

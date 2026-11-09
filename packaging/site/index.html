@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>qrow — query rows in tables, documents and databases</title>
-<meta name="description" content="qrow is an open-source terminal viewer and editor for CSV, JSON, YAML, Parquet, Excel, SQLite, DuckDB and more, and an MCP server for AI assistants. Written in Rust, Apache-2.0.">
+<title>rowq — query rows in tables, documents and databases</title>
+<meta name="description" content="rowq is an open-source terminal viewer and editor for CSV, JSON, YAML, Parquet, Excel, SQLite, DuckDB and more, and an MCP server for AI assistants. Written in Rust, Apache-2.0.">
 <meta name="color-scheme" content="light dark">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%232d353b'/%3E%3Crect x='6' y='7' width='20' height='3' fill='%23d3c6aa'/%3E%3Crect x='6' y='13' width='20' height='5' fill='%23a7c080'/%3E%3Crect x='6' y='21' width='20' height='2' fill='%23859289'/%3E%3Crect x='6' y='25' width='20' height='2' fill='%23859289'/%3E%3C/svg%3E">
 <style>
@@ -129,19 +129,19 @@ footer .lic{color:var(--muted)}
 <nav class="tabs" aria-label="Primary">
   <div class="term">
     <ul>
-      <li><a class="brand" href="/">qrow</a></li>
+      <li><a class="brand" href="/">rowq</a></li>
       <li><a href="#what">1:what</a></li>
       <li><a href="#install">2:install</a></li>
       <li><a href="#mcp">3:mcp</a></li>
       <li><a href="#tuitab">4:tuitab</a></li>
     </ul>
-    <a class="ext" href="https://github.com/denisotree/qrow">github</a>
+    <a class="ext" href="https://github.com/denisotree/rowq">github</a>
   </div>
 </nav>
 
 <main id="main" class="term">
   <section class="hero" aria-labelledby="title">
-    <h1 id="title">qrow</h1>
+    <h1 id="title">rowq</h1>
     <p class="lede">Query rows in tables, documents and databases — from the terminal or through an AI assistant.</p>
     <p class="meta">Written in Rust, Apache-2.0, by one developer. Continues tuitab.</p>
 
@@ -185,59 +185,59 @@ footer .lic{color:var(--muted)}
     <h2 id="install-h">install</h2>
 
     <h3>cargo</h3>
-    <div class="code"><pre><code>cargo install qrow</code></pre></div>
+    <div class="code"><pre><code>cargo install rowq</code></pre></div>
 
     <h3>homebrew</h3>
-    <div class="code"><pre><code>brew tap denisotree/qrow</code></pre></div>
-    <div class="code"><pre><code>brew install qrow</code></pre></div>
+    <div class="code"><pre><code>brew tap denisotree/rowq</code></pre></div>
+    <div class="code"><pre><code>brew install rowq</code></pre></div>
 
-    <h3>aur <small>pre-built: qrow-bin</small></h3>
-    <div class="code"><pre><code>yay -S qrow</code></pre></div>
+    <h3>aur <small>pre-built: rowq-bin</small></h3>
+    <div class="code"><pre><code>yay -S rowq</code></pre></div>
 
     <h3>apt <small>Debian 12+, Ubuntu 22.04+, amd64/arm64</small></h3>
-    <div class="code nop"><pre><code>curl -fsSL https://qrow.dev/apt/qrow.gpg \
-  | sudo tee /usr/share/keyrings/qrow.gpg &gt; /dev/null
-echo "deb [signed-by=/usr/share/keyrings/qrow.gpg] https://qrow.dev/apt stable main" \
-  | sudo tee /etc/apt/sources.list.d/qrow.list
-sudo apt update &amp;&amp; sudo apt install qrow</code></pre></div>
+    <div class="code nop"><pre><code>curl -fsSL https://rowq.dev/apt/rowq.gpg \
+  | sudo tee /usr/share/keyrings/rowq.gpg &gt; /dev/null
+echo "deb [signed-by=/usr/share/keyrings/rowq.gpg] https://rowq.dev/apt stable main" \
+  | sudo tee /etc/apt/sources.list.d/rowq.list
+sudo apt update &amp;&amp; sudo apt install rowq</code></pre></div>
     <details>
       <summary>apt key fingerprint</summary>
       <p class="fp">F1A1 0D49 EB64 0A0F 7C2E  F9FD 3C84 7155 6244 EF39</p>
     </details>
 
-    <p class="note">Cargo, Homebrew, AUR and APT install two commands: <code>qrow</code> and the short <code>qrw</code>.</p>
-    <p class="note">Pre-built archives, with <code>qrow</code> alone: <a href="https://github.com/denisotree/qrow/releases">github.com/denisotree/qrow/releases</a></p>
+    <p class="note">Cargo, Homebrew, AUR and APT install the <code>rowq</code> command.</p>
+    <p class="note">Pre-built archives, with <code>rowq</code> alone: <a href="https://github.com/denisotree/rowq/releases">github.com/denisotree/rowq/releases</a></p>
   </section>
 
   <section class="pane" id="mcp" aria-labelledby="mcp-h">
     <h2 id="mcp-h">use with an ai assistant</h2>
     <h3>claude code</h3>
-    <div class="code"><pre><code>claude mcp add -s user qrow -- qrow --mcp</code></pre></div>
+    <div class="code"><pre><code>claude mcp add -s user rowq -- rowq --mcp</code></pre></div>
     <h3>json config <small>Claude Desktop, Cursor, Zed…</small></h3>
-    <div class="code nop"><pre><code>{ "mcpServers": { "qrow": { "command": "/opt/homebrew/bin/qrow", "args": ["--mcp"] } } }</code></pre></div>
+    <div class="code nop"><pre><code>{ "mcpServers": { "rowq": { "command": "/opt/homebrew/bin/rowq", "args": ["--mcp"] } } }</code></pre></div>
     <p class="note">Use the full path: a desktop app does not start from your shell.</p>
   </section>
 
   <section class="pane quiet" id="tuitab" aria-labelledby="tuitab-h">
     <h2 id="tuitab-h">coming from tuitab</h2>
-    <p class="muted" style="color:var(--muted)">qrow continues tuitab, which stays at 0.11.1 and keeps working. The two install side by side; remove tuitab when you no longer need it.</p>
+    <p class="muted" style="color:var(--muted)">rowq continues tuitab, which stays at 0.11.1 and keeps working. The two install side by side; remove tuitab when you no longer need it.</p>
 
     <h3>cargo</h3>
-    <div class="code"><pre><code>cargo install qrow</code></pre></div>
+    <div class="code"><pre><code>cargo install rowq</code></pre></div>
 
     <h3>homebrew <small>own tap</small></h3>
-    <div class="code"><pre><code>brew install denisotree/qrow/qrow</code></pre></div>
+    <div class="code"><pre><code>brew install denisotree/rowq/rowq</code></pre></div>
 
     <h3>aur</h3>
-    <p>Install <code>qrow</code> or <code>qrow-bin</code>; <code>tuitab</code> can stay or go.</p>
+    <p>Install <code>rowq</code> or <code>rowq-bin</code>; <code>tuitab</code> can stay or go.</p>
 
     <h3>apt</h3>
-    <p><a href="#install">Add the qrow repository</a> and install qrow. The tuitab repository stays at 0.11.1; to remove it:</p>
+    <p><a href="#install">Add the rowq repository</a> and install rowq. The tuitab repository stays at 0.11.1; to remove it:</p>
     <div class="code"><pre><code>sudo rm /etc/apt/sources.list.d/tuitab.list /usr/share/keyrings/tuitab.gpg</code></pre></div>
 
     <h3>mcp</h3>
     <div class="code"><pre><code>claude mcp remove tuitab</code></pre></div>
-    <p>Add qrow as above, with <code>--mcp-write</code> if you had it. Permission rules follow the server's name: <code>mcp__tuitab__tuitab_query</code> → <code>mcp__qrow__qrow_query</code>, <code>mcp__tuitab</code> → <code>mcp__qrow</code>. In a JSON config, add a <code>qrow</code> entry with the command <code>qrow</code>.</p>
+    <p>Add rowq as above, with <code>--mcp-write</code> if you had it. Permission rules follow the server's name: <code>mcp__tuitab__tuitab_query</code> → <code>mcp__rowq__rowq_query</code>, <code>mcp__tuitab</code> → <code>mcp__rowq</code>. In a JSON config, add a <code>rowq</code> entry with the command <code>rowq</code>.</p>
   </section>
 </main>
 
@@ -245,10 +245,10 @@ sudo apt update &amp;&amp; sudo apt install qrow</code></pre></div>
   <div class="term">
     <ul>
       <li><span class="mode" aria-hidden="true">NORMAL</span></li>
-      <li><a href="https://github.com/denisotree/qrow">github</a></li>
-      <li><a href="https://github.com/denisotree/qrow/tree/master/docs/en">docs:en</a></li>
-      <li><a href="https://github.com/denisotree/qrow/tree/master/docs/ru" hreflang="ru">docs:ru</a></li>
-      <li><a href="https://github.com/denisotree/qrow/blob/master/CHANGELOG.md">changelog</a></li>
+      <li><a href="https://github.com/denisotree/rowq">github</a></li>
+      <li><a href="https://github.com/denisotree/rowq/tree/master/docs/en">docs:en</a></li>
+      <li><a href="https://github.com/denisotree/rowq/tree/master/docs/ru" hreflang="ru">docs:ru</a></li>
+      <li><a href="https://github.com/denisotree/rowq/blob/master/CHANGELOG.md">changelog</a></li>
     </ul>
     <span class="lic">Apache-2.0</span>
   </div>

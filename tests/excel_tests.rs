@@ -1,11 +1,11 @@
 //! What a spreadsheet's cells are once they are in a table.
 //!
-//! Every cell reaches qrow as text, and a column left as text is one no aggregate
+//! Every cell reaches rowq as text, and a column left as text is one no aggregate
 //! will touch — `sum` over a money column used to answer "the column is string", which
 //! made an .xlsx source useless for the arithmetic the tool exists to do.
 
-use qrow::data::io::{load_file, save_file_as};
-use qrow::types::ColumnType;
+use rowq::data::io::{load_file, save_file_as};
+use rowq::types::ColumnType;
 use std::path::{Path, PathBuf};
 
 fn tmp(name: &str) -> PathBuf {
@@ -18,9 +18,9 @@ fn tmp(name: &str) -> PathBuf {
     path
 }
 
-/// Written through qrow's own writer, which puts numbers in as numbers — the same
+/// Written through rowq's own writer, which puts numbers in as numbers — the same
 /// thing Excel does, and what the reader has to make sense of.
-fn round_trip(case: &str, csv: &str) -> qrow::data::dataframe::DataFrame {
+fn round_trip(case: &str, csv: &str) -> rowq::data::dataframe::DataFrame {
     let src = tmp(&format!("{}.csv", case));
     std::fs::write(&src, csv).unwrap();
     let df = load_file(&src, None).unwrap();
@@ -29,7 +29,7 @@ fn round_trip(case: &str, csv: &str) -> qrow::data::dataframe::DataFrame {
         &df,
         None,
         &xlsx,
-        qrow::data::io::doc_io::Shape::Records,
+        rowq::data::io::doc_io::Shape::Records,
         "Sheet1",
     )
     .unwrap();

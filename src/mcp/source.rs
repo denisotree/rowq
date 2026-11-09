@@ -3,7 +3,7 @@
 //! Every tool takes the same source shape — a path, plus an optional container
 //! for the formats that hold more than one table (Excel sheets, SQLite and
 //! DuckDB tables).  Loading goes through [`crate::data::io`], so the MCP layer
-//! inherits qrow's format support and type inference rather than restating it.
+//! inherits rowq's format support and type inference rather than restating it.
 
 use crate::data::dataframe::DataFrame;
 use crate::data::doc::{Doc, Format};
@@ -237,7 +237,7 @@ pub fn load_once(source: &Source) -> Result<DataFrame, String> {
     // and what the terminal has always done.  It used to be handed to the CSV reader —
     // the default for a path with no extension — which quietly concatenated a directory
     // of like files and refused one holding a `cover.jpg` beside an `index.md`, with
-    // Polars' advice to use a glob pattern that qrow then would not accept.
+    // Polars' advice to use a glob pattern that rowq then would not accept.
     if source.path.is_dir() {
         return io::load_directory(&source.path)
             .map_err(|e| format!("Could not list {}: {}", source.path.display(), e));
@@ -270,7 +270,7 @@ fn load_single(source: &Source) -> Result<DataFrame, String> {
             .len();
         return Err(format!(
             "'{}' holds {} tables and views; pass 'container' to pick one. \
-             qrow_inspect lists them.",
+             rowq_inspect lists them.",
             source.path.display(),
             n
         ));
@@ -319,7 +319,7 @@ pub fn load_db_table(
 
 /// `"{lead} {path}: {text}"`, unless `text` already names the file.
 ///
-/// A refusal qrow words itself (a locked file) quotes the path, and so do DuckDB's
+/// A refusal rowq words itself (a locked file) quotes the path, and so do DuckDB's
 /// own I/O errors; the engine's text for a corrupt file does not name it at all.  Only
 /// the quoted forms count: a short relative path such as `data` turns up inside
 /// "Corrupt database file" without naming anything.
@@ -393,7 +393,7 @@ pub fn load_doc(source: &Source) -> Result<Doc, String> {
     let format = format.ok_or_else(|| {
         format!(
             "jq needs a JSON, JSONL, YAML or TOML source; '{}' is not one. \
-             Use qrow_query for tabular data.",
+             Use rowq_query for tabular data.",
             if ext.is_empty() {
                 "(no extension)"
             } else {

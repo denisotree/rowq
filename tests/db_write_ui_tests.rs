@@ -7,9 +7,9 @@ mod keys;
 
 use crossterm::event::{KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use keys::{key, press};
-use qrow::app::App;
-use qrow::types::AppMode;
 use ratatui::{backend::TestBackend, Terminal};
+use rowq::app::App;
+use rowq::types::AppMode;
 use std::path::{Path, PathBuf};
 
 fn fixture(name: &str) -> PathBuf {
@@ -47,13 +47,13 @@ fn save_key(app: &mut App) {
         kind: KeyEventKind::Press,
         state: crossterm::event::KeyEventState::NONE,
     };
-    let action = qrow::event::handle_key_event(event, app.mode, app.stack.can_pop());
+    let action = rowq::event::handle_key_event(event, app.mode, app.stack.can_pop());
     app.handle_action(action);
 }
 
 fn screen(app: &mut App) -> String {
     let mut terminal = Terminal::new(TestBackend::new(120, 30)).unwrap();
-    terminal.draw(|f| qrow::ui::render(f, app)).unwrap();
+    terminal.draw(|f| rowq::ui::render(f, app)).unwrap();
     terminal
         .backend()
         .buffer()
@@ -226,8 +226,8 @@ fn a_null_looks_different_from_an_empty_string_on_screen() {
 /// characters. Skips where there is no system clipboard to talk to.
 #[test]
 fn a_null_copied_from_a_cell_pastes_back_as_a_null() {
-    let saved = qrow::clipboard::paste_from_clipboard().ok();
-    if qrow::clipboard::copy_text("qrow clipboard probe").is_err() {
+    let saved = rowq::clipboard::paste_from_clipboard().ok();
+    if rowq::clipboard::copy_text("rowq clipboard probe").is_err() {
         eprintln!("no system clipboard here — skipping");
         return;
     }
@@ -238,7 +238,7 @@ fn a_null_copied_from_a_cell_pastes_back_as_a_null() {
 
     app.stack.active_mut().table_state.select(Some(0)); // ann: note IS NULL
     press(&mut app, "yc");
-    assert_eq!(qrow::clipboard::paste_from_clipboard().unwrap(), "\\N");
+    assert_eq!(rowq::clipboard::paste_from_clipboard().unwrap(), "\\N");
 
     app.stack.active_mut().table_state.select(Some(2)); // cara: note = 'hi'
     key(&mut app, KeyCode::Char('p'));
@@ -250,7 +250,7 @@ fn a_null_copied_from_a_cell_pastes_back_as_a_null() {
     );
 
     if let Some(s) = saved {
-        let _ = qrow::clipboard::copy_text(&s);
+        let _ = rowq::clipboard::copy_text(&s);
     }
 }
 
@@ -285,7 +285,7 @@ fn saving_to_a_different_database_file_copies_it_and_asks_nothing() {
 
     save_key(&mut app);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
     key(&mut app, KeyCode::Enter);
 
     assert_eq!(app.mode, AppMode::Normal, "{:?}", app.save.error);
@@ -625,7 +625,7 @@ fn a_blank_sheet_offers_its_own_path_when_saving() {
 }
 
 #[test]
-fn a_format_qrow_cannot_write_is_still_an_error() {
+fn a_format_rowq_cannot_write_is_still_an_error() {
     let dir = missing("x.sqlite").parent().unwrap().to_path_buf();
     assert!(
         App::new_as(&dir.join("notes"), None, None).is_err(),
@@ -652,7 +652,7 @@ fn o_adds_a_row_below_the_cursor_where_vim_would() {
     assert_eq!(app.stack.active().table_state.selected(), Some(1));
     let names_now: Vec<String> = (0..4)
         .map(|r| {
-            qrow::data::dataframe::DataFrame::anyvalue_to_string_fmt(
+            rowq::data::dataframe::DataFrame::anyvalue_to_string_fmt(
                 &app.stack.active().dataframe.get_val(r, 1),
             )
         })
@@ -811,7 +811,7 @@ fn cancelling_the_sql_forgets_the_table_name() {
 
     save_key(&mut app);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
     key(&mut app, KeyCode::Enter);
     assert_eq!(app.mode, AppMode::TableNameInput);
     for _ in 0..40 {
@@ -854,7 +854,7 @@ fn a_blank_sheet_becomes_a_duckdb_database() {
     key(&mut app, KeyCode::Enter);
     assert_eq!(app.mode, AppMode::Normal, "{:?}", app.save.error);
 
-    let (df, src) = qrow::data::io::load_duckdb_table_full(&path, "inventory").unwrap();
+    let (df, src) = rowq::data::io::load_duckdb_table_full(&path, "inventory").unwrap();
     assert!(src.is_some());
     assert_eq!(df.visible_row_count(), 1);
     assert_eq!(df.get_physical(0, 0), "hello");
@@ -941,7 +941,7 @@ fn an_adopted_table_can_be_joined_against_its_neighbours() {
     let mut app = App::new_as(Path::new("test_data/sample.csv"), None, None).unwrap();
     save_key(&mut app);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
     key(&mut app, KeyCode::Enter);
     key(&mut app, KeyCode::Enter); // name defaults to the stem
     assert_eq!(app.mode, AppMode::Normal, "{:?}", app.save.error);
@@ -967,11 +967,11 @@ fn a_save_keeps_the_pins_widths_and_aggregators_the_user_set_up() {
         let cols = &mut app.stack.active_mut().dataframe.columns;
         cols[cursor].pinned = true;
         cols[cursor].width = 42;
-        cols[cursor].width_mode = qrow::data::column::ColumnWidthMode::Fit;
+        cols[cursor].width_mode = rowq::data::column::ColumnWidthMode::Fit;
         cols[cursor].default_width = 17;
         cols[cursor].precision = 4;
         cols[cursor].selected = true;
-        cols[cursor].aggregators = vec![qrow::data::aggregator::AggregatorKind::Count];
+        cols[cursor].aggregators = vec![rowq::data::aggregator::AggregatorKind::Count];
     }
     edit(&mut app, "ANN");
 
@@ -985,13 +985,13 @@ fn a_save_keeps_the_pins_widths_and_aggregators_the_user_set_up() {
     assert_eq!(col.name, "name", "the reload lined the metadata up by name");
     assert!(col.pinned);
     assert_eq!(col.width, 42);
-    assert_eq!(col.width_mode, qrow::data::column::ColumnWidthMode::Fit);
+    assert_eq!(col.width_mode, rowq::data::column::ColumnWidthMode::Fit);
     assert_eq!(col.default_width, 17);
     assert_eq!(col.precision, 4);
     assert!(col.selected);
     assert_eq!(
         col.aggregators,
-        vec![qrow::data::aggregator::AggregatorKind::Count]
+        vec![rowq::data::aggregator::AggregatorKind::Count]
     );
 }
 
@@ -1033,10 +1033,10 @@ fn the_declared_type_wins_over_what_the_sheet_had_before_the_save() {
     let id = app.stack.active().dataframe.column_index("id").unwrap();
     assert_eq!(
         app.stack.active().dataframe.columns[id].col_type,
-        qrow::types::ColumnType::Integer
+        rowq::types::ColumnType::Integer
     );
     // Pretend the sheet thought otherwise; the reload must not restore that.
-    app.stack.active_mut().dataframe.columns[id].col_type = qrow::types::ColumnType::String;
+    app.stack.active_mut().dataframe.columns[id].col_type = rowq::types::ColumnType::String;
     edit(&mut app, "ANN");
 
     save_key(&mut app);
@@ -1044,7 +1044,7 @@ fn the_declared_type_wins_over_what_the_sheet_had_before_the_save() {
     key(&mut app, KeyCode::Enter);
     assert_eq!(
         app.stack.active().dataframe.columns[id].col_type,
-        qrow::types::ColumnType::Integer
+        rowq::types::ColumnType::Integer
     );
 }
 
@@ -1147,7 +1147,7 @@ fn a_row_added_in_the_middle_stays_there_when_the_sort_is_reset() {
     let shown = |app: &App| -> Vec<String> {
         (0..app.stack.active().dataframe.visible_row_count())
             .map(|r| {
-                qrow::data::dataframe::DataFrame::anyvalue_to_string_fmt(
+                rowq::data::dataframe::DataFrame::anyvalue_to_string_fmt(
                     &app.stack.active().dataframe.get_val(r, 1),
                 )
             })
@@ -1261,11 +1261,11 @@ fn a_drilled_down_sheet_saves_back_into_its_table() {
     // A drill-down is Enter on a value of a frequency table over the sheet.
     // The frequency table defers one frame through the Calculating overlay, which the
     // key layer does not drive on its own.
-    app.handle_action(qrow::types::Action::OpenFrequencyTable);
-    app.handle_action(qrow::types::Action::OpenFrequencyTable);
+    app.handle_action(rowq::types::Action::OpenFrequencyTable);
+    app.handle_action(rowq::types::Action::OpenFrequencyTable);
     let row = (0..app.stack.active().dataframe.visible_row_count())
         .find(|&r| {
-            qrow::data::dataframe::DataFrame::anyvalue_to_string_fmt(
+            rowq::data::dataframe::DataFrame::anyvalue_to_string_fmt(
                 &app.stack.active().dataframe.get_val(r, 0),
             ) == "bob"
         })
@@ -1318,10 +1318,10 @@ fn replacing_a_table_shows_the_losses_in_the_popup() {
     let mut app = App::new_as(std::path::Path::new("test_data/sample.csv"), None, None).unwrap();
     save_key(&mut app);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(path.to_string_lossy().into_owned());
     key(&mut app, KeyCode::Enter);
     assert_eq!(app.mode, AppMode::TableNameInput);
-    app.save.table_input = qrow::ui::text_input::TextInput::with_value("users".to_string());
+    app.save.table_input = rowq::ui::text_input::TextInput::with_value("users".to_string());
     key(&mut app, KeyCode::Enter);
 
     assert_eq!(app.mode, AppMode::SqlConfirm, "{:?}", app.save.error);
@@ -1380,9 +1380,9 @@ fn a_hand_assigned_type_survives_a_save_and_does_not_replan() {
         let s = app.stack.active_mut();
         s.cursor_col = active;
         s.dataframe
-            .set_column_type(active, qrow::types::ColumnType::Boolean)
+            .set_column_type(active, rowq::types::ColumnType::Boolean)
             .unwrap();
-        s.dataframe.columns[active].db_retype = Some(qrow::types::ColumnType::Boolean);
+        s.dataframe.columns[active].db_retype = Some(rowq::types::ColumnType::Boolean);
     }
     let idx = app.stack.active().dataframe.column_index("name").unwrap();
     app.stack.active_mut().cursor_col = idx;
@@ -1394,7 +1394,7 @@ fn a_hand_assigned_type_survives_a_save_and_does_not_replan() {
     assert_eq!(app.mode, AppMode::Normal, "{}", app.status_message);
     assert_eq!(
         app.stack.active().dataframe.columns[active].col_type,
-        qrow::types::ColumnType::Boolean,
+        rowq::types::ColumnType::Boolean,
         "the type was dropped by the reload"
     );
 
@@ -1427,8 +1427,8 @@ fn a_table_from_a_database_without_an_extension_saves_back_into_it() {
     key(&mut app, KeyCode::Enter); // run it
     assert_eq!(names(&path), ["ANN", "bob", "cara"]);
     assert_eq!(
-        qrow::data::io::db_write::kind_of_file(&path),
-        Some(qrow::data::io::db_write::DbKind::Sqlite)
+        rowq::data::io::db_write::kind_of_file(&path),
+        Some(rowq::data::io::db_write::DbKind::Sqlite)
     );
 }
 
@@ -1448,7 +1448,7 @@ fn a_table_created_from_a_typed_sheet_forgets_the_type() {
     let mut app = App::new_as(&source, None, Some("csv")).unwrap();
     save_key(&mut app);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
     key(&mut app, KeyCode::Enter); // accept the path
     assert_eq!(app.mode, AppMode::TableNameInput, "{:?}", app.save.error);
     key(&mut app, KeyCode::Enter); // accept the name
@@ -1478,13 +1478,13 @@ fn reloading_a_table_created_by_saving_rereads_it() {
 
     save_key(&mut app);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
     key(&mut app, KeyCode::Enter); // accept the path
     assert_eq!(app.mode, AppMode::TableNameInput, "{:?}", app.save.error);
     key(&mut app, KeyCode::Enter); // accept the name
     assert_eq!(app.mode, AppMode::Normal, "{:?}", app.save.error);
 
-    app.handle_action(qrow::types::Action::ReloadFile);
+    app.handle_action(rowq::types::Action::ReloadFile);
     assert!(
         app.status_message.starts_with("Reloaded"),
         "{}",
@@ -1498,7 +1498,7 @@ fn reloading_a_table_created_by_saving_rereads_it() {
 /// they were stop being what `R` and Enter go by.
 #[test]
 fn reloading_search_results_saved_as_a_table_rereads_the_table() {
-    use qrow::types::Action;
+    use rowq::types::Action;
     let dir = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("tmp")
         .join("db-write-ui-tests");
@@ -1526,7 +1526,7 @@ fn reloading_search_results_saved_as_a_table_rereads_the_table() {
 
     save_key(&mut app);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
     key(&mut app, KeyCode::Enter); // accept the path
     assert_eq!(app.mode, AppMode::TableNameInput, "{:?}", app.save.error);
     key(&mut app, KeyCode::Enter); // accept the name
@@ -1557,7 +1557,7 @@ fn a_table_created_from_an_epoch_column_holds_its_integers() {
     let mut app = App::new_as(&source, None, None).unwrap();
     save_key(&mut app);
     app.save.input =
-        qrow::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
+        rowq::ui::text_input::TextInput::with_value(dest.to_string_lossy().into_owned());
     key(&mut app, KeyCode::Enter);
     assert_eq!(app.mode, AppMode::TableNameInput, "{:?}", app.save.error);
     key(&mut app, KeyCode::Enter);
