@@ -1,0 +1,49 @@
+//! rowq.dev is the landing page, served from its own repository (denisotree/rowq.dev).
+//! This repository publishes only the APT repository, from gh-pages, at apt.rowq.dev.
+
+use std::path::Path;
+
+fn root() -> &'static Path {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+}
+
+fn read(path: &str) -> String {
+    std::fs::read_to_string(root().join(path)).unwrap()
+}
+
+/// The install notes point APT at apt.rowq.dev, the key included.
+#[test]
+fn apt_is_installed_from_apt_rowq_dev() {
+    let readme = read("README.md");
+    assert!(
+        readme.contains("https://apt.rowq.dev/rowq.gpg"),
+        "README: key URL"
+    );
+    assert!(
+        readme.contains("https://apt.rowq.dev stable main"),
+        "README: sources line"
+    );
+    for path in [
+        "README.md",
+        ".github/workflows/apt.yml",
+        "packaging/apt/publish.sh",
+    ] {
+        assert!(
+            !read(path).contains("rowq.dev/apt"),
+            "{path} still uses rowq.dev/apt"
+        );
+    }
+}
+
+/// gh-pages here carries the APT repository at its root under the apt.rowq.dev domain;
+/// the landing page is not copied in from this repository any more.
+#[test]
+fn gh_pages_carries_only_the_apt_repository() {
+    assert!(!root().join("packaging/site").exists());
+    let workflow = read(".github/workflows/apt.yml");
+    assert!(!workflow.contains("packaging/site"));
+    assert!(
+        workflow.contains("apt.rowq.dev"),
+        "apt.yml does not set the domain"
+    );
+}

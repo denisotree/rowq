@@ -186,9 +186,9 @@ git clone https://aur.archlinux.org/rowq.git && cd rowq && makepkg -si
 ### Debian / Ubuntu (APT)
 
 ```sh
-curl -fsSL https://rowq.dev/apt/rowq.gpg \
+curl -fsSL https://apt.rowq.dev/rowq.gpg \
   | sudo tee /usr/share/keyrings/rowq.gpg > /dev/null
-echo "deb [signed-by=/usr/share/keyrings/rowq.gpg] https://rowq.dev/apt stable main" \
+echo "deb [signed-by=/usr/share/keyrings/rowq.gpg] https://apt.rowq.dev stable main" \
   | sudo tee /etc/apt/sources.list.d/rowq.list
 sudo apt update && sudo apt install rowq
 ```

@@ -28,7 +28,7 @@ versions follow 1.{update}.{patch}: a feature update raises the middle number, a
   [rowq.dev](https://rowq.dev). [denisotree/tuitab](https://github.com/denisotree/tuitab)
   keeps tuitab 0.11.1 and earlier.
 - Packages: crates.io `rowq`; Homebrew `brew install denisotree/rowq/rowq` (its own tap);
-  AUR `rowq` and `rowq-bin`; APT at `https://rowq.dev/apt` with the key `rowq.gpg`. None
+  AUR `rowq` and `rowq-bin`; APT at `https://apt.rowq.dev` with the key `rowq.gpg`. None
   of them touches tuitab — install rowq side by side, and remove tuitab when you want.
 
 ### Changed

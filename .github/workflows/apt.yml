@@ -1,7 +1,7 @@
 name: APT repository
 
 # Publishes a release's .deb files into the signed APT repository served from
-# the gh-pages branch, served at https://rowq.dev/apt.  Called by
+# the gh-pages branch, served at https://apt.rowq.dev.  Called by
 # release.yml once the GitHub Release exists; run it by hand to republish a tag.
 on:
   workflow_call:
@@ -71,15 +71,14 @@ jobs:
             git init -b gh-pages site
             git -C site remote add origin "$url"
           fi
+          # gh-pages holds the APT repository alone, at the root of apt.rowq.dev.  The
+          # landing page at rowq.dev is served from its own repository, denisotree/rowq.dev.
           touch site/.nojekyll
-          # The landing page and the custom domain (CNAME) live in the repository, so a
-          # fresh branch gets them too and an edit to the page ships with the next
-          # release.
-          cp -R packaging/site/. site/
+          echo apt.rowq.dev > site/CNAME
 
       - name: Build repository
         if: steps.key.outputs.ok == 'true'
-        run: packaging/apt/publish.sh debs site/apt
+        run: packaging/apt/publish.sh debs site
 
       - name: Push gh-pages
         if: steps.key.outputs.ok == 'true'

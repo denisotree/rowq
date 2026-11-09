@@ -68,7 +68,7 @@ libm = "0.2"
 rust_decimal = { version = "1.43", default-features = false, features = ["std", "maths"] }
 
 # `.deb` built by cargo-deb in the release workflow and served from the APT
-# repository on rowq.dev.
+# repository at apt.rowq.dev.
 [package.metadata.deb]
 maintainer = "denisotree <denisotree@users.noreply.github.com>"
 copyright = "2026, denisotree"

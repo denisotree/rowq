@@ -6,7 +6,7 @@ fn read(path: &str) -> String {
     std::fs::read_to_string(std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join(path)).unwrap()
 }
 
-const NOTES: [&str; 3] = ["README.md", "CHANGELOG.md", "packaging/site/index.html"];
+const NOTES: [&str; 2] = ["README.md", "CHANGELOG.md"];
 
 /// The old docs registered the server in local scope; `remove -s user` fails there,
 /// and in `remove && add` the rowq server is then never added.

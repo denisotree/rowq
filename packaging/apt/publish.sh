@@ -3,7 +3,7 @@
 #
 #   publish.sh <dir with new .deb files> <repository root>
 #
-# The repository root is what GitHub Pages serves under /apt, at https://rowq.dev/apt.  The signing key
+# The repository root is what GitHub Pages serves at https://apt.rowq.dev.  The signing key
 # must already be in the gpg keyring; APT_GPG_KEY_ID names it.  Only the newest
 # KEEP_VERSIONS versions stay in the pool — Pages caps a site at 1 GB and every
 # release adds two ~20 MB packages.
