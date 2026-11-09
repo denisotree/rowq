@@ -52,13 +52,14 @@ const NEW_FILE_STORAGE: &str = "v1.0.0";
 /// Open DuckDB, saying what it means when it refuses.
 ///
 /// DuckDB has no busy timeout to set: one process holds the file and every other one is
-/// turned away outright, with a message about lock files and PIDs.  Waiting is not on
-/// offer, so the only thing to improve is the sentence.
+/// turned away outright, with a message about lock files and PIDs — "Conflicting lock"
+/// on Unix, "File is already open in" on Windows.  Waiting is not on offer, so the only
+/// thing to improve is the sentence.
 pub(crate) fn open_duckdb(path: &Path) -> Result<duckdb::Connection> {
     let cfg = duckdb::Config::default().with("storage_compatibility_version", NEW_FILE_STORAGE)?;
     duckdb::Connection::open_with_flags(path, cfg).map_err(|e| {
         let text = e.to_string();
-        if text.contains("Conflicting lock") {
+        if text.contains("Conflicting lock") || text.contains("File is already open in") {
             eyre!(
                 "'{}' is open in another program — DuckDB allows one process at a time. \
                  Close it and try again.",
