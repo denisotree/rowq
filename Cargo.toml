@@ -38,7 +38,7 @@ clap = { version = "4", features = ["derive"] }
 regex = "1"
 chrono = { version = "0.4", features = ["serde"] }
 tempfile = "3"
-bincode = "1"
+bincode = "2"
 arboard = { version = "3", default-features = false }
 polars = { version = "0.55", default-features = false, features = ["csv", "lazy", "dtype-date", "dtype-datetime", "strings", "parquet", "ipc", "serde", "pivot", "is_in", "regex", "rank", "cum_agg", "diagonal_concat", "semi_anti_join", "abs", "round_series", "log", "temporal", "extract_jsonpath", "dtype-struct", "dtype-decimal", "json", "streaming", "concat_str"] }
 libc = "0.2"
