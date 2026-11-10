@@ -9,6 +9,6 @@ pkgbase = rowq
 	makedepends = rust
 	makedepends = cargo
 	source = rowq-1.0.1.tar.gz::https://github.com/denisotree/rowq/archive/refs/tags/v1.0.1.tar.gz
-	sha256sums = SKIP
+	sha256sums = 9b39fc33da3f41e6a6638a66ea400e48fc9b6b8a42a03eab47459540a218355d
 
 pkgname = rowq
