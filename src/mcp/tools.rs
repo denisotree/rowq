@@ -38,6 +38,16 @@ WORKFLOW
    result.
 3. Explain the returned numbers to the user. Quote them; do not re-derive them.
 
+OPERATIONS AT A GLANCE — one object per step in 'ops'; the full reference is below
+  {\"filter\": [{\"col\":\"region\",\"op\":\"eq\",\"value\":\"North\"}]}  {\"select\": [\"a\",\"b\"]}  {\"limit\": 10}
+  {\"sort\": {\"col\":\"amount\",\"desc\":true}}  {\"compute\": {\"name\":\"margin\",\"expr\":\"revenue - cost\"}}
+  {\"group_by\": {\"by\":[\"region\"],\"agg\":[{\"col\":\"amount\",\"fn\":\"sum\"}]}}
+  {\"aggregate\": [{\"col\":\"amount\",\"fn\":\"avg\"}]}  {\"frequency\": {\"by\":[\"product\"]}}
+  {\"pivot\": {\"index\":[\"region\"],\"on\":\"quarter\",\"formula\":\"sum(amount)\"}}
+  Also: unpivot, join, dedup, duplicates, window, sample, transpose, expand_json.
+  fn: count, distinct, sum, avg (or mean), min, max, median, stdev, mad, p5, p25, p50, \
+p75, p95.
+
 FORMATS
 csv, tsv, txt, parquet, arrow/feather/ipc, xlsx/xls, sqlite, duckdb, json, jsonl, \
 yaml, toml, md/markdown, and a directory path (which lists its files). For xlsx, sqlite \

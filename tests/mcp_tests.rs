@@ -2880,3 +2880,62 @@ fn an_empty_database_says_it_holds_no_tables() {
     std::fs::remove_file(&empty).unwrap();
     std::fs::remove_file(&zero).unwrap();
 }
+
+// ── What a model sees first ───────────────────────────────────────────────────────
+
+/// Claude Code shows a server's first 4096 bytes of instructions and drops the rest,
+/// so the shape of every operation has to be in them — not only filter to compute,
+/// which is where the full reference got cut and models started guessing
+/// `aggs` and `mean`.
+#[test]
+fn the_first_4096_bytes_of_the_instructions_name_every_operation() {
+    let all = rowq::mcp::tools::INSTRUCTIONS.as_bytes();
+    let head = String::from_utf8_lossy(&all[..4096.min(all.len())]);
+    for op in [
+        "filter",
+        "select",
+        "sort",
+        "compute",
+        "group_by",
+        "aggregate",
+        "frequency",
+        "pivot",
+        "limit",
+        "unpivot",
+        "join",
+        "dedup",
+        "duplicates",
+        "window",
+        "sample",
+        "transpose",
+        "expand_json",
+    ] {
+        assert!(head.contains(op), "{op} is past the first 4096 bytes");
+    }
+    assert!(
+        head.contains(r#"{"group_by": {"by":["region"],"agg":[{"col":"amount","fn":"sum"}]}}"#),
+        "no group_by example in the first 4096 bytes"
+    );
+    for f in [
+        "count", "distinct", "sum", "avg", "min", "max", "median", "stdev", "mad", "p5", "p25",
+        "p50", "p75", "p95",
+    ] {
+        assert!(
+            head.contains(f),
+            "aggregate {f} is past the first 4096 bytes"
+        );
+    }
+}
+
+/// `mean` is what pandas and Polars call it; it is avg, not an error.
+#[test]
+fn mean_is_avg() {
+    let mut server = Server::new();
+    let ops = |f: &str| {
+        json!([{"group_by": {"by": ["department"], "agg": [{"col": "salary", "fn": f}]}},
+               {"sort": {"col": "department"}}])
+    };
+    let avg = query(&mut server, ops("avg"));
+    let mean = query(&mut server, ops("mean"));
+    assert_eq!(avg["rows"], mean["rows"]);
+}

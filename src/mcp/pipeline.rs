@@ -503,6 +503,8 @@ fn parse_aggs(value: Option<&Value>) -> Result<Vec<AggSpec>, String> {
             }
             let col = required_str(item, "col")?;
             let name = required_str(item, "fn")?;
+            // pandas and Polars call it mean.
+            let name = if name == "mean" { "avg" } else { name.as_str() };
             let kind = AggregatorKind::all()
                 .iter()
                 .find(|k| k.name() == name)
