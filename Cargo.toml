@@ -1,6 +1,6 @@
 [package]
 name = "rowq"
-version = "1.0.0"
+version = "1.0.1"
 edition = "2021"
 authors = ["denisotree"]
 description = "Query rows in tables, documents and databases from the terminal — CSV, JSON, YAML, TOML, Parquet, Excel, SQLite, DuckDB — with an MCP server that lets AI assistants compute over the same files"

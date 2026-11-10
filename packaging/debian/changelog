@@ -1,3 +1,9 @@
+rowq (1.0.1-1) unstable; urgency=low
+
+  * Release 1.0.1.
+
+ -- denisotree <denisotree@users.noreply.github.com>  Tue, 10 Nov 2026 13:03:15 +0000
+
 rowq (1.0.0-1) unstable; urgency=low
 
   * Release 1.0.0.

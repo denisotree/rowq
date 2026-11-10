@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-10
+
+### Fixed
+
+- `E` runs an `$EDITOR` that carries flags or a quoted path: `EDITOR="code --wait"`
+  used to be taken as the name of one program and fail to start.
+- Reading a `.sqlite` or `.duckdb` path with nothing behind it says "No such file"
+  instead of creating an empty database there — which then answered every later read
+  with "holds 0 tables". A database is still created when you write one.
+- A database with no tables says so, instead of asking for a `container` to pick.
+- MCP: the shape of every operation is in the first 4096 bytes of the server's
+  instructions, the part clients keep, so a model no longer guesses at `group_by`;
+  `mean` is accepted as `avg`.
+
+### Docs
+
+- The install notes no longer mention an alias left out of the binstall build.
+- `E`: which editor opens and how to pass it flags.
+- The MCP guide gives the Claude Desktop config path for macOS only.
+
 ## [1.0.0] - 2026-11-09
 
 ### Breaking
@@ -1528,7 +1548,8 @@ versions follow 1.{update}.{patch}: a feature update raises the middle number, a
 - Non-English keyboard remapping
 - Three binary aliases: `tuitab`, `ttab`, `tt`
 
-[Unreleased]: https://github.com/denisotree/rowq/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/denisotree/rowq/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/denisotree/rowq/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/denisotree/rowq/compare/v0.11.1...v1.0.0
 [0.11.1]: https://github.com/denisotree/tuitab/compare/v0.11.0...v0.11.1
 [0.11.0]: https://github.com/denisotree/tuitab/compare/v0.10.3...v0.11.0
