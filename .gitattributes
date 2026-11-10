@@ -1,3 +1,0 @@
-# One checkout everywhere: tests compare files byte for byte, and a Windows
-# checkout with core.autocrlf would otherwise hand them CRLF copies.
-* text=auto eol=lf

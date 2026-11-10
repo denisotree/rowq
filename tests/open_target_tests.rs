@@ -231,8 +231,6 @@ fn saving_to_a_new_path_without_an_extension_still_writes_csv() {
     assert_eq!(written.lines().next(), sample.lines().next());
 }
 
-// Unix only, with no Windows counterpart: a Windows filesystem has no FIFO files —
-// named pipes live under `\\.\pipe\`, which a directory listing never reaches.
 #[cfg(unix)]
 #[test]
 fn a_fifo_is_not_a_database_and_is_not_opened() {

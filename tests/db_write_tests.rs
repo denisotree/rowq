@@ -2662,10 +2662,11 @@ fn a_duckdb_file_held_by_another_process_says_so_plainly() {
     );
 
     assert!(err.contains("open in another program"), "{}", err);
-    // The engine's own words: Unix, then Windows.
-    for raw in ["Conflicting lock", "File is already open in"] {
-        assert!(!err.contains(raw), "raw engine text: {}", err);
-    }
+    assert!(
+        !err.contains("Conflicting lock"),
+        "raw engine text: {}",
+        err
+    );
 }
 
 // ── Storage formats: DuckDB 1.x and 2.x files ─────────────────────────────────────

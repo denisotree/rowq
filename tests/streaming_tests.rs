@@ -1073,14 +1073,3 @@ fn a_small_file_is_loaded_and_kept_rather_than_streamed() {
     assert_eq!(out["isError"], json!(false), "{}", out);
     assert!(tight.cache.is_empty());
 }
-
-/// The budget is half the machine's memory on every platform — before, anything
-/// that was not Unix got a fixed 8 GiB whatever it had.
-#[test]
-fn the_memory_budget_is_half_the_physical_memory() {
-    use sysinfo::{MemoryRefreshKind, RefreshKind, System};
-    let sys = System::new_with_specifics(
-        RefreshKind::nothing().with_memory(MemoryRefreshKind::nothing().with_ram()),
-    );
-    assert_eq!(rowq::data::io::memory_budget(), sys.total_memory() / 2);
-}

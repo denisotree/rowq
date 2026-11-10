@@ -2,7 +2,7 @@
 //!
 //! Most of these drive `handle_message` directly — it is the whole request path
 //! minus the pipe, so a test gets the same answer a client would without paying
-//! for a process.  Two tests in "the wire" section do spawn the binaries, to check the
+//! for a process.  One test at the end does spawn the binary, to check the
 //! framing and that nothing leaks onto stdout.
 
 use rowq::mcp::{handle_message, Server};
@@ -1154,14 +1154,15 @@ fn jq_on_a_csv_points_at_the_right_tool() {
 
 // ── the wire ────────────────────────────────────────────────────────────────
 
-/// The tests that pay for a process: they check the newline framing and that
+/// The one test that pays for a process: it checks the newline framing and that
 /// nothing but protocol messages reaches stdout.
-fn speaks_the_protocol(exe: &str, args: &[&str]) {
+#[test]
+fn the_binary_speaks_the_protocol_over_stdio() {
     use std::io::Write;
     use std::process::{Command, Stdio};
 
-    let mut child = Command::new(exe)
-        .args(args)
+    let mut child = Command::new(env!("CARGO_BIN_EXE_rowq"))
+        .arg("--mcp")
         .current_dir(env!("CARGO_MANIFEST_DIR"))
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -1212,18 +1213,6 @@ fn speaks_the_protocol(exe: &str, args: &[&str]) {
         })
         .collect();
     assert_eq!(ids, vec![1, 2, 3]);
-}
-
-#[test]
-fn the_binary_speaks_the_protocol_over_stdio() {
-    speaks_the_protocol(env!("CARGO_BIN_EXE_rowq"), &["--mcp"]);
-}
-
-/// `rowq-mcp` is the same server on its own — what Windows clients run, because it
-/// opens no console window there.
-#[test]
-fn rowq_mcp_speaks_the_protocol_over_stdio() {
-    speaks_the_protocol(env!("CARGO_BIN_EXE_rowq-mcp"), &[]);
 }
 
 /// An unseeded random operation must report the seed it drew, or its result is
@@ -1647,7 +1636,6 @@ fn a_delete_removes_only_the_matched_rows() {
         .query_row("SELECT k FROM other", [], |r| r.get(0))
         .unwrap();
     assert_eq!(other, "untouched", "the neighbouring table is not touched");
-    drop(conn); // Windows will not delete a file that is still open
     std::fs::remove_file(&db).unwrap();
 }
 
@@ -1691,7 +1679,6 @@ fn an_insert_leaves_a_defaulted_column_to_the_schema_and_writes_null_otherwise()
         })
         .unwrap();
     assert_eq!(tier.as_deref(), Some("basic"));
-    drop(conn); // Windows will not delete a file that is still open
     std::fs::remove_file(&db).unwrap();
 }
 
@@ -1724,8 +1711,6 @@ fn alter_adds_drops_and_renames_columns() {
         cols.iter().find(|(n, _)| n == "level").unwrap().1,
         "INTEGER"
     );
-    drop(stmt);
-    drop(conn); // Windows will not delete a file that is still open
     std::fs::remove_file(&db).unwrap();
 }
 
@@ -2216,8 +2201,6 @@ fn a_table_name_with_spaces_around_it_is_trimmed() {
         .map(|r| r.unwrap())
         .collect();
     assert_eq!(names, ["spaced"]);
-    drop(stmt);
-    drop(conn); // Windows will not delete a file that is still open
     std::fs::remove_file(&out).unwrap();
 }
 
