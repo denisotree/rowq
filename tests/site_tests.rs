@@ -58,3 +58,18 @@ fn the_keybindings_explain_the_external_editor() {
         }
     }
 }
+
+/// There is no alias any more; the install notes must not promise one is left out.
+#[test]
+fn the_install_notes_do_not_mention_an_alias() {
+    for path in [
+        "README.md",
+        "docs/en/getting-started.md",
+        "docs/ru/getting-started.md",
+    ] {
+        let text = read(path);
+        for stale in ["without the\nalias", "without the alias", "без псевдонима"] {
+            assert!(!text.contains(stale), "{path}: {stale:?}");
+        }
+    }
+}

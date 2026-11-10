@@ -161,8 +161,7 @@ cargo install rowq
 Installs the `rowq` command.
 
 To skip the build, [cargo-binstall](https://github.com/cargo-bins/cargo-binstall)
-fetches the pre-built binary from the release instead — `rowq` only, without the
-alias:
+fetches the pre-built binary from the release instead:
 
 ```sh
 cargo binstall rowq

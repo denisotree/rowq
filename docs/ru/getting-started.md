@@ -11,9 +11,8 @@ cargo install rowq
 ```
 
 Устанавливается команда `rowq`.
-`cargo binstall rowq` обходится без сборки и берёт готовый `rowq` из релиза,
-без псевдонима. Остальные способы (Homebrew, AUR, Debian,
-готовые сборки) описаны в [основном README](https://github.com/denisotree/rowq/blob/master/README.md#installation).
+`cargo binstall rowq` обходится без сборки и берёт готовый `rowq` из релиза.
+Остальные способы (Homebrew, AUR, Debian, готовые сборки) описаны в [основном README](https://github.com/denisotree/rowq/blob/master/README.md#installation).
 
 ## Открыть файл
 

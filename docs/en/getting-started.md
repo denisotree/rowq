@@ -12,8 +12,7 @@ cargo install rowq
 
 This installs the `rowq` command.
 `cargo binstall rowq` skips the build and fetches the pre-built `rowq` from the
-release, without the alias. Other options (Homebrew, AUR,
-Debian, pre-built binaries) are in the
+release. Other options (Homebrew, AUR, Debian, pre-built binaries) are in the
 [main README](https://github.com/denisotree/rowq/blob/master/README.md#installation).
 
 ## Open a file
