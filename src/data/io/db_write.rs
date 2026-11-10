@@ -32,15 +32,38 @@ const DISPLAY_CAP: usize = 2000;
 /// How long to wait for another writer to let go before giving up.
 const BUSY_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(5);
 
-/// Open SQLite the way every path here wants it: willing to wait its turn.
+/// Open an existing SQLite database the way every path here wants it: willing to wait
+/// its turn, and never creating one.
 ///
-/// Without this, a second writer — another rowq, the MCP server, `sqlite3` in a
+/// Without the timeout, a second writer — another rowq, the MCP server, `sqlite3` in a
 /// terminal — turns a save into a bare "database is locked" the instant the two
-/// collide, even though the collision is usually over in milliseconds.
+/// collide, even though the collision is usually over in milliseconds.  Without the
+/// refusal, reading a path with nothing behind it would leave an empty database there,
+/// and every answer after that would be "holds 0 tables" instead of "No such file".
 pub(crate) fn open_sqlite(path: &Path) -> Result<rusqlite::Connection> {
+    must_exist(path)?;
+    use rusqlite::OpenFlags as F;
+    let conn = rusqlite::Connection::open_with_flags(
+        path,
+        F::SQLITE_OPEN_READ_WRITE | F::SQLITE_OPEN_URI | F::SQLITE_OPEN_NO_MUTEX,
+    )?;
+    conn.busy_timeout(BUSY_TIMEOUT)?;
+    Ok(conn)
+}
+
+/// [`open_sqlite`] for a plan that creates its table, which may create the file too.
+fn create_sqlite(path: &Path) -> Result<rusqlite::Connection> {
     let conn = rusqlite::Connection::open(path)?;
     conn.busy_timeout(BUSY_TIMEOUT)?;
     Ok(conn)
+}
+
+fn must_exist(path: &Path) -> Result<()> {
+    if path.exists() {
+        Ok(())
+    } else {
+        Err(eyre!("No such file: {}", path.display()))
+    }
 }
 
 /// The storage format of a DuckDB file rowq creates: the 1.x one (version 64), which
@@ -55,6 +78,12 @@ const NEW_FILE_STORAGE: &str = "v1.0.0";
 /// turned away outright, with a message about lock files and PIDs.  Waiting is not on
 /// offer, so the only thing to improve is the sentence.
 pub(crate) fn open_duckdb(path: &Path) -> Result<duckdb::Connection> {
+    must_exist(path)?;
+    create_duckdb(path)
+}
+
+/// [`open_duckdb`] for a plan that creates its table, which may create the file too.
+fn create_duckdb(path: &Path) -> Result<duckdb::Connection> {
     let cfg = duckdb::Config::default().with("storage_compatibility_version", NEW_FILE_STORAGE)?;
     duckdb::Connection::open_with_flags(path, cfg).map_err(|e| {
         let text = e.to_string();
@@ -1625,7 +1654,11 @@ fn check_shape(src: &TableSource, actual: Vec<String>) -> Result<()> {
 
 fn apply_sqlite(src: &TableSource, plan: &WritePlan) -> Result<()> {
     use super::sqlite::value_to_opt_string;
-    let mut conn = open_sqlite(&src.db_path)?;
+    let mut conn = if plan.create {
+        create_sqlite(&src.db_path)?
+    } else {
+        open_sqlite(&src.db_path)?
+    };
 
     // Dropping the table would otherwise cascade through anything pointing at it.  This
     // has to be set outside a transaction — inside one it is a no-op — and the check
@@ -1711,7 +1744,11 @@ fn apply_sqlite_inner(
 }
 
 fn apply_duckdb(src: &TableSource, plan: &WritePlan) -> Result<()> {
-    let mut conn = open_duckdb(&src.db_path)?;
+    let mut conn = if plan.create {
+        create_duckdb(&src.db_path)?
+    } else {
+        open_duckdb(&src.db_path)?
+    };
     let tx = conn.transaction()?;
 
     if !plan.create {

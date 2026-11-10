@@ -2815,3 +2815,68 @@ fn tool_descriptions_have_no_runs_of_spaces() {
         walk(&tool["name"], tool);
     }
 }
+
+// ── A database that is not there, or holds nothing ────────────────────────────────
+
+/// Reading never writes. A database path with nothing behind it is "No such file" for
+/// every read tool, as any other format is, and the read leaves no empty database
+/// behind to turn the next answer into "holds 0 tables".
+#[test]
+fn reading_a_missing_database_creates_nothing() {
+    let mut server = Server::new();
+    for ext in ["sqlite", "duckdb"] {
+        let path = tmp(&format!("not-there.{ext}"));
+        let _ = std::fs::remove_file(&path);
+        for (tool, args) in [
+            ("rowq_inspect", json!({"source": path.to_string_lossy()})),
+            (
+                "rowq_query",
+                json!({"source": path.to_string_lossy(), "ops": []}),
+            ),
+            ("rowq_describe", json!({"source": path.to_string_lossy()})),
+            (
+                "rowq_query",
+                json!({"source": {"path": path.to_string_lossy(), "container": "t"}, "ops": []}),
+            ),
+        ] {
+            let msg = call_expecting_failure(&mut server, tool, args);
+            assert!(msg.contains("No such file"), "{tool} on .{ext}: {msg}");
+            assert!(!path.exists(), "{tool} created {}", path.display());
+        }
+    }
+}
+
+/// A database with no tables has nothing to pick from: the answer says so instead of
+/// sending the caller off to choose a container.
+#[test]
+fn an_empty_database_says_it_holds_no_tables() {
+    let mut server = Server::new();
+    let empty = tmp("no-tables.sqlite");
+    let _ = std::fs::remove_file(&empty);
+    rusqlite::Connection::open(&empty)
+        .unwrap()
+        .execute_batch("PRAGMA user_version = 1;")
+        .unwrap();
+    let zero = tmp("zero-bytes.sqlite");
+    std::fs::write(&zero, "").unwrap();
+
+    for path in [&empty, &zero] {
+        for tool in ["rowq_inspect", "rowq_describe"] {
+            let msg = call_expecting_failure(
+                &mut server,
+                tool,
+                json!({"source": path.to_string_lossy()}),
+            );
+            assert!(msg.contains("no tables or views"), "{tool}: {msg}");
+            assert!(!msg.contains("container"), "{tool}: {msg}");
+        }
+    }
+    let msg = call_expecting_failure(
+        &mut server,
+        "rowq_describe",
+        json!({"source": zero.to_string_lossy()}),
+    );
+    assert!(msg.contains("empty (0 bytes)"), "{msg}");
+    std::fs::remove_file(&empty).unwrap();
+    std::fs::remove_file(&zero).unwrap();
+}

@@ -268,6 +268,20 @@ fn load_single(source: &Source) -> Result<DataFrame, String> {
         let n = io::db_containers(&source.path)
             .map_err(|e| name_once(&source.path, "Could not open", &e.to_string()))?
             .len();
+        if n == 0 {
+            // Nothing to pick: advice to name a container would only send the caller to
+            // an empty listing.
+            let empty = std::fs::metadata(&source.path).is_ok_and(|m| m.len() == 0);
+            return Err(format!(
+                "'{}' is a database with no tables or views, so there is nothing to read.{}",
+                source.path.display(),
+                if empty {
+                    " The file is empty (0 bytes)."
+                } else {
+                    ""
+                }
+            ));
+        }
         return Err(format!(
             "'{}' holds {} tables and views; pass 'container' to pick one. \
              rowq_inspect lists them.",
