@@ -2702,7 +2702,11 @@ impl App {
             .or_else(|_| std::env::var("VISUAL"))
             .unwrap_or_else(|_| "vi".to_string());
 
-        let status = std::process::Command::new(&editor).arg(&tmp_path).status();
+        let (program, args) = editor_command(&editor);
+        let status = std::process::Command::new(&program)
+            .args(&args)
+            .arg(&tmp_path)
+            .status();
 
         // Resume TUI (always, even on error)
         enable_raw_mode()?;
@@ -3076,6 +3080,27 @@ impl App {
             self.join.path_input = crate::ui::text_input::TextInput::with_value(new_value);
         }
     }
+}
+
+/// The program and arguments `$EDITOR` names. `code --wait` is a program and a flag; a
+/// quoted program keeps its spaces (`"/Applications/Sublime Text.app/.../subl" -w`);
+/// an unquoted string that is itself an existing file is one program, spaces and all.
+pub fn editor_command(editor: &str) -> (String, Vec<String>) {
+    let editor = editor.trim();
+    if let Some(rest) = editor.strip_prefix('"') {
+        if let Some((program, args)) = rest.split_once('"') {
+            return (
+                program.to_string(),
+                args.split_whitespace().map(str::to_string).collect(),
+            );
+        }
+    }
+    if std::path::Path::new(editor).is_file() {
+        return (editor.to_string(), Vec::new());
+    }
+    let mut words = editor.split_whitespace().map(str::to_string);
+    let program = words.next().unwrap_or_default();
+    (program, words.collect())
 }
 
 /// Copy a rejected `$EDITOR` buffer somewhere stable before the temp file is dropped,

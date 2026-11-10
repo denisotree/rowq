@@ -47,3 +47,14 @@ fn gh_pages_carries_only_the_apt_repository() {
         "apt.yml does not set the domain"
     );
 }
+
+/// Which editor `E` opens, and how to give it flags.
+#[test]
+fn the_keybindings_explain_the_external_editor() {
+    for path in ["docs/en/keybindings.md", "docs/ru/keybindings.md"] {
+        let text = read(path);
+        for needle in ["`$VISUAL`", "EDITOR=\"code --wait\""] {
+            assert!(text.contains(needle), "{path}: no {needle:?}");
+        }
+    }
+}

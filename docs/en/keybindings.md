@@ -116,6 +116,10 @@ first `Enter` says how many and waits, and a second `Enter` inserts. On a databa
 sheet `\N` also means NULL, the same as when editing a cell. Not available on a
 JSON/YAML/TOML sheet.
 
+`E` opens `$EDITOR` (or `$VISUAL`), and `vi` without either. It may carry flags, and a
+path with spaces goes in quotes: `EDITOR="code --wait"`. A GUI editor has to be told
+to wait like that — one that returns at once gives nothing back.
+
 ## Clipboard (`y` prefix)
 
 | Key | Action |
