@@ -26,7 +26,7 @@ claude mcp add rowq -- rowq --mcp
 Add `-s user` to make it available in every project rather than the current one.
 
 **Claude Desktop** — `~/Library/Application Support/Claude/claude_desktop_config.json`
-on macOS, `%APPDATA%\Claude\claude_desktop_config.json` on Windows:
+on macOS:
 
 ```json
 {

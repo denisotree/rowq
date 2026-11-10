@@ -26,7 +26,7 @@ claude mcp add rowq -- rowq --mcp
 текущем.
 
 **Claude Desktop** — `~/Library/Application Support/Claude/claude_desktop_config.json`
-на macOS, `%APPDATA%\Claude\claude_desktop_config.json` на Windows:
+на macOS:
 
 ```json
 {

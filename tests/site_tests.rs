@@ -73,3 +73,28 @@ fn the_install_notes_do_not_mention_an_alias() {
         }
     }
 }
+
+/// rowq runs on Linux and macOS; on Windows, through WSL like any Linux program. The
+/// user docs say nothing about a native Windows build there is not.
+#[test]
+fn the_docs_do_not_describe_native_windows() {
+    let mut paths = vec!["README.md".to_string()];
+    for lang in ["en", "ru"] {
+        for entry in std::fs::read_dir(root().join("docs").join(lang)).unwrap() {
+            let p = entry.unwrap().path();
+            if p.extension().is_some_and(|e| e == "md") {
+                paths.push(
+                    p.strip_prefix(root())
+                        .unwrap()
+                        .to_string_lossy()
+                        .into_owned(),
+                );
+            }
+        }
+    }
+    for path in paths {
+        for (n, line) in read(&path).lines().enumerate() {
+            assert!(!line.contains("Windows"), "{path}:{}: {line}", n + 1);
+        }
+    }
+}
