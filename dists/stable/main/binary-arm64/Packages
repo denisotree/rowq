@@ -1,0 +1,52 @@
+Package: rowq
+Architecture: arm64
+Version: 1.0.0-1
+Priority: optional
+Section: utils
+Maintainer: denisotree <denisotree@users.noreply.github.com>
+Installed-Size: 125718
+Depends: libc6 (>= 2.34), libstdc++6 (>= 12)
+Filename: pool/main/r/rowq/rowq_1.0.0-1_arm64.deb
+Size: 27001388
+MD5sum: aa4dc95813af2bc1e7bd028daea51dac
+SHA1: be50456b9147fd0ae83f8c0d1dff728e335446a6
+SHA256: 9280bcabeb32ae8bad6c231e6376077b4f80c0f89899458f45ebf7fd42ba131f
+SHA512: 17231c1aaa3a46e0b1c7111761eba99f9a6ce3bb43f5729dd8210b4f2d2c2bb47c0a1e058c96a8112a89b65301a01fbfee966366597155ea90187885bd3c006f
+Homepage: https://rowq.dev
+Description: Query rows in tables, documents and databases from the terminal — CSV, JSON,
+ YAML, TOML, Parquet, Excel, SQLite, DuckDB — with an MCP server that lets AI
+ assistants compute over the same files
+ A fast, keyboard-driven terminal viewer for tables, documents and databases,
+ with an MCP server that lets AI assistants compute over the same files. Reads
+ CSV, TSV, JSON, JSONL, YAML, TOML, Markdown, Parquet, Arrow, Excel, SQLite and
+ DuckDB. Filtering, sorting, pivot tables, joins, computed columns, statistics
+ and charts. JSON, YAML and TOML open as a table over the parsed document, so
+ nested data can be browsed, edited and converted between formats. rowq
+ continues tuitab, which stays at 0.11.1 and installs side by side with it.
+
+Package: rowq
+Architecture: arm64
+Version: 1.0.1-1
+Priority: optional
+Section: utils
+Maintainer: denisotree <denisotree@users.noreply.github.com>
+Installed-Size: 125710
+Depends: libc6 (>= 2.34), libstdc++6 (>= 12)
+Filename: pool/main/r/rowq/rowq_1.0.1-1_arm64.deb
+Size: 26997008
+MD5sum: 498f4f9ff62104e4c65ced3629d8d276
+SHA1: 761593c4e22e54684d0dad2d033961f8303e4d8b
+SHA256: 03b6ea11e1de52e2d1f572a41c1ba8e72de86cf23303d392d02868b80f1e5bee
+SHA512: bdcf12c3b9173232551a16e16fbae57ca5d7439e8bd18b4068ae11da018fd8a8601a962008a3157706ae054b2935d740ca4f4451ff5fe7cc54e3506bc45a10e6
+Homepage: https://rowq.dev
+Description: Query rows in tables, documents and databases from the terminal — CSV, JSON,
+ YAML, TOML, Parquet, Excel, SQLite, DuckDB — with an MCP server that lets AI
+ assistants compute over the same files
+ A fast, keyboard-driven terminal viewer for tables, documents and databases,
+ with an MCP server that lets AI assistants compute over the same files. Reads
+ CSV, TSV, JSON, JSONL, YAML, TOML, Markdown, Parquet, Arrow, Excel, SQLite and
+ DuckDB. Filtering, sorting, pivot tables, joins, computed columns, statistics
+ and charts. JSON, YAML and TOML open as a table over the parsed document, so
+ nested data can be browsed, edited and converted between formats. rowq
+ continues tuitab, which stays at 0.11.2 and installs side by side with it.
+
