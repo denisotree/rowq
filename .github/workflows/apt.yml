@@ -48,6 +48,14 @@ jobs:
       - uses: actions/checkout@v7
         if: steps.key.outputs.ok == 'true'
 
+      # publish.sh builds the index with apt-ftparchive. The runner image no longer
+      # carries apt-utils, so it is installed here rather than counted on.
+      - name: Install apt-ftparchive
+        if: steps.key.outputs.ok == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends apt-utils
+
       - name: Download .deb assets
         if: steps.key.outputs.ok == 'true'
         run: |

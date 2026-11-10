@@ -98,3 +98,19 @@ fn the_docs_do_not_describe_native_windows() {
         }
     }
 }
+
+/// publish.sh builds the index with apt-ftparchive, from apt-utils. The runner image
+/// stopped carrying it (the v1.0.1 publish failed with "command not found"), so the
+/// workflow installs it rather than counting on the image.
+#[test]
+fn the_apt_workflow_installs_apt_ftparchive_before_publishing() {
+    let workflow = read(".github/workflows/apt.yml");
+    let install = workflow
+        .find("apt-get install -y --no-install-recommends apt-utils")
+        .expect("apt.yml does not install apt-utils");
+    let publish = workflow.find("packaging/apt/publish.sh").unwrap();
+    assert!(
+        install < publish,
+        "apt-utils is installed after publish.sh runs"
+    );
+}
