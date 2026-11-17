@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-11-17
+
+### Security
+
+- quinn-udp 0.5.14 → 0.5.16 for RUSTSEC-2026-0538 (receive loop can spin after a
+  truncated datagram). Linked through polars → reqwest → quinn; rowq makes no network
+  requests, so the code was never reached.
+
 ## [1.0.1] - 2026-11-10
 
 ### Fixed
@@ -1548,7 +1556,8 @@ versions follow 1.{update}.{patch}: a feature update raises the middle number, a
 - Non-English keyboard remapping
 - Three binary aliases: `tuitab`, `ttab`, `tt`
 
-[Unreleased]: https://github.com/denisotree/rowq/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/denisotree/rowq/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/denisotree/rowq/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/denisotree/rowq/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/denisotree/rowq/compare/v0.11.1...v1.0.0
 [0.11.1]: https://github.com/denisotree/tuitab/compare/v0.11.0...v0.11.1
