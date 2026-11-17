@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-17
+
+### Changed
+
+- The bundled SQLite (rusqlite 0.42) and DuckDB (1.20000.2) are updated.
+
 ### Docs
 
 - tuitab, which rowq continues, is now frozen at 0.11.3.
@@ -1560,7 +1566,8 @@ versions follow 1.{update}.{patch}: a feature update raises the middle number, a
 - Non-English keyboard remapping
 - Three binary aliases: `tuitab`, `ttab`, `tt`
 
-[Unreleased]: https://github.com/denisotree/rowq/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/denisotree/rowq/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/denisotree/rowq/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/denisotree/rowq/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/denisotree/rowq/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/denisotree/rowq/compare/v0.11.1...v1.0.0
