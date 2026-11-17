@@ -18,24 +18,24 @@ class Rowq < Formula
   on_macos do
     on_arm do
       url "https://github.com/denisotree/rowq/releases/download/v1.0.2/rowq-v1.0.2-aarch64-apple-darwin.tar.gz"
-      sha256 "FILL_IN_AFTER_RELEASE"
+      sha256 "7fa0c534ac48ec19d1c56f6cb1e6a62178e96ca0b38016cf616d353cdc68ae62"
       version "1.0.2"
     end
     on_intel do
       url "https://github.com/denisotree/rowq/releases/download/v1.0.2/rowq-v1.0.2-x86_64-apple-darwin.tar.gz"
-      sha256 "FILL_IN_AFTER_RELEASE"
+      sha256 "8062224b69f874fddd521e3d51fa1055e61e7c45b8e1c3737ea15abfd83b5e20"
       version "1.0.2"
     end
   end
   on_linux do
     on_arm do
       url "https://github.com/denisotree/rowq/releases/download/v1.0.2/rowq-v1.0.2-aarch64-unknown-linux-gnu.tar.gz"
-      sha256 "FILL_IN_AFTER_RELEASE"
+      sha256 "13d6d75ed84fa488772fea51bcfbe0eaed7308ae5d4d90d6383858328b3885f9"
       version "1.0.2"
     end
     on_intel do
       url "https://github.com/denisotree/rowq/releases/download/v1.0.2/rowq-v1.0.2-x86_64-unknown-linux-gnu.tar.gz"
-      sha256 "FILL_IN_AFTER_RELEASE"
+      sha256 "72710e2fc6e83d297d210d08f4c5964f8e3536c50acf2dee58333d3cf41d5b50"
       version "1.0.2"
     end
   end
