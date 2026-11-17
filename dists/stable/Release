@@ -1,0 +1,27 @@
+Architectures: amd64 arm64
+Codename: stable
+Components: main
+Date: Tue, 17 Nov 2026 14:47:00 +0000
+Label: rowq
+Origin: rowq
+Suite: stable
+MD5Sum:
+ 81538be064d65d106c882b339d5c3cec             4077 main/binary-amd64/Packages
+ a8e4f786a6b542b7ee9fdf9753f82415             1264 main/binary-amd64/Packages.gz
+ 451cf0e9358eaa0f9e60acd8c0f10bc8             4077 main/binary-arm64/Packages
+ 08ee1ab7c92ae15233c1c9da5b1e31c8             1263 main/binary-arm64/Packages.gz
+SHA1:
+ 33a7b1791a30c662c88b78b258b352209e361457             4077 main/binary-amd64/Packages
+ fd66821570be7a8a6abc8f10bf7aabc89032303f             1264 main/binary-amd64/Packages.gz
+ 1a3d192ceb9f50727fe800fcab6ce3391bd8267e             4077 main/binary-arm64/Packages
+ 174c11e9ae55aee85bc6e19dff9196d62bfe0f02             1263 main/binary-arm64/Packages.gz
+SHA256:
+ 65873e48472700f0997028f7f1171a64aad7a2a1690da6c03ffa8b5b43ebcbac             4077 main/binary-amd64/Packages
+ 9a1ea49317495ef17a7341c5513aedc2196f426bf30779e95fa279b1a4a98dd9             1264 main/binary-amd64/Packages.gz
+ 817b1b09d9652f6cc4223dbf91f435d4d5f29b5431bb5080ee8db8ab1afb0c35             4077 main/binary-arm64/Packages
+ cacf485731f657a6e5e10bbd71a182ed7e4157c58dde48277dc6e2606abbf087             1263 main/binary-arm64/Packages.gz
+SHA512:
+ 1caa29ac8a15c9a9b4d4afb2f900960870721bcfd3bf99ee1438cf921ba4240f20c6a84af3781e182e76a75ebac408f04559880113bfec89611489d61108e937             4077 main/binary-amd64/Packages
+ 6f39cff27bbfc40f386c8d7cfd1e47380c55dda5a1cc47c274deff86f3932f4088fc12d91920f889fb531e7bad9f2cba1b9d7d53bdd0a6a4aa7f714c7029aed7             1264 main/binary-amd64/Packages.gz
+ 3d57abf14e821098453e060993540c62903c8df888927283a0535d70799edf029a50104fcf4c32e534d1d3e305174a56adc861aff7b9b8daf86abd6e9e30947f             4077 main/binary-arm64/Packages
+ fc41a235149dadbfc44b506751ef32023aacc54443d35349b1dc114dcbd59ac54f2876fd8aac3a40ec7cac2fe30595a32e587b37a90b2c024722c189ecaaeb28             1263 main/binary-arm64/Packages.gz

@@ -1,0 +1,78 @@
+Package: rowq
+Architecture: amd64
+Version: 1.0.1-1
+Priority: optional
+Section: utils
+Maintainer: denisotree <denisotree@users.noreply.github.com>
+Installed-Size: 138809
+Depends: libc6 (>= 2.34), libstdc++6 (>= 12)
+Filename: pool/main/r/rowq/rowq_1.0.1-1_amd64.deb
+Size: 31078940
+MD5sum: 88dab95ae9832993e480cde77c356a88
+SHA1: b4b19e6260e44820785a6b6e444a394018238b73
+SHA256: adf3eada70bee95590eafa84f35444d3b455c37dfe24a2f4c29080bcacd2853d
+SHA512: 3a70f76cea4923aa2db3a3214b62589f41e7860db3db8c6c2e025c4ab7a2747961b1cd60afd16ce54c9a1f3abff1549e8e7c2d05444323e4bed55ae5cb91963c
+Homepage: https://rowq.dev
+Description: Query rows in tables, documents and databases from the terminal — CSV, JSON,
+ YAML, TOML, Parquet, Excel, SQLite, DuckDB — with an MCP server that lets AI
+ assistants compute over the same files
+ A fast, keyboard-driven terminal viewer for tables, documents and databases,
+ with an MCP server that lets AI assistants compute over the same files. Reads
+ CSV, TSV, JSON, JSONL, YAML, TOML, Markdown, Parquet, Arrow, Excel, SQLite and
+ DuckDB. Filtering, sorting, pivot tables, joins, computed columns, statistics
+ and charts. JSON, YAML and TOML open as a table over the parsed document, so
+ nested data can be browsed, edited and converted between formats. rowq
+ continues tuitab, which stays at 0.11.2 and installs side by side with it.
+
+Package: rowq
+Architecture: amd64
+Version: 1.0.2-1
+Priority: optional
+Section: utils
+Maintainer: denisotree <denisotree@users.noreply.github.com>
+Installed-Size: 138917
+Depends: libc6 (>= 2.34), libstdc++6 (>= 12)
+Filename: pool/main/r/rowq/rowq_1.0.2-1_amd64.deb
+Size: 31101268
+MD5sum: ec2ba4d3d52e64117c1ef9aafb69d163
+SHA1: 4e793028e156cb5a8c71812c5fc7f7cd5c6abe7c
+SHA256: 32644c0ef96b5f780488dbab0409d35cb381d7b89052e501f2f57d6c0c613162
+SHA512: 6396bfc026c60989cd96196e49838c1376c7556eaaebe60eced0e723705fba22d3479f7d8eacf7eb50c2b0c1241dcab3dd62765e91dd686484dd6c85708c7465
+Homepage: https://rowq.dev
+Description: Query rows in tables, documents and databases from the terminal — CSV, JSON,
+ YAML, TOML, Parquet, Excel, SQLite, DuckDB — with an MCP server that lets AI
+ assistants compute over the same files
+ A fast, keyboard-driven terminal viewer for tables, documents and databases,
+ with an MCP server that lets AI assistants compute over the same files. Reads
+ CSV, TSV, JSON, JSONL, YAML, TOML, Markdown, Parquet, Arrow, Excel, SQLite and
+ DuckDB. Filtering, sorting, pivot tables, joins, computed columns, statistics
+ and charts. JSON, YAML and TOML open as a table over the parsed document, so
+ nested data can be browsed, edited and converted between formats. rowq
+ continues tuitab, which stays at 0.11.2 and installs side by side with it.
+
+Package: rowq
+Architecture: amd64
+Version: 1.0.3-1
+Priority: optional
+Section: utils
+Maintainer: denisotree <denisotree@users.noreply.github.com>
+Installed-Size: 138922
+Depends: libc6 (>= 2.34), libstdc++6 (>= 12)
+Filename: pool/main/r/rowq/rowq_1.0.3-1_amd64.deb
+Size: 31107976
+MD5sum: 9784edb35f3d74680e00f370e2447e26
+SHA1: ac1507e33c0337d339b26bb6500493c6ac2370b0
+SHA256: 148a7d891a2a7951ea8c6119fe32f19893e85c458cefb59759b67e97856f77c7
+SHA512: 53e3aefccc10c945821749b1adc1893e674844a84e7def175b11f6ddf6f512b4d2544e472ab07b17642d19a78537b456b8b0672fe314d65649188845d40ac6c0
+Homepage: https://rowq.dev
+Description: Query rows in tables, documents and databases from the terminal — CSV, JSON,
+ YAML, TOML, Parquet, Excel, SQLite, DuckDB — with an MCP server that lets AI
+ assistants compute over the same files
+ A fast, keyboard-driven terminal viewer for tables, documents and databases,
+ with an MCP server that lets AI assistants compute over the same files. Reads
+ CSV, TSV, JSON, JSONL, YAML, TOML, Markdown, Parquet, Arrow, Excel, SQLite and
+ DuckDB. Filtering, sorting, pivot tables, joins, computed columns, statistics
+ and charts. JSON, YAML and TOML open as a table over the parsed document, so
+ nested data can be browsed, edited and converted between formats. rowq
+ continues tuitab, which stays at 0.11.3 and installs side by side with it.
+
