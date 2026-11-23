@@ -2599,7 +2599,7 @@ dependencies = [
  "num-complex",
  "num-rational",
  "num-traits",
- "rand 0.10.3",
+ "rand 0.10.4",
  "simba",
  "typenum",
 ]
@@ -2856,7 +2856,7 @@ dependencies = [
  "parking_lot",
  "percent-encoding",
  "quick-xml 0.39.4",
- "rand 0.10.3",
+ "rand 0.10.4",
  "reqwest",
  "ring",
  "serde",
@@ -3187,7 +3187,7 @@ dependencies = [
  "polars-config",
  "polars-error",
  "polars-utils",
- "rand 0.10.3",
+ "rand 0.10.4",
  "slotmap",
  "tokio",
 ]
@@ -3223,7 +3223,7 @@ dependencies = [
  "polars-buffer",
  "polars-error",
  "polars-utils",
- "rand 0.10.3",
+ "rand 0.10.4",
  "serde",
  "strength_reduce",
  "strum_macros 0.28.0",
@@ -3268,7 +3268,7 @@ dependencies = [
  "polars-row",
  "polars-schema",
  "polars-utils",
- "rand 0.10.3",
+ "rand 0.10.4",
  "rand_distr",
  "rayon",
  "regex",
@@ -3330,7 +3330,7 @@ dependencies = [
  "polars-row",
  "polars-time",
  "polars-utils",
- "rand 0.10.3",
+ "rand 0.10.4",
  "rayon",
  "recursive",
  "regex",
@@ -3374,7 +3374,7 @@ dependencies = [
  "polars-schema",
  "polars-time",
  "polars-utils",
- "rand 0.10.3",
+ "rand 0.10.4",
  "rayon",
  "regex",
  "reqwest",
@@ -3471,7 +3471,7 @@ dependencies = [
  "polars-error",
  "polars-io",
  "polars-utils",
- "rand 0.10.3",
+ "rand 0.10.4",
  "rand_distr",
  "thread_local",
  "tokio",
@@ -3505,7 +3505,7 @@ dependencies = [
  "polars-json",
  "polars-schema",
  "polars-utils",
- "rand 0.10.3",
+ "rand 0.10.4",
  "rayon",
  "regex",
  "regex-syntax",
@@ -3741,7 +3741,7 @@ dependencies = [
  "num-traits",
  "polars-config",
  "polars-error",
- "rand 0.10.3",
+ "rand 0.10.4",
  "raw-cpuid",
  "rayon",
  "regex",
@@ -3883,7 +3883,7 @@ dependencies = [
  "bytes",
  "getrandom 0.4.2",
  "lru-slab",
- "rand 0.10.3",
+ "rand 0.10.4",
  "rand_pcg",
  "ring",
  "rustc-hash",
@@ -3954,9 +3954,9 @@ dependencies = [
 
 [[package]]
 name = "rand"
-version = "0.10.3"
+version = "0.10.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "65c9fb96cbc91e3478eaae79a69fcd3f1ae4ad052e471fe6732fff548984b4af"
+checksum = "8f6fa277c67e6ea590466f04c3fe82cb509f0864fe470643e5570de9514a9b11"
 dependencies = [
  "chacha20",
  "getrandom 0.4.2",
@@ -4014,7 +4014,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4d431c2703ccf129de4d45253c03f49ebb22b97d6ad79ee3ecfc7e3f4862c1d8"
 dependencies = [
  "num-traits",
- "rand 0.10.3",
+ "rand 0.10.4",
 ]
 
 [[package]]
@@ -4352,7 +4352,7 @@ dependencies = [
  "libduckdb-sys",
  "libm",
  "polars",
- "rand 0.10.3",
+ "rand 0.10.4",
  "ratatui",
  "rayon",
  "regex",
@@ -4886,7 +4886,7 @@ dependencies = [
  "approx",
  "nalgebra",
  "num-traits",
- "rand 0.10.3",
+ "rand 0.10.4",
  "thiserror 2.0.21",
 ]
 
